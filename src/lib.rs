@@ -25,8 +25,26 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
                 );
                 op_bytes += 3;
             }
+            Ok(0x07) => {
+                println!("{:04X} {}", op_bytes, "RLC");
+                op_bytes += 1;
+            }
             Ok(0x0F) => {
                 println!("{:04X} {}", op_bytes, "RRC");
+                op_bytes += 1;
+            }
+            Ok(0x16) => {
+                let byte2 = bytes.next().unwrap().unwrap();
+                println!(
+                    "{:04X} {:06} {}",
+                    op_bytes,
+                    "MVI",
+                    format!("D,#${:02X?}", byte2)
+                );
+                op_bytes += 2;
+            }
+            Ok(0x19) => {
+                println!("{:04X} {:06} {}", op_bytes, "DAD", "D");
                 op_bytes += 1;
             }
             Ok(0x21) => {
@@ -40,12 +58,27 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
                 );
                 op_bytes += 3;
             }
+            Ok(0x22) => {
+                let byte2 = bytes.next().unwrap().unwrap();
+                let byte3 = bytes.next().unwrap().unwrap();
+                println!(
+                    "{:04X} {:06} {}",
+                    op_bytes,
+                    "SHLD",
+                    format!("${:02X?}{:02X?}", byte3, byte2)
+                );
+                op_bytes += 3;
+            }
             Ok(0x23) => {
                 println!("{:04X} {:06} {}", op_bytes, "INX", "H");
                 op_bytes += 1;
             }
             Ok(0x27) => {
                 println!("{:04X} {}", op_bytes, "DAA");
+                op_bytes += 1;
+            }
+            Ok(0x2B) => {
+                println!("{:04X} {:06} {}", op_bytes, "DCX", "H");
                 op_bytes += 1;
             }
             Ok(0x32) => {
@@ -74,6 +107,14 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
                 );
                 op_bytes += 3;
             }
+            Ok(0x3C) => {
+                println!("{:04X} {:06} {}", op_bytes, "INR", "A");
+                op_bytes += 1;
+            }
+            Ok(0x3D) => {
+                println!("{:04X} {:06} {}", op_bytes, "DCR", "A");
+                op_bytes += 1;
+            }
             Ok(0x3E) => {
                 let byte2 = bytes.next().unwrap().unwrap();
                 println!(
@@ -82,7 +123,6 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
                     "MVI",
                     format!("A,#${:02X?}", byte2)
                 );
-
                 op_bytes += 2;
             }
             Ok(0x40) => {
@@ -633,7 +673,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
                     "{:04x} {:06} {}",
                     op_bytes,
                     "ADI",
-                    format!("#${:02x}", byte2)
+                    format!("#${:02X}", byte2)
                 );
                 op_bytes += 2;
             }
@@ -699,7 +739,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
                     "{:04x} {:06} {}",
                     op_bytes,
                     "SBI",
-                    format!("#${:02x}", byte2)
+                    format!("#${:02X}", byte2)
                 );
                 op_bytes += 2;
             }
@@ -709,6 +749,20 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
             }
             Ok(0xE5) => {
                 println!("{:04X} {:06} {}", op_bytes, "PUSH", "H");
+                op_bytes += 1;
+            }
+            Ok(0xE6) => {
+                let byte2 = bytes.next().unwrap().unwrap();
+                println!(
+                    "{:04x} {:06} {}",
+                    op_bytes,
+                    "ANI",
+                    format!("#${:02X}", byte2)
+                );
+                op_bytes += 2;
+            }
+            Ok(0xEB) => {
+                println!("{:04X} {}", op_bytes, "XCHG");
                 op_bytes += 1;
             }
             Ok(0xF1) => {
@@ -729,7 +783,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
                     "{:04x} {:06} {}",
                     op_bytes,
                     "CPI",
-                    format!("#${:02x}", byte2)
+                    format!("#${:02X}", byte2)
                 );
                 op_bytes += 2;
             }
