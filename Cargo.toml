@@ -1,0 +1,6 @@
+[package]
+name = "rusty-invaders"
+version = "0.1.0"
+authors = ["Axel Örn Sigurðsson <axel@absalon.is>"]
+
+[dependencies]
