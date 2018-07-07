@@ -128,48 +128,21 @@ impl State {
 
     fn add(&mut self, register: Register) -> () {
         // 4 instructions
-        let byte = self.read_byte().unwrap();
-
-        match register {
-            Register::A => {
-                let (result, carry) = self.a.overflowing_add(byte);
-                self.a = result;
-                self.set_flags(result, carry);
-            }
-            Register::B => {
-                let (result, carry) = self.b.overflowing_add(byte);
-                self.b = result;
-                self.set_flags(result, carry);
-            }
-            Register::C => {
-                let (result, carry) = self.c.overflowing_add(byte);
-                self.c = result;
-                self.set_flags(result, carry);
-            }
-            Register::D => {
-                let (result, carry) = self.d.overflowing_add(byte);
-                self.d = result;
-                self.set_flags(result, carry);
-            }
-            Register::E => {
-                let (result, carry) = self.e.overflowing_add(byte);
-                self.e = result;
-                self.set_flags(result, carry);
-            }
-            Register::H => {
-                let (result, carry) = self.h.overflowing_add(byte);
-                self.h = result;
-                self.set_flags(result, carry);
-            }
-            Register::L => {
-                let (result, carry) = self.l.overflowing_add(byte);
-                self.l = result;
-                self.set_flags(result, carry);
-            }
+        let (result, carry) = match register {
+            Register::A => self.a.overflowing_add(self.a),
+            Register::B => self.a.overflowing_add(self.b),
+            Register::C => self.a.overflowing_add(self.c),
+            Register::D => self.a.overflowing_add(self.d),
+            Register::E => self.a.overflowing_add(self.e),
+            Register::H => self.a.overflowing_add(self.h),
+            Register::L => self.a.overflowing_add(self.l),
             unsupported => {
                 panic!("add doesn't support {:?}", unsupported);
             }
         };
+
+        self.a = result;
+        self.set_flags(result, carry);
     }
 }
 
@@ -383,22 +356,85 @@ mod test {
     }
 
     #[test]
-    fn add_adds_to_registers() {
-        let mut state = State {
-            memory: vec![
-                0x80, 1, 0x81, 2, 0x82, 3, 0x83, 4, 0x84, 5, 0x85, 6, 0x87, 8,
-            ],
+    fn add_b_adds_b_to_accumulator() {
+        let state = emulate(State {
+            memory: vec![0x80],
+            a: 1,
+            b: 2,
             ..State::default()
-        };
+        }).unwrap();
 
-        state = emulate(state).unwrap();
+        assert_eq!(state.a, 3);
+    }
 
-        assert_eq!(state.a, 8);
-        assert_eq!(state.b, 1);
-        assert_eq!(state.c, 2);
-        assert_eq!(state.d, 3);
-        assert_eq!(state.e, 4);
-        assert_eq!(state.h, 5);
-        assert_eq!(state.l, 6);
+    #[test]
+    fn add_c_adds_c_to_accumulator() {
+        let state = emulate(State {
+            memory: vec![0x81],
+            a: 1,
+            c: 2,
+            ..State::default()
+        }).unwrap();
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_d_adds_d_to_accumulator() {
+        let state = emulate(State {
+            memory: vec![0x82],
+            a: 1,
+            d: 2,
+            ..State::default()
+        }).unwrap();
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_e_adds_e_to_accumulator() {
+        let state = emulate(State {
+            memory: vec![0x83],
+            a: 1,
+            e: 2,
+            ..State::default()
+        }).unwrap();
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_h_adds_h_to_accumulator() {
+        let state = emulate(State {
+            memory: vec![0x84],
+            a: 1,
+            h: 2,
+            ..State::default()
+        }).unwrap();
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_l_adds_l_to_accumulator() {
+        let state = emulate(State {
+            memory: vec![0x85],
+            a: 1,
+            l: 2,
+            ..State::default()
+        }).unwrap();
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_a_adds_a_to_accumulator() {
+        let state = emulate(State {
+            memory: vec![0x87],
+            a: 1,
+            ..State::default()
+        }).unwrap();
+
+        assert_eq!(state.a, 2);
     }
 }
