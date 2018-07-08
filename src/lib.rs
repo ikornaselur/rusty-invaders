@@ -82,6 +82,46 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             Some(0x9E) => state.sbb(Register::M),
             Some(0x9F) => state.sbb(Register::A),
 
+            // ANA ?
+            Some(0xA0) => state.ana(Register::B),
+            Some(0xA1) => state.ana(Register::C),
+            Some(0xA2) => state.ana(Register::D),
+            Some(0xA3) => state.ana(Register::E),
+            Some(0xA4) => state.ana(Register::H),
+            Some(0xA5) => state.ana(Register::L),
+            Some(0xA6) => state.ana(Register::M),
+            Some(0xA7) => state.ana(Register::A),
+
+            // XRA ?
+            Some(0xA8) => state.xra(Register::B),
+            Some(0xA9) => state.xra(Register::C),
+            Some(0xAA) => state.xra(Register::D),
+            Some(0xAB) => state.xra(Register::E),
+            Some(0xAC) => state.xra(Register::H),
+            Some(0xAD) => state.xra(Register::L),
+            Some(0xAE) => state.xra(Register::M),
+            Some(0xAF) => state.xra(Register::A),
+
+            // ORA ?
+            Some(0xB0) => state.ora(Register::B),
+            Some(0xB1) => state.ora(Register::C),
+            Some(0xB2) => state.ora(Register::D),
+            Some(0xB3) => state.ora(Register::E),
+            Some(0xB4) => state.ora(Register::H),
+            Some(0xB5) => state.ora(Register::L),
+            Some(0xB6) => state.ora(Register::M),
+            Some(0xB7) => state.ora(Register::A),
+
+            // CMP ?
+            Some(0xB8) => state.cmp(Register::B),
+            Some(0xB9) => state.cmp(Register::C),
+            Some(0xBA) => state.cmp(Register::D),
+            Some(0xBB) => state.cmp(Register::E),
+            Some(0xBC) => state.cmp(Register::H),
+            Some(0xBD) => state.cmp(Register::L),
+            Some(0xBE) => state.cmp(Register::M),
+            Some(0xBF) => state.cmp(Register::A),
+
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
             }

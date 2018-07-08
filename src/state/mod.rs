@@ -1,4 +1,5 @@
 mod adc;
+mod cmp;
 mod add;
 mod ana;
 mod lxi;
