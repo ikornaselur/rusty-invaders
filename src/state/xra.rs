@@ -17,7 +17,7 @@ impl State {
                 *self.memory.get(offset as usize).unwrap()
             }
             unsupported => {
-                panic!("add doesn't support {:?}", unsupported);
+                panic!("xra doesn't support {:?}", unsupported);
             }
         };
 

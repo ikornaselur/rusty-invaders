@@ -22,7 +22,7 @@ impl State {
                     self.a.overflowing_sub(*byte)
                 }
                 unsupported => {
-                    panic!("add doesn't support {:?}", unsupported);
+                    panic!("sbb doesn't support {:?}", unsupported);
                 }
             };
 

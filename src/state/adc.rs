@@ -21,7 +21,7 @@ impl State {
                     self.a.overflowing_add(*byte)
                 }
                 unsupported => {
-                    panic!("add doesn't support {:?}", unsupported);
+                    panic!("adc doesn't support {:?}", unsupported);
                 }
             };
 
