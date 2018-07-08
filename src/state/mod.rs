@@ -1,5 +1,6 @@
 mod adc;
 mod add;
+mod ana;
 mod lxi;
 mod sbb;
 mod sub;
@@ -154,8 +155,6 @@ mod test {
         let odd1: u8 = 0b0000_0001;
         let odd2: u8 = 0b0101_0001;
         let odd3: u8 = 0b1011_0101;
-
-        let hehe = "whoa there";
 
         state.set_flags(odd1, false);
         assert_eq!(state.cc.parity, false);
