@@ -4,6 +4,7 @@ mod ana;
 mod lxi;
 mod sbb;
 mod sub;
+mod xra;
 
 #[derive(Debug)]
 pub enum Register {
