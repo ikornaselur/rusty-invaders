@@ -23,7 +23,7 @@ impl State {
         };
 
         self.a = result;
-        self.set_flags(result, !borrow);
+        self.set_flags(result, borrow);
     }
 }
 
@@ -137,7 +137,7 @@ mod test {
     }
 
     #[test]
-    fn sub_sets_the_carry_bit_if_no_borrow() {
+    fn sub_resets_the_carry_bit_if_no_borrow() {
         let mut state = State {
             a: 10,
             b: 3,
@@ -146,11 +146,11 @@ mod test {
 
         state.sub(Register::B);
 
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.cc.carry, false);
     }
 
     #[test]
-    fn sub_resets_the_carry_bit_if_borrow() {
+    fn sub_sets_the_carry_bit_if_borrow() {
         let mut state = State {
             a: 1,
             b: 3,
@@ -159,7 +159,7 @@ mod test {
 
         state.sub(Register::B);
 
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.cc.carry, true);
     }
 
     #[test]
@@ -171,7 +171,7 @@ mod test {
 
         state.sub(Register::A);
 
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.cc.carry, false);
         assert_eq!(state.a, 0);
     }
 }
