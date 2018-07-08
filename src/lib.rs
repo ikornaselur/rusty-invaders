@@ -62,6 +62,26 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             Some(0x8E) => state.adc(Register::M),
             Some(0x8F) => state.adc(Register::A),
 
+            // SUB ?
+            Some(0x90) => state.sub(Register::B),
+            Some(0x91) => state.sub(Register::C),
+            Some(0x92) => state.sub(Register::D),
+            Some(0x93) => state.sub(Register::E),
+            Some(0x94) => state.sub(Register::H),
+            Some(0x95) => state.sub(Register::L),
+            Some(0x96) => state.sub(Register::M),
+            Some(0x97) => state.sub(Register::A),
+
+            // SBB ?
+            Some(0x98) => state.sbb(Register::B),
+            Some(0x99) => state.sbb(Register::C),
+            Some(0x9A) => state.sbb(Register::D),
+            Some(0x9B) => state.sbb(Register::E),
+            Some(0x9C) => state.sbb(Register::H),
+            Some(0x9D) => state.sbb(Register::L),
+            Some(0x9E) => state.sbb(Register::M),
+            Some(0x9F) => state.sbb(Register::A),
+
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
             }

@@ -185,6 +185,35 @@ impl State {
             }
         }
     }
+
+    pub fn sub(&mut self, register: Register) -> () {
+        // 4 instructions
+        let (result, borrow) = match register {
+            Register::A => self.a.overflowing_sub(self.a),
+            Register::B => self.a.overflowing_sub(self.b),
+            Register::C => self.a.overflowing_sub(self.c),
+            Register::D => self.a.overflowing_sub(self.d),
+            Register::E => self.a.overflowing_sub(self.e),
+            Register::H => self.a.overflowing_sub(self.h),
+            Register::L => self.a.overflowing_sub(self.l),
+            Register::M => {
+                let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
+                let byte = self.memory.get(offset as usize).unwrap();
+                self.a.overflowing_sub(*byte)
+            }
+            unsupported => {
+                panic!("add doesn't support {:?}", unsupported);
+            }
+        };
+
+        self.a = result;
+        self.set_flags(result, !borrow);
+    }
+
+    pub fn sbb(&mut self, register: Register) -> () {
+        // 4 instructions
+        ()
+    }
 }
 
 #[cfg(test)]
@@ -607,5 +636,57 @@ mod test {
 
         assert_eq!(state.a, 3);
         assert_eq!(state.cc.carry, false);
+    }
+
+    #[test]
+    fn sub_b_subs_b_from_accumulator() {
+        let mut state = State {
+            a: 10,
+            b: 3,
+            ..State::default()
+        };
+
+        state.sub(Register::B);
+
+        assert_eq!(state.a, 7);
+    }
+
+    #[test]
+    fn sub_sets_the_carry_bit_if_no_borrow() {
+        let mut state = State {
+            a: 10,
+            b: 3,
+            ..State::default()
+        };
+
+        state.sub(Register::B);
+
+        assert_eq!(state.cc.carry, true);
+    }
+
+    #[test]
+    fn sub_resets_the_carry_bit_if_borrow() {
+        let mut state = State {
+            a: 1,
+            b: 3,
+            ..State::default()
+        };
+
+        state.sub(Register::B);
+
+        assert_eq!(state.cc.carry, false);
+    }
+
+    #[test]
+    fn sub_a_resets_the_carry_and_zeros_the_accumulator() {
+        let mut state = State {
+            a: 0x3e,
+            ..State::default()
+        };
+
+        state.sub(Register::A);
+
+        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.a, 0);
     }
 }
