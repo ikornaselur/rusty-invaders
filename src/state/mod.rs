@@ -2,6 +2,7 @@ mod adc;
 mod add;
 mod ana;
 mod lxi;
+mod ora;
 mod sbb;
 mod sub;
 mod xra;
