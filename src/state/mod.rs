@@ -338,6 +338,98 @@ mod test {
     }
 
     #[test]
+    fn add_c_adds_c_to_accumulator() {
+        let mut state = State {
+            a: 1,
+            c: 2,
+            ..State::default()
+        };
+
+        state.add(Register::C);
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_d_adds_d_to_accumulator() {
+        let mut state = State {
+            a: 1,
+            d: 2,
+            ..State::default()
+        };
+
+        state.add(Register::D);
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_e_adds_e_to_accumulator() {
+        let mut state = State {
+            a: 1,
+            e: 2,
+            ..State::default()
+        };
+
+        state.add(Register::E);
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_h_adds_h_to_accumulator() {
+        let mut state = State {
+            a: 1,
+            h: 2,
+            ..State::default()
+        };
+
+        state.add(Register::H);
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_l_adds_l_to_accumulator() {
+        let mut state = State {
+            a: 1,
+            l: 2,
+            ..State::default()
+        };
+
+        state.add(Register::L);
+
+        assert_eq!(state.a, 3);
+    }
+
+    #[test]
+    fn add_a_adds_a_to_accumulator() {
+        let mut state = State {
+            a: 1,
+            ..State::default()
+        };
+
+        state.add(Register::A);
+
+        assert_eq!(state.a, 2);
+    }
+
+    #[test]
+    fn add_m_adds_byte_at_hl_address_to_accumulator() {
+        let mut state = State {
+            memory: vec![0x00, 0x00, 0x00, 0x00, 0x00, 5],
+            a: 1,
+            h: 0x00,
+            l: 0x05,
+            ..State::default()
+        };
+
+        state.add(Register::M);
+
+        assert_eq!(state.a, 6);
+    }
+
+    #[test]
     fn adc_b_adds_b_with_carry_to_accumulator() {
         let mut state = State {
             a: 1,
@@ -515,97 +607,5 @@ mod test {
 
         assert_eq!(state.a, 3);
         assert_eq!(state.cc.carry, false);
-    }
-
-    #[test]
-    fn add_c_adds_c_to_accumulator() {
-        let mut state = State {
-            a: 1,
-            c: 2,
-            ..State::default()
-        };
-
-        state.add(Register::C);
-
-        assert_eq!(state.a, 3);
-    }
-
-    #[test]
-    fn add_d_adds_d_to_accumulator() {
-        let mut state = State {
-            a: 1,
-            d: 2,
-            ..State::default()
-        };
-
-        state.add(Register::D);
-
-        assert_eq!(state.a, 3);
-    }
-
-    #[test]
-    fn add_e_adds_e_to_accumulator() {
-        let mut state = State {
-            a: 1,
-            e: 2,
-            ..State::default()
-        };
-
-        state.add(Register::E);
-
-        assert_eq!(state.a, 3);
-    }
-
-    #[test]
-    fn add_h_adds_h_to_accumulator() {
-        let mut state = State {
-            a: 1,
-            h: 2,
-            ..State::default()
-        };
-
-        state.add(Register::H);
-
-        assert_eq!(state.a, 3);
-    }
-
-    #[test]
-    fn add_l_adds_l_to_accumulator() {
-        let mut state = State {
-            a: 1,
-            l: 2,
-            ..State::default()
-        };
-
-        state.add(Register::L);
-
-        assert_eq!(state.a, 3);
-    }
-
-    #[test]
-    fn add_a_adds_a_to_accumulator() {
-        let mut state = State {
-            a: 1,
-            ..State::default()
-        };
-
-        state.add(Register::A);
-
-        assert_eq!(state.a, 2);
-    }
-
-    #[test]
-    fn add_m_adds_byte_at_hl_address_to_accumulator() {
-        let mut state = State {
-            memory: vec![0x00, 0x00, 0x00, 0x00, 0x00, 5],
-            a: 1,
-            h: 0x00,
-            l: 0x05,
-            ..State::default()
-        };
-
-        state.add(Register::M);
-
-        assert_eq!(state.a, 6);
     }
 }
