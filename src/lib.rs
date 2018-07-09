@@ -158,7 +158,8 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             // Set carry
             Some(0x37) => state.stc(),
 
-            // Some(0x2F) => state.cma(),
+            // Complement accumulator
+            Some(0x2F) => state.cma(),
 
             // Complement carry
             Some(0x3F) => state.cmc(),
