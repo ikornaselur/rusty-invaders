@@ -148,8 +148,8 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
 
             // Rotate accumulator
             Some(0x07) => state.rlc(),
-            Some(0x17) => state.ral(),
             Some(0x0F) => state.rrc(),
+            Some(0x17) => state.ral(),
             Some(0x1F) => state.rar(),
 
             // Decimal Adjustment Accumulator
@@ -159,7 +159,10 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             Some(0x37) => state.stc(),
 
             // Some(0x2F) => state.cma(),
-            // Some(0x3F) => state.cmc(),
+
+            // Complement carry
+            Some(0x3F) => state.cmc(),
+
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
             }
