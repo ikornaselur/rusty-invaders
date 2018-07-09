@@ -55,14 +55,14 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             Some(0x3C) => state.inr(Register::A),
 
             // DCR ?
-            // Some(0x05) => state.dcr(Register::B),
-            // Some(0x15) => state.dcr(Register::D),
-            // Some(0x25) => state.dcr(Register::H),
-            // Some(0x35) => state.dcr(Register::M),
-            // Some(0x0C) => state.dcr(Register::C),
-            // Some(0x1C) => state.dcr(Register::E),
-            // Some(0x2C) => state.dcr(Register::L),
-            // Some(0x3C) => state.dcr(Register::A),
+            Some(0x05) => state.dcr(Register::B),
+            Some(0x15) => state.dcr(Register::D),
+            Some(0x25) => state.dcr(Register::H),
+            Some(0x35) => state.dcr(Register::M),
+            Some(0x0D) => state.dcr(Register::C),
+            Some(0x1D) => state.dcr(Register::E),
+            Some(0x2D) => state.dcr(Register::L),
+            Some(0x3D) => state.dcr(Register::A),
 
             // ADD ?
             Some(0x80) => state.add(Register::B),
