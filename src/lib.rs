@@ -155,7 +155,9 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             // Decimal Adjustment Accumulator
             Some(0x27) => state.daa(),
 
-            // Some(0x37) => state.stc(),
+            // Set carry
+            Some(0x37) => state.stc(),
+
             // Some(0x2F) => state.cma(),
             // Some(0x3F) => state.cmc(),
             Some(byte) => {

@@ -9,6 +9,7 @@ mod lxi;
 mod ora;
 mod rotate;
 mod sbb;
+mod stc;
 mod sub;
 mod xra;
 
