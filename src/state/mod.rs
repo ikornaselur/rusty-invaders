@@ -2,15 +2,16 @@ mod adc;
 mod add;
 mod ana;
 mod carry;
+mod cma;
 mod cmp;
 mod daa;
 mod dcr;
 mod inr;
 mod lxi;
+mod mov;
 mod ora;
 mod rotate;
 mod sbb;
-mod cma;
 mod sub;
 mod xra;
 
