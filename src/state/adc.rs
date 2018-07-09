@@ -17,8 +17,7 @@ impl State {
                 Register::L => self.a.overflowing_add(self.l),
                 Register::M => {
                     let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
-                    let byte = self.memory.get(offset as usize).unwrap();
-                    self.a.overflowing_add(*byte)
+                    self.a.overflowing_add(self.memory[offset as usize])
                 }
                 unsupported => {
                     panic!("adc doesn't support {:?}", unsupported);

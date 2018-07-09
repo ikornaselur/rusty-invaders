@@ -14,7 +14,7 @@ impl State {
             Register::L => self.l,
             Register::M => {
                 let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
-                *self.memory.get(offset as usize).unwrap()
+                self.memory[offset as usize]
             }
             unsupported => {
                 panic!("xra doesn't support {:?}", unsupported);

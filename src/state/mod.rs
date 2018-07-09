@@ -1,7 +1,8 @@
 mod adc;
-mod cmp;
 mod add;
 mod ana;
+mod cmp;
+mod inr;
 mod lxi;
 mod ora;
 mod sbb;
@@ -87,13 +88,12 @@ impl State {
     }
 
     pub fn read_byte(&mut self) -> Option<u8> {
-        let byte = self.memory.get(self.pc as usize);
-        match byte.cloned() {
-            Some(byte) => {
-                self.pc += 1;
-                Some(byte)
-            }
-            None => None,
+        if self.pc as usize >= self.memory.len() {
+            None
+        } else {
+            let byte = self.memory[self.pc as usize];
+            self.pc += 1;
+            Some(byte)
         }
     }
 

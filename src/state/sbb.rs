@@ -18,8 +18,7 @@ impl State {
                 Register::L => self.a.overflowing_sub(self.l),
                 Register::M => {
                     let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
-                    let byte = self.memory.get(offset as usize).unwrap();
-                    self.a.overflowing_sub(*byte)
+                    self.a.overflowing_sub(self.memory[offset as usize])
                 }
                 unsupported => {
                     panic!("sbb doesn't support {:?}", unsupported);

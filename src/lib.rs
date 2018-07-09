@@ -36,11 +36,33 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             Some(0x30) => state.nop(),
             Some(0x38) => state.nop(),
 
+            // Instructions with registers
+
             // LXI ?,d16
             Some(0x01) => state.lxi(Register::B),
             Some(0x11) => state.lxi(Register::D),
             Some(0x21) => state.lxi(Register::H),
             Some(0x31) => state.lxi(Register::SP),
+
+            // INR ?
+            Some(0x04) => state.inr(Register::B),
+            Some(0x14) => state.inr(Register::D),
+            Some(0x24) => state.inr(Register::H),
+            Some(0x34) => state.inr(Register::M),
+            Some(0x0C) => state.inr(Register::C),
+            Some(0x1C) => state.inr(Register::E),
+            Some(0x2C) => state.inr(Register::L),
+            Some(0x3C) => state.inr(Register::A),
+
+            // DCR ?
+            // Some(0x05) => state.dcr(Register::B),
+            // Some(0x15) => state.dcr(Register::D),
+            // Some(0x25) => state.dcr(Register::H),
+            // Some(0x35) => state.dcr(Register::M),
+            // Some(0x0C) => state.dcr(Register::C),
+            // Some(0x1C) => state.dcr(Register::E),
+            // Some(0x2C) => state.dcr(Register::L),
+            // Some(0x3C) => state.dcr(Register::A),
 
             // ADD ?
             Some(0x80) => state.add(Register::B),
@@ -122,6 +144,15 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             Some(0xBE) => state.cmp(Register::M),
             Some(0xBF) => state.cmp(Register::A),
 
+            // Instructions without registers
+            // Some(0x07) => state.rlc(),
+            // Some(0x17) => state.ral(),
+            // Some(0x27) => state.daa(),
+            // Some(0x37) => state.stc(),
+            // Some(0x0F) => state.rrc(),
+            // Some(0x1F) => state.rar(),
+            // Some(0x2F) => state.cma(),
+            // Some(0x3F) => state.cmc(),
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
             }
