@@ -152,7 +152,9 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             Some(0x0F) => state.rrc(),
             Some(0x1F) => state.rar(),
 
-            // Some(0x27) => state.daa(),
+            // Decimal Adjustment Accumulator
+            Some(0x27) => state.daa(),
+
             // Some(0x37) => state.stc(),
             // Some(0x2F) => state.cma(),
             // Some(0x3F) => state.cmc(),
