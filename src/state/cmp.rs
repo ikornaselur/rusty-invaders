@@ -3,7 +3,7 @@ use super::State;
 
 impl State {
     pub fn cmp(&mut self, register: Register) -> () {
-        // 4 instructions
+        // 4 cycles
         let (result, borrow) = match register {
             Register::A => self.a.overflowing_sub(self.a),
             Register::B => self.a.overflowing_sub(self.b),

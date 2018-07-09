@@ -3,7 +3,7 @@ use super::State;
 
 impl State {
     pub fn add(&mut self, register: Register) -> () {
-        // 4 instructions
+        // 4 cycles
         let (result, carry) = match register {
             Register::A => self.a.overflowing_add(self.a),
             Register::B => self.a.overflowing_add(self.b),

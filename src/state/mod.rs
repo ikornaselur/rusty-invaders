@@ -6,6 +6,7 @@ mod dcr;
 mod inr;
 mod lxi;
 mod ora;
+mod rotate;
 mod sbb;
 mod sub;
 mod xra;
@@ -106,7 +107,7 @@ impl State {
     }
 
     pub fn nop(&mut self) -> () {
-        // 4 instructions
+        // 4 cycles
         ()
     }
 }

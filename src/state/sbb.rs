@@ -3,11 +3,11 @@ use super::State;
 
 impl State {
     pub fn sbb(&mut self, register: Register) -> () {
-        // 4 instructions
+        // 4 cycles
         if !self.cc.carry {
             self.sub(register)
         } else {
-            // 4 instructions
+            // 4 cycles
             let (result, borrow) = match register {
                 Register::A => self.a.overflowing_sub(self.a),
                 Register::B => self.a.overflowing_sub(self.b),

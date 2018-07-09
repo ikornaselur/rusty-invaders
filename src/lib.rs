@@ -145,12 +145,15 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             Some(0xBF) => state.cmp(Register::A),
 
             // Instructions without registers
-            // Some(0x07) => state.rlc(),
-            // Some(0x17) => state.ral(),
+
+            // Rotate accumulator
+            Some(0x07) => state.rlc(),
+            Some(0x17) => state.ral(),
+            Some(0x0F) => state.rrc(),
+            Some(0x1F) => state.rar(),
+
             // Some(0x27) => state.daa(),
             // Some(0x37) => state.stc(),
-            // Some(0x0F) => state.rrc(),
-            // Some(0x1F) => state.rar(),
             // Some(0x2F) => state.cma(),
             // Some(0x3F) => state.cmc(),
             Some(byte) => {

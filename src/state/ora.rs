@@ -3,7 +3,7 @@ use super::State;
 
 impl State {
     pub fn ora(&mut self, register: Register) -> () {
-        // 4 instructions
+        // 4 cycles
         let result = self.a | match register {
             Register::A => self.a,
             Register::B => self.b,
