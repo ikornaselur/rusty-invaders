@@ -3,7 +3,7 @@ use super::State;
 
 impl State {
     pub fn mov(&mut self, to: Register, from: Register) -> () {
-        // 4 cycles
+        // 7 cycles if either is M, else 5
         let val = match from {
             Register::A => self.a,
             Register::B => self.b,

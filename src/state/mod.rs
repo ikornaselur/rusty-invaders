@@ -9,6 +9,7 @@ mod dcr;
 mod inr;
 mod lxi;
 mod mov;
+mod mvi;
 mod ora;
 mod rotate;
 mod sbb;

@@ -64,6 +64,16 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
             Some(0x2D) => state.dcr(Register::L),
             Some(0x3D) => state.dcr(Register::A),
 
+            // MVI ?, d8
+            Some(0x06) => state.mvi(Register::B),
+            Some(0x0E) => state.mvi(Register::C),
+            Some(0x16) => state.mvi(Register::D),
+            Some(0x1E) => state.mvi(Register::E),
+            Some(0x26) => state.mvi(Register::H),
+            Some(0x2E) => state.mvi(Register::L),
+            Some(0x36) => state.mvi(Register::M),
+            Some(0x3E) => state.mvi(Register::A),
+
             // MOV ?, ?
             Some(0x40) => state.mov(Register::B, Register::B),
             Some(0x41) => state.mov(Register::B, Register::C),
