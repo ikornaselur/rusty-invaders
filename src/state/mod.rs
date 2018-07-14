@@ -109,6 +109,14 @@ impl State {
         }
     }
 
+    pub fn write_byte(&mut self, byte: u8) -> () {
+        if self.pc == 0 {
+            panic!("Writing out of bounds!")
+        }
+        self.pc -= 1;
+        self.memory[self.pc as usize] = byte;
+    }
+
     fn set_flags(&mut self, byte: u8, carry: bool) -> () {
         self.cc.sign = (byte & 0x80) != 0;
         self.cc.zero = byte == 0u8;
@@ -486,7 +494,7 @@ mod test {
     }
 
     #[test]
-    fn read_bytes_increases_pc() {
+    fn read_byte_returns_byte_and_increases_pc() {
         let mut state = State {
             memory: vec![0x01, 0x02],
             pc: 0,
@@ -504,5 +512,26 @@ mod test {
         let byte = state.read_byte();
         assert_eq!(byte, None);
         assert_eq!(state.pc, 2);
+    }
+
+    #[test]
+    fn write_byte_writes_byte_and_decrements_pc() {
+        let mut state = State {
+            memory: vec![0x01, 0x02, 0x03],
+            pc: 3,
+            ..State::default()
+        };
+
+        state.write_byte(0xFF);
+        assert_eq!(state.memory, vec![0x01, 0x02, 0xFF]);
+        assert_eq!(state.pc, 2);
+
+        state.write_byte(0xFF);
+        assert_eq!(state.memory, vec![0x01, 0xFF, 0xFF]);
+        assert_eq!(state.pc, 1);
+
+        state.write_byte(0xFF);
+        assert_eq!(state.memory, vec![0xFF, 0xFF, 0xFF]);
+        assert_eq!(state.pc, 0);
     }
 }
