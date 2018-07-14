@@ -32,6 +32,23 @@ impl State {
         self.a = result;
         self.set_flags(result, carry);
     }
+
+    pub fn dad(&mut self, register: Register) -> () {
+        let current: u16 = ((self.h as u16) << 8) + self.l as u16;
+        let (result, carry) = match register {
+            Register::B => current.overflowing_add(((self.b as u16) << 8) + self.c as u16),
+            Register::D => current.overflowing_add(((self.d as u16) << 8) + self.e as u16),
+            Register::H => current.overflowing_add(((self.h as u16) << 8) + self.l as u16),
+            Register::SP => current.overflowing_add(self.sp),
+            unsupported => {
+                panic!("dad doesn't support {:?}", unsupported);
+            }
+        };
+
+        self.l = result as u8;
+        self.h = (result >> 8) as u8;
+        self.cc.carry = carry;
+    }
 }
 
 #[cfg(test)]
@@ -160,4 +177,68 @@ mod test {
         assert_eq!(state.cc.carry, false);
     }
 
+    #[test]
+    fn dad_b_double_adds_b_c_to_h_l() {
+        let mut state = State {
+            b: 0x33,
+            c: 0x9F,
+            h: 0xA1,
+            l: 0x7B,
+            ..State::default()
+        };
+
+        state.dad(Register::B);
+
+        assert_eq!(state.h, 0xD5);
+        assert_eq!(state.l, 0x1A);
+        assert_eq!(state.cc.carry, false);
+    }
+
+    #[test]
+    fn dad_d_double_adds_d_e_to_h_l() {
+        let mut state = State {
+            d: 0x33,
+            e: 0x9F,
+            h: 0xA1,
+            l: 0x7B,
+            ..State::default()
+        };
+
+        state.dad(Register::D);
+
+        assert_eq!(state.h, 0xD5);
+        assert_eq!(state.l, 0x1A);
+        assert_eq!(state.cc.carry, false);
+    }
+
+    #[test]
+    fn dad_h_double_adds_h_l_to_h_l() {
+        let mut state = State {
+            h: 0x11,
+            l: 0x22,
+            ..State::default()
+        };
+
+        state.dad(Register::H);
+
+        assert_eq!(state.h, 0x22);
+        assert_eq!(state.l, 0x44);
+        assert_eq!(state.cc.carry, false);
+    }
+
+    #[test]
+    fn dad_sp_double_adds_sp_to_h_l() {
+        let mut state = State {
+            h: 0x11,
+            l: 0x22,
+            sp: 0x1111,
+            ..State::default()
+        };
+
+        state.dad(Register::SP);
+
+        assert_eq!(state.h, 0x22);
+        assert_eq!(state.l, 0x33);
+        assert_eq!(state.cc.carry, false);
+    }
 }

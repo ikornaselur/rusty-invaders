@@ -364,6 +364,12 @@ impl State {
             Some(0xE5) => self.push(Register::H),
             Some(0xF5) => self.push(Register::PSW),
 
+            // DAD
+            Some(0x09) => self.dad(Register::B),
+            Some(0x19) => self.dad(Register::D),
+            Some(0x29) => self.dad(Register::H),
+            Some(0x39) => self.dad(Register::SP),
+
             // Instructions without registers
             // ADI d8
             Some(0xC6) => self.adi(),
