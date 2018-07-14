@@ -24,7 +24,7 @@ impl State {
                 self.a = most;
             }
             unsupported => {
-                panic!("lxi doesn't support {:?}", unsupported);
+                panic!("pop doesn't support {:?}", unsupported);
             }
         };
     }
