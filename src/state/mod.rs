@@ -119,12 +119,12 @@ impl State {
         None
     }
 
-    pub fn write_byte(&mut self, byte: u8) -> () {
-        if self.pc == 0 {
+    pub fn write_byte_to_stack(&mut self, byte: u8) -> () {
+        if self.sp == 0 {
             panic!("Writing out of bounds!")
         }
-        self.pc -= 1;
-        self.memory[self.pc as usize] = byte;
+        self.sp -= 1;
+        self.memory[self.sp as usize] = byte;
     }
 
     fn set_flags(&mut self, byte: u8, carry: bool) -> () {
@@ -656,23 +656,23 @@ mod test {
     }
 
     #[test]
-    fn write_byte_writes_byte_and_decrements_pc() {
+    fn write_byte_to_stack_writes_byte_and_decrements_pc() {
         let mut state = State {
             memory: vec![0x01, 0x02, 0x03],
-            pc: 3,
+            sp: 3,
             ..State::default()
         };
 
-        state.write_byte(0xFF);
+        state.write_byte_to_stack(0xFF);
         assert_eq!(state.memory, vec![0x01, 0x02, 0xFF]);
-        assert_eq!(state.pc, 2);
+        assert_eq!(state.sp, 2);
 
-        state.write_byte(0xFF);
+        state.write_byte_to_stack(0xFF);
         assert_eq!(state.memory, vec![0x01, 0xFF, 0xFF]);
-        assert_eq!(state.pc, 1);
+        assert_eq!(state.sp, 1);
 
-        state.write_byte(0xFF);
+        state.write_byte_to_stack(0xFF);
         assert_eq!(state.memory, vec![0xFF, 0xFF, 0xFF]);
-        assert_eq!(state.pc, 0);
+        assert_eq!(state.sp, 0);
     }
 }

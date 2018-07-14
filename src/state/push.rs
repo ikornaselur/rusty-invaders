@@ -12,8 +12,8 @@ impl State {
                 panic!("pop doesn't support {:?}", unsupported);
             }
         };
-        self.write_byte(most);
-        self.write_byte(least);
+        self.write_byte_to_stack(most);
+        self.write_byte_to_stack(least);
     }
 }
 
@@ -28,13 +28,13 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0],
             b: 0xBB,
             c: 0xCC,
-            pc: 4,
+            sp: 0x0004,
             ..State::default()
         };
 
         state.push(Register::B);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(state.sp, 0x0002);
         assert_eq!(state.memory, vec![0, 0, 0xCC, 0xBB, 0, 0]);
     }
 
@@ -42,16 +42,16 @@ mod test {
     fn push_from_register_d_pushed_bytes_onto_the_stack_from_d_and_e() {
         let mut state = State {
             memory: vec![0, 0, 0, 0, 0, 0],
-            d: 0xDD,
-            e: 0xEE,
-            pc: 4,
+            d: 0x8F,
+            e: 0x9D,
+            sp: 0x0004,
             ..State::default()
         };
 
         state.push(Register::D);
 
-        assert_eq!(state.pc, 2);
-        assert_eq!(state.memory, vec![0, 0, 0xEE, 0xDD, 0, 0]);
+        assert_eq!(state.sp, 0x0002);
+        assert_eq!(state.memory, vec![0, 0, 0x9D, 0x8F, 0, 0]);
     }
 
     #[test]
@@ -60,13 +60,13 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0],
             h: 0xFF,
             l: 0x11,
-            pc: 4,
+            sp: 0x0004,
             ..State::default()
         };
 
         state.push(Register::H);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(state.sp, 2);
         assert_eq!(state.memory, vec![0, 0, 0x11, 0xFF, 0, 0]);
     }
 
@@ -75,7 +75,7 @@ mod test {
         let mut state = State {
             memory: vec![0, 0, 0, 0, 0, 0],
             a: 0xAA,
-            pc: 4,
+            sp: 0x0004,
             cc: ConditionCodes {
                 carry: true,
                 sign: true,
@@ -88,7 +88,7 @@ mod test {
 
         state.push(Register::PSW);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(state.sp, 2);
         assert_eq!(state.memory, vec![0, 0, 0b1100_0101, 0xAA, 0, 0]);
     }
 }
