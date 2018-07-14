@@ -7,6 +7,7 @@ mod cmp;
 mod daa;
 mod dcr;
 mod full_test;
+mod immediate;
 mod inr;
 mod lxi;
 mod mov;
@@ -319,6 +320,22 @@ impl State {
             Some(0xBF) => self.cmp(Register::A),
 
             // Instructions without registers
+            // ADI d8
+            Some(0xC6) => self.adi(),
+            // SUI d8
+            Some(0xD6) => self.sui(),
+            // ANI d8
+            // Some(0xE6) => self.ani(),
+            // ORI d8
+            // Some(0xF6) => self.ori(),
+            // ACI d8
+            Some(0xCE) => self.aci(),
+            // SBI d8
+            Some(0xDE) => self.sbi(),
+            // XRI d8
+            // Some(0xEE) => self.xri(),
+            // CPI d8
+            // Some(0xFE) => self.cpi(),
 
             // Rotate accumulator
             Some(0x07) => self.rlc(),
