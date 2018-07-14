@@ -8,6 +8,7 @@ mod decrement;
 mod exchange;
 mod full_test;
 mod increment;
+mod jump;
 mod load;
 mod mov;
 mod or;
@@ -455,6 +456,30 @@ impl State {
 
             // Load H and L direct a16
             Some(0x2A) => self.lhld(),
+
+            // Load Program Counter
+            Some(0xE9) => self.pchl(),
+
+            // Jumps
+            // Jump
+            Some(0xC3) => self.jmp(),
+            Some(0xCB) => self.jmp(),
+            // Jump if carry
+            Some(0xDA) => self.jc(),
+            // Jump if no carry
+            Some(0xD2) => self.jnc(),
+            // Jump if zero
+            Some(0xCA) => self.jz(),
+            // Jump if not zero
+            Some(0xC2) => self.jnz(),
+            // Jump if minus
+            Some(0xFA) => self.jm(),
+            // Jump if positive
+            Some(0xF2) => self.jp(),
+            // Jump if parity even
+            Some(0xEA) => self.jpe(),
+            // Jump if parity off
+            Some(0xE2) => self.jpo(),
 
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
