@@ -8,8 +8,8 @@ impl State {
     }
 
     pub fn xthl(&mut self) -> () {
-        swap(&mut self.h, &mut self.memory[self.sp as usize]);
-        swap(&mut self.l, &mut self.memory[(self.sp + 1) as usize]);
+        swap(&mut self.h, &mut self.memory[(self.sp + 1) as usize]);
+        swap(&mut self.l, &mut self.memory[self.sp as usize]);
     }
 }
 
@@ -47,8 +47,8 @@ mod test {
 
         state.xthl();
 
-        assert_eq!(state.h, 0xDE);
-        assert_eq!(state.l, 0xAD);
-        assert_eq!(state.memory, vec![0, 0xBE, 0xEF]);
+        assert_eq!(state.h, 0xAD);
+        assert_eq!(state.l, 0xDE);
+        assert_eq!(state.memory, vec![0, 0xEF, 0xBE]);
     }
 }

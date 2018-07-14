@@ -144,12 +144,6 @@ impl State {
     }
 
     pub fn write_byte_to_stack(&mut self, byte: u8) -> () {
-        if self.debug {
-            println!(
-                "Writing byte 0x{:02X?} to the stack at 0x{:04X?} ({:?})",
-                byte, self.sp, self.sp
-            );
-        }
         if self.sp == 0 {
             panic!("Stack pointer out of bounds!")
         }
@@ -197,7 +191,7 @@ impl State {
         let byte = self.read_byte();
         if self.debug {
             if let Some(byte) = byte {
-                println!("Read byte: 0x{:02X?} as 0x{:04X?}", byte, self.pc - 1);
+                println!("Read byte: 0x{:02X?} at 0x{:04X?}", byte, self.pc - 1);
             }
         }
         match byte {
