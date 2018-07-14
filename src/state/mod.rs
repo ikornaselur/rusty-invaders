@@ -423,7 +423,8 @@ impl State {
             Some(0xEB) => self.xchg(),
 
             // Exchange stack
-            // Some(0xE3) => self.xthl(),
+            Some(0xE3) => self.xthl(),
+
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
             }
