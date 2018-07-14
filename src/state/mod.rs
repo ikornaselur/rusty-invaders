@@ -11,6 +11,8 @@ mod increase;
 mod load;
 mod mov;
 mod or;
+mod pop;
+mod push;
 mod rotate;
 mod sub;
 mod sub_with_borrow;
@@ -28,6 +30,7 @@ pub enum Register {
     M,
     SP,
     PC,
+    PSW,
 }
 
 #[derive(Debug, PartialEq)]
@@ -107,10 +110,17 @@ impl State {
     }
 
     fn set_flags(&mut self, byte: u8, carry: bool) -> () {
-        self.cc.carry = carry;
-        self.cc.zero = byte == 0u8;
         self.cc.sign = (byte & 0x80) != 0;
+        self.cc.zero = byte == 0u8;
         self.cc.parity = byte.count_ones() % 2 == 0;
+        self.cc.carry = carry;
+    }
+
+    fn set_flags_from_bits(&mut self, bits: u8) -> () {
+        self.cc.sign = bits & 0b1000_0000 != 0;
+        self.cc.zero = bits & 0b0100_0000 != 0;
+        self.cc.parity = bits & 0b0000_0100 != 0;
+        self.cc.carry = bits & 0b0000_0001 != 0;
     }
 
     pub fn nop(&mut self) -> () {
@@ -317,6 +327,18 @@ impl State {
             Some(0xBE) => self.cmp(Register::M),
             Some(0xBF) => self.cmp(Register::A),
 
+            // POP
+            Some(0xC1) => self.pop(Register::B),
+            Some(0xD1) => self.pop(Register::D),
+            Some(0xE1) => self.pop(Register::H),
+            Some(0xF1) => self.pop(Register::PSW),
+
+            // PUSH
+            Some(0xC5) => self.push(Register::B),
+            Some(0xD5) => self.push(Register::D),
+            Some(0xE5) => self.push(Register::H),
+            Some(0xF5) => self.push(Register::PSW),
+
             // Instructions without registers
             // ADI d8
             Some(0xC6) => self.adi(),
@@ -421,6 +443,46 @@ mod test {
 
         state.set_flags(odd3, false);
         assert_eq!(state.cc.parity, false);
+    }
+
+    #[test]
+    fn set_flags_from_bits_sets_flags() {
+        let mut state = State::default();
+
+        let sign = 0b1000_0000;
+        let zero = 0b0100_0000;
+        let parity = 0b0000_0100;
+        let carry = 0b0000_0001;
+
+        state.set_flags_from_bits(sign);
+        assert_eq!(state.cc.sign, true);
+        assert_eq!(state.cc.zero, false);
+        assert_eq!(state.cc.parity, false);
+        assert_eq!(state.cc.carry, false);
+
+        state.set_flags_from_bits(zero);
+        assert_eq!(state.cc.sign, false);
+        assert_eq!(state.cc.zero, true);
+        assert_eq!(state.cc.parity, false);
+        assert_eq!(state.cc.carry, false);
+
+        state.set_flags_from_bits(parity);
+        assert_eq!(state.cc.sign, false);
+        assert_eq!(state.cc.zero, false);
+        assert_eq!(state.cc.parity, true);
+        assert_eq!(state.cc.carry, false);
+
+        state.set_flags_from_bits(carry);
+        assert_eq!(state.cc.sign, false);
+        assert_eq!(state.cc.zero, false);
+        assert_eq!(state.cc.parity, false);
+        assert_eq!(state.cc.carry, true);
+
+        state.set_flags_from_bits(0b1111_1111);
+        assert_eq!(state.cc.sign, true);
+        assert_eq!(state.cc.zero, true);
+        assert_eq!(state.cc.parity, true);
+        assert_eq!(state.cc.carry, true);
     }
 
     #[test]
