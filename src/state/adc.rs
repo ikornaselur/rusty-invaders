@@ -3,36 +3,34 @@ use super::State;
 
 impl State {
     pub fn adc(&mut self, register: Register) -> () {
-        if !self.cc.carry {
-            self.add(register)
-        } else {
-            // 4 cycles
-            let (result, carry) = match register {
-                Register::A => self.a.overflowing_add(self.a),
-                Register::B => self.a.overflowing_add(self.b),
-                Register::C => self.a.overflowing_add(self.c),
-                Register::D => self.a.overflowing_add(self.d),
-                Register::E => self.a.overflowing_add(self.e),
-                Register::H => self.a.overflowing_add(self.h),
-                Register::L => self.a.overflowing_add(self.l),
-                Register::M => {
-                    let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
-                    self.a.overflowing_add(self.memory[offset as usize])
-                }
-                unsupported => {
-                    panic!("adc doesn't support {:?}", unsupported);
-                }
-            };
-
-            if !carry {
-                let (result, carry) = result.overflowing_add(1);
-                self.a = result;
-                self.set_flags(result, carry);
-            } else {
-                self.a = result.wrapping_add(1);
-                self.set_flags(result, carry);
+        // 4 cycles
+        let byte = match register {
+            //let (result, carry) = match register {
+            Register::A => self.a,
+            Register::B => self.b,
+            Register::C => self.c,
+            Register::D => self.d,
+            Register::E => self.e,
+            Register::H => self.h,
+            Register::L => self.l,
+            Register::M => {
+                let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
+                self.memory[offset as usize]
             }
-        }
+            unsupported => {
+                panic!("adc doesn't support {:?}", unsupported);
+            }
+        };
+
+        let (byte, byte_carry) = match self.cc.carry {
+            true => byte.overflowing_add(1),
+            false => (byte, false),
+        };
+
+        let (result, carry) = self.a.overflowing_add(byte);
+
+        self.a = result;
+        self.set_flags(result, carry || byte_carry);
     }
 }
 

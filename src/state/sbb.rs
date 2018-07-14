@@ -4,36 +4,32 @@ use super::State;
 impl State {
     pub fn sbb(&mut self, register: Register) -> () {
         // 4 cycles
-        if !self.cc.carry {
-            self.sub(register)
-        } else {
-            // 4 cycles
-            let (result, borrow) = match register {
-                Register::A => self.a.overflowing_sub(self.a),
-                Register::B => self.a.overflowing_sub(self.b),
-                Register::C => self.a.overflowing_sub(self.c),
-                Register::D => self.a.overflowing_sub(self.d),
-                Register::E => self.a.overflowing_sub(self.e),
-                Register::H => self.a.overflowing_sub(self.h),
-                Register::L => self.a.overflowing_sub(self.l),
-                Register::M => {
-                    let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
-                    self.a.overflowing_sub(self.memory[offset as usize])
-                }
-                unsupported => {
-                    panic!("sbb doesn't support {:?}", unsupported);
-                }
-            };
-
-            if !borrow {
-                let (result, borrow) = result.overflowing_sub(1);
-                self.a = result;
-                self.set_flags(result, borrow);
-            } else {
-                self.a = result.wrapping_sub(1);
-                self.set_flags(result, borrow);
+        let byte = match register {
+            Register::A => self.a,
+            Register::B => self.b,
+            Register::C => self.c,
+            Register::D => self.d,
+            Register::E => self.e,
+            Register::H => self.h,
+            Register::L => self.l,
+            Register::M => {
+                let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
+                self.memory[offset as usize]
             }
-        }
+            unsupported => {
+                panic!("sbb doesn't support {:?}", unsupported);
+            }
+        };
+
+        let (byte, byte_carry) = match self.cc.carry {
+            true => byte.overflowing_add(1),
+            false => (byte, false),
+        };
+
+        let (result, carry) = self.a.overflowing_sub(byte);
+
+        self.a = result;
+        self.set_flags(result, carry || byte_carry);
     }
 }
 
