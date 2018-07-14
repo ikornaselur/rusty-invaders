@@ -384,6 +384,14 @@ impl State {
             Some(0x2B) => self.dcx(Register::H),
             Some(0x3B) => self.dcx(Register::SP),
 
+            // STAX ?
+            Some(0x02) => self.stax(Register::B),
+            Some(0x12) => self.stax(Register::D),
+
+            // LDAX ?
+            Some(0x0A) => self.ldax(Register::B),
+            Some(0x1A) => self.ldax(Register::D),
+
             // Instructions without registers
             // ADI d8
             Some(0xC6) => self.adi(),

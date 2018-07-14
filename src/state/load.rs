@@ -49,6 +49,18 @@ impl State {
         self.l = self.memory[address as usize];
         self.h = self.memory[(address + 1) as usize];
     }
+
+    pub fn ldax(&mut self, register: Register) -> () {
+        let address = match register {
+            Register::B => ((self.b as u16) << 8) + self.c as u16,
+            Register::D => ((self.d as u16) << 8) + self.e as u16,
+            unsupported => {
+                panic!("stax doesn't support {:?}", unsupported);
+            }
+        };
+
+        self.a = self.memory[address as usize];
+    }
 }
 
 #[cfg(test)]
@@ -159,5 +171,35 @@ mod test {
         );
         assert_eq!(state.h, 0xDE);
         assert_eq!(state.l, 0xAD);
+    }
+
+    #[test]
+    fn ldax_b_accumulator_from_b_c_address() {
+        let mut state = State {
+            memory: vec![0, 0, 0xFF],
+            a: 0x00,
+            b: 0x00,
+            c: 0x02,
+            ..State::default()
+        };
+
+        state.ldax(Register::B);
+
+        assert_eq!(state.a, 0xFF);
+    }
+
+    #[test]
+    fn ldax_d_accumulator_from_d_e_address() {
+        let mut state = State {
+            memory: vec![0, 0, 0xFF],
+            a: 0x00,
+            d: 0x00,
+            e: 0x02,
+            ..State::default()
+        };
+
+        state.ldax(Register::D);
+
+        assert_eq!(state.a, 0xFF);
     }
 }
