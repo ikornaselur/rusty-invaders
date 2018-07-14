@@ -5,9 +5,9 @@ mod carry;
 mod compare;
 mod complement;
 mod daa;
-mod decrease;
+mod decrement;
 mod full_test;
-mod increase;
+mod increment;
 mod load;
 mod mov;
 mod or;
@@ -352,23 +352,35 @@ impl State {
             Some(0xBE) => self.cmp(Register::M),
             Some(0xBF) => self.cmp(Register::A),
 
-            // POP
+            // POP ?
             Some(0xC1) => self.pop(Register::B),
             Some(0xD1) => self.pop(Register::D),
             Some(0xE1) => self.pop(Register::H),
             Some(0xF1) => self.pop(Register::PSW),
 
-            // PUSH
+            // PUSH ?
             Some(0xC5) => self.push(Register::B),
             Some(0xD5) => self.push(Register::D),
             Some(0xE5) => self.push(Register::H),
             Some(0xF5) => self.push(Register::PSW),
 
-            // DAD
+            // DAD ?
             Some(0x09) => self.dad(Register::B),
             Some(0x19) => self.dad(Register::D),
             Some(0x29) => self.dad(Register::H),
             Some(0x39) => self.dad(Register::SP),
+
+            // INX ?
+            Some(0x03) => self.inx(Register::B),
+            Some(0x13) => self.inx(Register::D),
+            Some(0x23) => self.inx(Register::H),
+            Some(0x33) => self.inx(Register::SP),
+
+            // DCX ?
+            Some(0x0B) => self.dcx(Register::B),
+            Some(0x1B) => self.dcx(Register::D),
+            Some(0x2B) => self.dcx(Register::H),
+            Some(0x3B) => self.dcx(Register::SP),
 
             // Instructions without registers
             // ADI d8

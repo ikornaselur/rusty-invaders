@@ -51,8 +51,33 @@ impl State {
             unsupported => {
                 panic!("add doesn't support {:?}", unsupported);
             }
+        };
+    }
+
+    pub fn dcx(&mut self, register: Register) -> () {
+        match register {
+            Register::B => {
+                let result = (((self.b as u16) << 8) + self.c as u16).wrapping_sub(1);
+                self.b = (result >> 8) as u8;
+                self.c = result as u8;
+            }
+            Register::D => {
+                let result = (((self.d as u16) << 8) + self.e as u16).wrapping_sub(1);
+                self.d = (result >> 8) as u8;
+                self.e = result as u8;
+            }
+            Register::H => {
+                let result = (((self.h as u16) << 8) + self.l as u16).wrapping_sub(1);
+                self.h = (result >> 8) as u8;
+                self.l = result as u8;
+            }
+            Register::SP => {
+                self.sp = self.sp.wrapping_sub(1);
+            }
+            unsupported => {
+                panic!("inx doesn't support {:?}", unsupported);
+            }
         }
-        ()
     }
 }
 
@@ -169,5 +194,63 @@ mod test {
         state.dcr(Register::M);
 
         assert_eq!(state.memory[0x05], 0x02);
+    }
+
+    #[test]
+    fn dcx_b_increments_b_c_pair() {
+        let mut state = State {
+            b: 0x98,
+            c: 0x00,
+            ..State::default()
+        };
+
+        state.dcx(Register::B);
+
+        assert_eq!(state.b, 0x97);
+        assert_eq!(state.c, 0xFF);
+    }
+
+    #[test]
+    fn dcx_d_increments_d_e_pair() {
+        let mut state = State {
+            d: 0x98,
+            e: 0x00,
+            ..State::default()
+        };
+
+        state.dcx(Register::D);
+
+        assert_eq!(state.d, 0x97);
+        assert_eq!(state.e, 0xFF);
+    }
+
+    #[test]
+    fn dcx_h_increments_h_l_pair() {
+        let mut state = State {
+            h: 0x98,
+            l: 0x00,
+            ..State::default()
+        };
+
+        state.dcx(Register::H);
+
+        assert_eq!(state.h, 0x97);
+        assert_eq!(state.l, 0xFF);
+    }
+
+    #[test]
+    fn dcx_sp_increments_sp() {
+        let mut state = State {
+            sp: 0x0001,
+            ..State::default()
+        };
+
+        state.dcx(Register::SP);
+
+        assert_eq!(state.sp, 0x0000);
+
+        state.dcx(Register::SP);
+
+        assert_eq!(state.sp, 0xFFFF);
     }
 }
