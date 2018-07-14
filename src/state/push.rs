@@ -18,10 +18,8 @@ impl State {
 }
 
 #[cfg(test)]
-use super::ConditionCodes;
-
-#[cfg(test)]
 mod test {
+    use super::super::ConditionCodes;
     use super::*;
 
     #[test]

@@ -1,5 +1,4 @@
 mod add;
-mod add_with_carry;
 mod and;
 mod carry;
 mod compare;
@@ -17,7 +16,6 @@ mod push;
 mod rotate;
 mod store;
 mod sub;
-mod sub_with_borrow;
 mod xor;
 
 #[derive(Debug)]
