@@ -491,31 +491,31 @@ impl State {
             Some(0xE9) => self.pchl(),
 
             // Jumps
-            // Jump
             Some(0xC3) => self.jmp(),
             Some(0xCB) => self.jmp(),
-            // Jump if carry
-            Some(0xDA) => self.jc(),
-            // Jump if no carry
-            Some(0xD2) => self.jnc(),
-            // Jump if zero
-            Some(0xCA) => self.jz(),
-            // Jump if not zero
-            Some(0xC2) => self.jnz(),
-            // Jump if minus
-            Some(0xFA) => self.jm(),
-            // Jump if positive
-            Some(0xF2) => self.jp(),
-            // Jump if parity even
-            Some(0xEA) => self.jpe(),
-            // Jump if parity off
-            Some(0xE2) => self.jpo(),
+            Some(0xDA) => self.jc(),  // Jump if carry
+            Some(0xD2) => self.jnc(), // Jump if no carry
+            Some(0xCA) => self.jz(),  // Jump if zero
+            Some(0xC2) => self.jnz(), // Jump if not zero
+            Some(0xFA) => self.jm(),  // Jump if minus
+            Some(0xF2) => self.jp(),  // Jump if positive
+            Some(0xEA) => self.jpe(), // Jump if parity even
+            Some(0xE2) => self.jpo(), // Jump if parity off
 
             // Calls
             Some(0xCD) => self.call(),
             Some(0xDD) => self.call(),
             Some(0xED) => self.call(),
             Some(0xFD) => self.call(),
+
+            Some(0xDC) => self.cc(),  // Call if carry
+            Some(0xD4) => self.cnc(), // Call if no carry
+            Some(0xCC) => self.cz(),  // Call if zero
+            Some(0xC4) => self.cnz(), // Call if not zero
+            Some(0xFC) => self.cm(),  // Call if minus
+            Some(0xF4) => self.cp(),  // Call if plus
+            Some(0xEC) => self.cpe(), // Call if parity even
+            Some(0xE4) => self.cpo(), // Call if parity off
 
             // Returns
             Some(0xC9) => self.ret(),

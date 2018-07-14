@@ -72,7 +72,7 @@ mod test {
     }
 
     #[test]
-    fn jc_sets_pc_to_new_address_if_carry_bit_set() {
+    fn jc_sets_pc_to_new_address_if_carry_flag_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             cc: ConditionCodes {
@@ -93,7 +93,7 @@ mod test {
     }
 
     #[test]
-    fn jnc_sets_pc_to_new_address_if_carry_bit_is_not_set() {
+    fn jnc_sets_pc_to_new_address_if_carry_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             cc: ConditionCodes {
@@ -114,7 +114,7 @@ mod test {
     }
 
     #[test]
-    fn jz_sets_pc_to_new_address_if_zero_bit_is_set() {
+    fn jz_sets_pc_to_new_address_if_zero_flag_is_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             cc: ConditionCodes {
@@ -135,7 +135,7 @@ mod test {
     }
 
     #[test]
-    fn jnz_sets_pc_to_new_address_if_zero_bit_is_not_set() {
+    fn jnz_sets_pc_to_new_address_if_zero_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             cc: ConditionCodes {
@@ -156,7 +156,7 @@ mod test {
     }
 
     #[test]
-    fn jm_sets_pc_to_new_address_if_sign_bit_is_set() {
+    fn jm_sets_pc_to_new_address_if_sign_flag_is_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             cc: ConditionCodes {
@@ -177,7 +177,7 @@ mod test {
     }
 
     #[test]
-    fn jp_sets_pc_to_new_address_if_sign_bit_is_not_set() {
+    fn jp_sets_pc_to_new_address_if_sign_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             cc: ConditionCodes {
@@ -198,7 +198,7 @@ mod test {
     }
 
     #[test]
-    fn jpe_sets_pc_to_new_address_if_parity_bit_is_set() {
+    fn jpe_sets_pc_to_new_address_if_parity_flag_is_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             cc: ConditionCodes {
@@ -219,7 +219,7 @@ mod test {
     }
 
     #[test]
-    fn jpo_sets_pc_to_new_address_if_parity_bit_is_not_set() {
+    fn jpo_sets_pc_to_new_address_if_parity_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             cc: ConditionCodes {
