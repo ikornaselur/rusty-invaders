@@ -3,17 +3,13 @@ use super::State;
 
 impl State {
     pub fn sta(&mut self) -> () {
-        let least = self.read_byte().unwrap();
-        let most = self.read_byte().unwrap();
-        let address = ((most as u16) << 8) + least as u16;
+        let address = self.read_address().unwrap();
 
         self.memory[address as usize] = self.a;
     }
 
     pub fn shld(&mut self) -> () {
-        let least = self.read_byte().unwrap();
-        let most = self.read_byte().unwrap();
-        let address = ((most as u16) << 8) + least as u16;
+        let address = self.read_address().unwrap();
 
         self.memory[address as usize] = self.l;
         self.memory[(address + 1) as usize] = self.h;

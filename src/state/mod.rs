@@ -109,6 +109,15 @@ impl State {
         }
     }
 
+    pub fn read_address(&mut self) -> Option<u16> {
+        if let Some(least) = self.read_byte() {
+            if let Some(most) = self.read_byte() {
+                return Some(((most as u16) << 8) + least as u16);
+            }
+        }
+        None
+    }
+
     pub fn write_byte(&mut self, byte: u8) -> () {
         if self.pc == 0 {
             panic!("Writing out of bounds!")
@@ -599,6 +608,26 @@ mod test {
         let byte = state.read_byte();
         assert_eq!(byte, None);
         assert_eq!(state.pc, 2);
+    }
+
+    #[test]
+    fn read_address_returns_double_and_increases_pc() {
+        let mut state = State {
+            memory: vec![0x01, 0x02, 0x03, 0x04],
+            pc: 0,
+            ..State::default()
+        };
+
+        let address = state.read_address();
+        assert_eq!(address, Some(0x0201));
+        assert_eq!(state.pc, 2);
+
+        let address = state.read_address();
+        assert_eq!(address, Some(0x0403));
+        assert_eq!(state.pc, 4);
+
+        let address = state.read_address();
+        assert_eq!(address, None);
     }
 
     #[test]

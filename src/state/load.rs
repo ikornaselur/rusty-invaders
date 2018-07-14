@@ -34,17 +34,13 @@ impl State {
     }
 
     pub fn lda(&mut self) -> () {
-        let least = self.read_byte().unwrap();
-        let most = self.read_byte().unwrap();
-        let address = ((most as u16) << 8) + least as u16;
+        let address = self.read_address().unwrap();
 
         self.a = self.memory[address as usize];
     }
 
     pub fn lhld(&mut self) -> () {
-        let least = self.read_byte().unwrap();
-        let most = self.read_byte().unwrap();
-        let address = ((most as u16) << 8) + least as u16;
+        let address = self.read_address().unwrap();
 
         self.l = self.memory[address as usize];
         self.h = self.memory[(address + 1) as usize];
@@ -60,6 +56,10 @@ impl State {
         };
 
         self.a = self.memory[address as usize];
+    }
+
+    pub fn pchl(&mut self) -> () {
+        self.pc = ((self.h as u16) << 8) + self.l as u16;
     }
 }
 
@@ -201,5 +201,19 @@ mod test {
         state.ldax(Register::D);
 
         assert_eq!(state.a, 0xFF);
+    }
+
+    #[test]
+    fn pchl_loads_pc_from_h_l_pair() {
+        let mut state = State {
+            pc: 0x1234,
+            h: 0xDE,
+            l: 0xAD,
+            ..State::default()
+        };
+
+        state.pchl();
+
+        assert_eq!(state.pc, 0xDEAD);
     }
 }
