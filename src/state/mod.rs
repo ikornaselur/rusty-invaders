@@ -1,22 +1,20 @@
-mod adc;
 mod add;
-mod ana;
+mod add_with_carry;
+mod and;
 mod carry;
-mod cma;
-mod cmp;
+mod compare;
+mod complement;
 mod daa;
-mod dcr;
+mod decrease;
 mod full_test;
-mod immediate;
-mod inr;
-mod lxi;
+mod increase;
+mod load;
 mod mov;
-mod mvi;
-mod ora;
+mod or;
 mod rotate;
-mod sbb;
 mod sub;
-mod xra;
+mod sub_with_borrow;
+mod xor;
 
 #[derive(Debug)]
 pub enum Register {
@@ -325,17 +323,17 @@ impl State {
             // SUI d8
             Some(0xD6) => self.sui(),
             // ANI d8
-            // Some(0xE6) => self.ani(),
+            Some(0xE6) => self.ani(),
             // ORI d8
-            // Some(0xF6) => self.ori(),
+            Some(0xF6) => self.ori(),
             // ACI d8
             Some(0xCE) => self.aci(),
             // SBI d8
             Some(0xDE) => self.sbi(),
             // XRI d8
-            // Some(0xEE) => self.xri(),
+            Some(0xEE) => self.xri(),
             // CPI d8
-            // Some(0xFE) => self.cpi(),
+            Some(0xFE) => self.cpi(),
 
             // Rotate accumulator
             Some(0x07) => self.rlc(),

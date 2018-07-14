@@ -24,6 +24,15 @@ impl State {
         self.a = result;
         self.set_flags(result, false);
     }
+
+    pub fn xri(&mut self) -> () {
+        let byte = self.read_byte().unwrap();
+
+        let result = self.a ^ byte;
+
+        self.a = result;
+        self.set_flags(result, false);
+    }
 }
 
 #[cfg(test)]
@@ -153,5 +162,26 @@ mod test {
         state.xra(Register::M);
 
         assert_eq!(state.a, 0b0010_0100);
+    }
+
+    #[test]
+    fn xri_xors_immediate_byte_with_accumulator() {
+        let mut state = State {
+            memory: vec![0b0011_0101, 0b0010_0110],
+            a: 0b0111_0000,
+            cc: ConditionCodes {
+                carry: true,
+                ..ConditionCodes::default()
+            },
+            ..State::default()
+        };
+
+        state.xri();
+        assert_eq!(state.a, 0b0100_0101);
+        assert_eq!(state.cc.carry, false);
+
+        state.xri();
+        assert_eq!(state.a, 0b0110_0011);
+        assert_eq!(state.cc.carry, false);
     }
 }

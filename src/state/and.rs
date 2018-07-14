@@ -24,6 +24,15 @@ impl State {
         self.a = result;
         self.set_flags(result, false);
     }
+
+    pub fn ani(&mut self) -> () {
+        let byte = self.read_byte().unwrap();
+
+        let result = self.a & byte;
+
+        self.a = result;
+        self.set_flags(result, false);
+    }
 }
 
 #[cfg(test)]
@@ -153,5 +162,26 @@ mod test {
         state.ana(Register::M);
 
         assert_eq!(state.a, 0b0000_1100);
+    }
+
+    #[test]
+    fn ani_ands_immediate_byte_with_accumulator() {
+        let mut state = State {
+            memory: vec![0b0011_0101, 0b0010_0010],
+            a: 0b1111_0000,
+            cc: ConditionCodes {
+                carry: true,
+                ..ConditionCodes::default()
+            },
+            ..State::default()
+        };
+
+        state.ani();
+        assert_eq!(state.a, 0b0011_0000);
+        assert_eq!(state.cc.carry, false);
+
+        state.ani();
+        assert_eq!(state.a, 0b0010_0000);
+        assert_eq!(state.cc.carry, false);
     }
 }

@@ -24,6 +24,14 @@ impl State {
         self.a = result;
         self.set_flags(result, carry);
     }
+
+    pub fn adi(&mut self) -> () {
+        let byte = self.read_byte().unwrap();
+        let (result, carry) = self.a.overflowing_add(byte);
+
+        self.a = result;
+        self.set_flags(result, carry);
+    }
 }
 
 #[cfg(test)]
@@ -134,4 +142,22 @@ mod test {
 
         assert_eq!(state.a, 6);
     }
+
+    #[test]
+    fn adi_adds_immediate_byte_to_accumulator() {
+        let mut state = State {
+            memory: vec![1, 5],
+            a: 0xFF,
+            ..State::default()
+        };
+
+        state.adi();
+        assert_eq!(state.a, 0);
+        assert_eq!(state.cc.carry, true);
+
+        state.adi();
+        assert_eq!(state.a, 5);
+        assert_eq!(state.cc.carry, false);
+    }
+
 }

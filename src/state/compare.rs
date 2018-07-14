@@ -23,6 +23,14 @@ impl State {
 
         self.set_flags(result, borrow);
     }
+
+    pub fn cpi(&mut self) -> () {
+        let byte = self.read_byte().unwrap();
+
+        let (result, borrow) = self.a.overflowing_sub(byte);
+
+        self.set_flags(result, borrow);
+    }
 }
 
 #[cfg(test)]
@@ -79,6 +87,60 @@ mod test {
 
         assert_eq!(state.a, 10);
         assert_eq!(state.b, 11);
+
+        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.cc.zero, false);
+        assert_eq!(state.cc.sign, true);
+        assert_eq!(state.cc.parity, true);
+    }
+
+    #[test]
+    fn cpi_with_smaller_immediate_byte_compares_it_to_accumulator_and_sets_flags() {
+        let mut state = State {
+            memory: vec![9],
+            a: 10,
+            ..State::default()
+        };
+
+        state.cpi();
+
+        assert_eq!(state.a, 10);
+
+        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.cc.zero, false);
+        assert_eq!(state.cc.sign, false);
+        assert_eq!(state.cc.parity, false);
+    }
+
+    #[test]
+    fn cpi_with_equal_immediate_byte_compares_it_to_accumulator_and_sets_flags() {
+        let mut state = State {
+            memory: vec![10],
+            a: 10,
+            ..State::default()
+        };
+
+        state.cpi();
+
+        assert_eq!(state.a, 10);
+
+        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.cc.zero, true);
+        assert_eq!(state.cc.sign, false);
+        assert_eq!(state.cc.parity, true);
+    }
+
+    #[test]
+    fn cpi_with_larget_immediate_byte_compares_it_to_accumulator_and_sets_flags() {
+        let mut state = State {
+            memory: vec![11],
+            a: 10,
+            ..State::default()
+        };
+
+        state.cpi();
+
+        assert_eq!(state.a, 10);
 
         assert_eq!(state.cc.carry, true);
         assert_eq!(state.cc.zero, false);

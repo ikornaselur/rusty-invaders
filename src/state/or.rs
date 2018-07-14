@@ -24,6 +24,15 @@ impl State {
         self.a = result;
         self.set_flags(result, false);
     }
+
+    pub fn ori(&mut self) -> () {
+        let byte = self.read_byte().unwrap();
+
+        let result = self.a | byte;
+
+        self.a = result;
+        self.set_flags(result, false);
+    }
 }
 
 #[cfg(test)]
@@ -153,5 +162,26 @@ mod test {
         state.ora(Register::M);
 
         assert_eq!(state.a, 0b0111_1100);
+    }
+
+    #[test]
+    fn ori_ors_immediate_byte_with_accumulator() {
+        let mut state = State {
+            memory: vec![0b0011_0101, 0b0010_0110],
+            a: 0b0111_0000,
+            cc: ConditionCodes {
+                carry: true,
+                ..ConditionCodes::default()
+            },
+            ..State::default()
+        };
+
+        state.ori();
+        assert_eq!(state.a, 0b0111_0101);
+        assert_eq!(state.cc.carry, false);
+
+        state.ori();
+        assert_eq!(state.a, 0b0111_0111);
+        assert_eq!(state.cc.carry, false);
     }
 }

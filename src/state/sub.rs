@@ -24,6 +24,14 @@ impl State {
         self.a = result;
         self.set_flags(result, borrow);
     }
+
+    pub fn sui(&mut self) -> () {
+        let byte = self.read_byte().unwrap();
+        let (result, carry) = self.a.overflowing_sub(byte);
+
+        self.a = result;
+        self.set_flags(result, carry);
+    }
 }
 
 #[cfg(test)]
@@ -172,5 +180,22 @@ mod test {
 
         assert_eq!(state.cc.carry, false);
         assert_eq!(state.a, 0);
+    }
+
+    #[test]
+    fn sui_removes_immediate_byte_from_accumulator() {
+        let mut state = State {
+            memory: vec![1, 5],
+            a: 0,
+            ..State::default()
+        };
+
+        state.sui();
+        assert_eq!(state.a, 255);
+        assert_eq!(state.cc.carry, true);
+
+        state.sui();
+        assert_eq!(state.a, 250);
+        assert_eq!(state.cc.carry, false);
     }
 }
