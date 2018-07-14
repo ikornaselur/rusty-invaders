@@ -119,6 +119,16 @@ impl State {
         None
     }
 
+    pub fn read_byte_from_stack(&mut self) -> Option<u8> {
+        if self.sp as usize >= self.memory.len() {
+            None
+        } else {
+            let byte = self.memory[self.sp as usize];
+            self.sp += 1;
+            Some(byte)
+        }
+    }
+
     pub fn write_byte_to_stack(&mut self, byte: u8) -> () {
         if self.sp == 0 {
             panic!("Writing out of bounds!")
@@ -633,6 +643,27 @@ mod test {
         let byte = state.read_byte();
         assert_eq!(byte, None);
         assert_eq!(state.pc, 2);
+    }
+
+    #[test]
+    fn read_byte_from_stack_returns_byte_and_increases_sp() {
+        let mut state = State {
+            memory: vec![0x01, 0x02],
+            sp: 0,
+            ..State::default()
+        };
+
+        let byte = state.read_byte_from_stack();
+        assert_eq!(byte, Some(0x01));
+        assert_eq!(state.sp, 1);
+
+        let byte = state.read_byte_from_stack();
+        assert_eq!(byte, Some(0x02));
+        assert_eq!(state.sp, 2);
+
+        let byte = state.read_byte_from_stack();
+        assert_eq!(byte, None);
+        assert_eq!(state.sp, 2);
     }
 
     #[test]
