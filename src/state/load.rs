@@ -32,6 +32,14 @@ impl State {
     pub fn sphl(&mut self) -> () {
         self.sp = ((self.h as u16) << 8) + self.l as u16;
     }
+
+    pub fn lda(&mut self) -> () {
+        let least = self.read_byte().unwrap();
+        let most = self.read_byte().unwrap();
+        let address = ((most as u16) << 8) + least as u16;
+
+        self.a = self.memory[address as usize];
+    }
 }
 
 #[cfg(test)]
@@ -107,5 +115,21 @@ mod test {
         assert_eq!(state.h, 0x50);
         assert_eq!(state.l, 0x6C);
         assert_eq!(state.sp, 0x506C);
+    }
+
+    #[test]
+    fn lda_loads_accumulator_from_address() {
+        let mut state = State {
+            memory: vec![0x11, 0x12, 0x06, 0x00, 0x13, 0x14, 0xAA],
+            a: 0xFF,
+            pc: 2,
+            ..State::default()
+        };
+
+        state.lda();
+
+        assert_eq!(state.pc, 4);
+        assert_eq!(state.memory, vec![0x11, 0x12, 0x06, 0x00, 0x13, 0x14, 0xAA]);
+        assert_eq!(state.a, 0xAA);
     }
 }

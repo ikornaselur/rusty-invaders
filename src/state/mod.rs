@@ -15,6 +15,7 @@ mod or;
 mod pop;
 mod push;
 mod rotate;
+mod store;
 mod sub;
 mod sub_with_borrow;
 mod xor;
@@ -424,6 +425,15 @@ impl State {
 
             // Exchange stack
             Some(0xE3) => self.xthl(),
+
+            // Load SP from H and L
+            Some(0xF9) => self.sphl(),
+
+            // Store accumulator direct a16
+            Some(0x32) => self.sta(),
+
+            // Load accumulator direct a16
+            Some(0x3A) => self.lda(),
 
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
