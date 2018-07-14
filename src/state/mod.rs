@@ -15,6 +15,7 @@ mod mov;
 mod or;
 mod pop;
 mod push;
+mod returns;
 mod rotate;
 mod store;
 mod sub;
@@ -128,6 +129,15 @@ impl State {
             self.sp += 1;
             Some(byte)
         }
+    }
+
+    pub fn read_address_from_stack(&mut self) -> Option<u16> {
+        if let Some(least) = self.read_byte_from_stack() {
+            if let Some(most) = self.read_byte_from_stack() {
+                return Some(((most as u16) << 8) + least as u16);
+            }
+        }
+        None
     }
 
     pub fn write_byte_to_stack(&mut self, byte: u8) -> () {
@@ -497,6 +507,10 @@ impl State {
             Some(0xDD) => self.call(),
             Some(0xED) => self.call(),
             Some(0xFD) => self.call(),
+
+            // Returns
+            Some(0xC9) => self.ret(),
+            Some(0xD9) => self.ret(),
 
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
