@@ -73,6 +73,7 @@ pub struct State {
     memory: Vec<u8>,
     cc: ConditionCodes,
     int_enable: u8,
+    exit: bool,
     debug: bool,
 }
 
@@ -91,6 +92,7 @@ impl Default for State {
             memory: Vec::new(),
             cc: Default::default(),
             int_enable: 0,
+            exit: false,
             debug: false,
         }
     }
@@ -188,6 +190,9 @@ impl State {
     }
 
     pub fn step(&mut self) -> Option<()> {
+        if self.exit {
+            return None;
+        }
         let byte = self.read_byte();
         if self.debug {
             if let Some(byte) = byte {

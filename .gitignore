@@ -3,5 +3,4 @@
 **/*.rs.bk
 invaders
 manual.pdf
-*.bin
 *.png

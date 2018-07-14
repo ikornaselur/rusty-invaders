@@ -2,6 +2,21 @@ use super::State;
 
 impl State {
     fn process_call(&mut self, address: u16) -> () {
+        // A specific hack for full cpu test
+        if self.debug && address == 5 && self.c == 9 {
+            let offset = ((self.d as u16) << 8) + self.e as u16;
+            if offset == 0x018B {
+                panic!("CPU HAS FAILED");
+            } else if offset == 0x0174 {
+                println!("*** CPU IS OPERATIONAL ***");
+                self.exit = true;
+                return ();
+            } else {
+                panic!("UNKNOWN PRINT");
+            }
+        }
+        // End of said hack
+
         let least = self.pc as u8;
         let most = (self.pc >> 8) as u8;
 

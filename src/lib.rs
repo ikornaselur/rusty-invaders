@@ -37,6 +37,7 @@ fn emulate(mut state: State) -> Result<State, Box<Error>> {
 
 pub struct Config {
     pub filename: String,
+    pub debug: bool,
 }
 
 impl Config {
@@ -48,6 +49,9 @@ impl Config {
             None => return Err("Filename missing"),
         };
 
-        Ok(Config { filename })
+        Ok(Config {
+            filename,
+            debug: false,
+        })
     }
 }
