@@ -6,6 +6,7 @@ mod compare;
 mod complement;
 mod daa;
 mod decrement;
+mod exchange;
 mod full_test;
 mod increment;
 mod load;
@@ -418,6 +419,11 @@ impl State {
             // Complement carry
             Some(0x3F) => self.cmc(),
 
+            // Exchange registers
+            Some(0xEB) => self.xchg(),
+
+            // Exchange stack
+            // Some(0xE3) => self.xthl(),
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
             }
