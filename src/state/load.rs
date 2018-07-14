@@ -28,6 +28,10 @@ impl State {
             }
         };
     }
+
+    pub fn sphl(&mut self) -> () {
+        self.sp = ((self.h as u16) << 8) + self.l as u16;
+    }
 }
 
 #[cfg(test)]
@@ -87,5 +91,21 @@ mod test {
         state.lxi(Register::SP);
 
         assert_eq!(state.sp, 0xDEAD);
+    }
+
+    #[test]
+    fn sphl_loads_sp_from_h_and_l() {
+        let mut state = State {
+            h: 0x50,
+            l: 0x6C,
+            sp: 0x1234,
+            ..State::default()
+        };
+
+        state.sphl();
+
+        assert_eq!(state.h, 0x50);
+        assert_eq!(state.l, 0x6C);
+        assert_eq!(state.sp, 0x506C);
     }
 }
