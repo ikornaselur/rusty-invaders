@@ -1,5 +1,6 @@
 mod add;
 mod and;
+mod call;
 mod carry;
 mod compare;
 mod complement;
@@ -490,6 +491,12 @@ impl State {
             Some(0xEA) => self.jpe(),
             // Jump if parity off
             Some(0xE2) => self.jpo(),
+
+            // Calls
+            Some(0xCD) => self.call(),
+            Some(0xDD) => self.call(),
+            Some(0xED) => self.call(),
+            Some(0xFD) => self.call(),
 
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
