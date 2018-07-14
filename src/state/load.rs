@@ -40,6 +40,15 @@ impl State {
 
         self.a = self.memory[address as usize];
     }
+
+    pub fn lhld(&mut self) -> () {
+        let least = self.read_byte().unwrap();
+        let most = self.read_byte().unwrap();
+        let address = ((most as u16) << 8) + least as u16;
+
+        self.l = self.memory[address as usize];
+        self.h = self.memory[(address + 1) as usize];
+    }
 }
 
 #[cfg(test)]
@@ -131,5 +140,24 @@ mod test {
         assert_eq!(state.pc, 4);
         assert_eq!(state.memory, vec![0x11, 0x12, 0x06, 0x00, 0x13, 0x14, 0xAA]);
         assert_eq!(state.a, 0xAA);
+    }
+
+    #[test]
+    fn lhld_loads_h_and_l_from_address() {
+        let mut state = State {
+            memory: vec![0x11, 0x12, 0x06, 0x00, 0x13, 0x14, 0xAD, 0xDE],
+            pc: 2,
+            ..State::default()
+        };
+
+        state.lhld();
+
+        assert_eq!(state.pc, 4);
+        assert_eq!(
+            state.memory,
+            vec![0x11, 0x12, 0x06, 0x00, 0x13, 0x14, 0xAD, 0xDE]
+        );
+        assert_eq!(state.h, 0xDE);
+        assert_eq!(state.l, 0xAD);
     }
 }

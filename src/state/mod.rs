@@ -435,6 +435,12 @@ impl State {
             // Load accumulator direct a16
             Some(0x3A) => self.lda(),
 
+            // Store H and L direct a16
+            Some(0x22) => self.shld(),
+
+            // Load H and L direct a16
+            Some(0x2A) => self.lhld(),
+
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
             }
