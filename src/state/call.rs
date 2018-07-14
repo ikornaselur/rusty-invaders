@@ -127,7 +127,7 @@ mod test {
     }
 
     #[test]
-    fn cnc_pushes_the_address_after_to_the_stack_and_jumps_if_carry_flag_is_set() {
+    fn cnc_pushes_the_address_after_to_the_stack_and_jumps_if_carry_flag_is_not_set() {
         let mut state = State {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
@@ -183,7 +183,7 @@ mod test {
     }
 
     #[test]
-    fn cnz_pushes_the_address_after_to_the_stack_and_jumps_if_zero_flag_is_set() {
+    fn cnz_pushes_the_address_after_to_the_stack_and_jumps_if_zero_flag_is_not_set() {
         let mut state = State {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
@@ -239,7 +239,7 @@ mod test {
     }
 
     #[test]
-    fn cp_pushes_the_address_after_to_the_stack_and_jumps_if_sign_flag_is_set() {
+    fn cp_pushes_the_address_after_to_the_stack_and_jumps_if_sign_flag_is_not_set() {
         let mut state = State {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
@@ -295,7 +295,7 @@ mod test {
     }
 
     #[test]
-    fn cpo_pushes_the_address_after_to_the_stack_and_jumps_if_parity_flag_is_set() {
+    fn cpo_pushes_the_address_after_to_the_stack_and_jumps_if_parity_flag_is_not_set() {
         let mut state = State {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,

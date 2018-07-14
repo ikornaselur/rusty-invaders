@@ -144,6 +144,12 @@ impl State {
     }
 
     pub fn write_byte_to_stack(&mut self, byte: u8) -> () {
+        if self.debug {
+            println!(
+                "Writing byte 0x{:02X?} to the stack at 0x{:04X?} ({:?})",
+                byte, self.sp, self.sp
+            );
+        }
         if self.sp == 0 {
             panic!("Stack pointer out of bounds!")
         }
@@ -191,7 +197,7 @@ impl State {
         let byte = self.read_byte();
         if self.debug {
             if let Some(byte) = byte {
-                println!("Read byte: 0x{:02X?}", byte);
+                println!("Read byte: 0x{:02X?} as 0x{:04X?}", byte, self.pc - 1);
             }
         }
         match byte {
@@ -500,7 +506,7 @@ impl State {
             Some(0xFA) => self.jm(),  // Jump if minus
             Some(0xF2) => self.jp(),  // Jump if positive
             Some(0xEA) => self.jpe(), // Jump if parity even
-            Some(0xE2) => self.jpo(), // Jump if parity off
+            Some(0xE2) => self.jpo(), // Jump if parity odd
 
             // Calls
             Some(0xCD) => self.call(),
@@ -515,11 +521,20 @@ impl State {
             Some(0xFC) => self.cm(),  // Call if minus
             Some(0xF4) => self.cp(),  // Call if plus
             Some(0xEC) => self.cpe(), // Call if parity even
-            Some(0xE4) => self.cpo(), // Call if parity off
+            Some(0xE4) => self.cpo(), // Call if parity odd
 
             // Returns
             Some(0xC9) => self.ret(),
             Some(0xD9) => self.ret(),
+
+            Some(0xD8) => self.rc(),  // Return if carry
+            Some(0xD0) => self.rnc(), // Return if no carry
+            Some(0xC8) => self.rz(),  // Return if zero
+            Some(0xC0) => self.rnz(), // Return if not zero
+            Some(0xF8) => self.rm(),  // Return if minus
+            Some(0xF0) => self.rp(),  // Return if plus
+            Some(0xE8) => self.rpe(), // Return if parity even
+            Some(0xE0) => self.rpo(), // Return if parity odd
 
             Some(byte) => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
