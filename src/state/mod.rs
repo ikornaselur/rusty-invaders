@@ -7,7 +7,6 @@ mod complement;
 mod daa;
 mod decrement;
 mod exchange;
-mod full_test;
 mod increment;
 mod jump;
 mod load;
