@@ -73,6 +73,7 @@ pub struct State {
     memory: Vec<u8>,
     cc: ConditionCodes,
     int_enable: u8,
+    debug: bool,
 }
 
 impl Default for State {
@@ -90,14 +91,16 @@ impl Default for State {
             memory: Vec::new(),
             cc: Default::default(),
             int_enable: 0,
+            debug: false,
         }
     }
 }
 
 impl State {
-    pub fn new(memory: Vec<u8>) -> State {
+    pub fn new(memory: Vec<u8>, debug: bool) -> State {
         State {
             memory: memory,
+            debug: debug,
             ..State::default()
         }
     }
@@ -142,7 +145,7 @@ impl State {
 
     pub fn write_byte_to_stack(&mut self, byte: u8) -> () {
         if self.sp == 0 {
-            panic!("Writing out of bounds!")
+            panic!("Stack pointer out of bounds!")
         }
         self.sp -= 1;
         self.memory[self.sp as usize] = byte;
@@ -185,7 +188,13 @@ impl State {
     }
 
     pub fn step(&mut self) -> Option<()> {
-        match self.read_byte() {
+        let byte = self.read_byte();
+        if self.debug {
+            if let Some(byte) = byte {
+                println!("Read byte: 0x{:02X?}", byte);
+            }
+        }
+        match byte {
             // NOPs
             Some(0x00) => self.nop(),
             Some(0x08) => self.nop(),

@@ -11,7 +11,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
     let mut buffer = Vec::new();
     f.read_to_end(&mut buffer)?;
 
-    let state = State::new(buffer);
+    let state = State::new(buffer, true);
 
     let _state = match emulate(state) {
         Ok(state) => state,
