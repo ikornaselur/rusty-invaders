@@ -2,7 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn mvi(&mut self, to: Register) -> () {
+    pub fn mvi(&mut self, to: Register) -> Option<u8> {
         // 10 cycles if either is M, else 7
         let byte = self.read_byte().unwrap();
 
@@ -22,7 +22,7 @@ impl State {
                 panic!("mov doesn't support moving to {:?}", unsupported);
             }
         }
-        ()
+        None
     }
 }
 

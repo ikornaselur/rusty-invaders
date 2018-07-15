@@ -2,7 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn add(&mut self, register: Register) -> () {
+    pub fn add(&mut self, register: Register) -> Option<u8> {
         // 4 cycles
         let (result, carry) = match register {
             Register::A => self.a.overflowing_add(self.a),
@@ -23,17 +23,19 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry);
+        None
     }
 
-    pub fn adi(&mut self) -> () {
+    pub fn adi(&mut self) -> Option<u8> {
         let byte = self.read_byte().unwrap();
         let (result, carry) = self.a.overflowing_add(byte);
 
         self.a = result;
         self.set_flags(result, carry);
+        None
     }
 
-    pub fn dad(&mut self, register: Register) -> () {
+    pub fn dad(&mut self, register: Register) -> Option<u8> {
         let current: u16 = ((self.h as u16) << 8) + self.l as u16;
         let (result, carry) = match register {
             Register::B => current.overflowing_add(((self.b as u16) << 8) + self.c as u16),
@@ -48,9 +50,10 @@ impl State {
         self.l = result as u8;
         self.h = (result >> 8) as u8;
         self.cc.carry = carry;
+        None
     }
 
-    pub fn adc(&mut self, register: Register) -> () {
+    pub fn adc(&mut self, register: Register) -> Option<u8> {
         // 4 cycles
         let byte = match register {
             //let (result, carry) = match register {
@@ -79,9 +82,10 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry || byte_carry);
+        None
     }
 
-    pub fn aci(&mut self) -> () {
+    pub fn aci(&mut self) -> Option<u8> {
         let byte = self.read_byte().unwrap();
 
         let (byte, byte_carry) = match self.cc.carry {
@@ -93,6 +97,7 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry || byte_carry);
+        None
     }
 }
 

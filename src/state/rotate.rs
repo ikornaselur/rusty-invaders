@@ -1,16 +1,17 @@
 use super::State;
 
 impl State {
-    pub fn rlc(&mut self) -> () {
+    pub fn rlc(&mut self) -> Option<u8> {
         // 4 cycles
         let carry = self.a >> 7 == 1;
         let result = self.a.rotate_left(1);
 
         self.a = result;
         self.set_flags(result, carry);
+        None
     }
 
-    pub fn ral(&mut self) -> () {
+    pub fn ral(&mut self) -> Option<u8> {
         // 4 cycles
         let carry = self.a >> 7 == 1;
         let mut result = self.a << 1;
@@ -21,18 +22,20 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry);
+        None
     }
 
-    pub fn rrc(&mut self) -> () {
+    pub fn rrc(&mut self) -> Option<u8> {
         // 4 cycles
         let carry = self.a & 0x01 == 1;
         let result = self.a.rotate_right(1);
 
         self.a = result;
         self.set_flags(result, carry);
+        None
     }
 
-    pub fn rar(&mut self) -> () {
+    pub fn rar(&mut self) -> Option<u8> {
         // 4 cycles
         let carry = self.a & 0x01 == 1;
         let mut result = self.a >> 1;
@@ -43,6 +46,7 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry);
+        None
     }
 }
 

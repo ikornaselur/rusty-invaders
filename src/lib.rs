@@ -11,7 +11,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
     let mut buffer = Vec::new();
     f.read_to_end(&mut buffer)?;
 
-    buffer.resize(0x8000, 0);
+    buffer.resize(0x10000, 0);
 
     let state = State::new(buffer, true);
 
@@ -27,8 +27,13 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
 fn emulate(mut state: State) -> Result<State, Box<Error>> {
     loop {
         match state.step() {
+            Some((byte, Some(result))) => {
+                println!("Byte {:02X?} got result: {:b}", byte, result);
+            }
+            Some((byte, None)) => {
+                println!("Byte {:02X?} got no result", byte);
+            }
             None => break,
-            _ => (),
         }
     }
 

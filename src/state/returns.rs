@@ -1,56 +1,65 @@
 use super::State;
 
 impl State {
-    pub fn ret(&mut self) -> () {
+    pub fn ret(&mut self) -> Option<u8> {
         self.pc = self.read_address_from_stack().unwrap();
+        None
     }
 
-    pub fn rc(&mut self) -> () {
+    pub fn rc(&mut self) -> Option<u8> {
         if self.cc.carry {
             self.ret();
         }
+        None
     }
 
-    pub fn rnc(&mut self) -> () {
+    pub fn rnc(&mut self) -> Option<u8> {
         if !self.cc.carry {
             self.ret();
         }
+        None
     }
 
-    pub fn rz(&mut self) -> () {
+    pub fn rz(&mut self) -> Option<u8> {
         if self.cc.zero {
             self.ret();
         }
+        None
     }
 
-    pub fn rnz(&mut self) -> () {
+    pub fn rnz(&mut self) -> Option<u8> {
         if !self.cc.zero {
             self.ret();
         }
+        None
     }
 
-    pub fn rm(&mut self) -> () {
+    pub fn rm(&mut self) -> Option<u8> {
         if self.cc.sign {
             self.ret();
         }
+        None
     }
 
-    pub fn rp(&mut self) -> () {
+    pub fn rp(&mut self) -> Option<u8> {
         if !self.cc.sign {
             self.ret();
         }
+        None
     }
 
-    pub fn rpe(&mut self) -> () {
+    pub fn rpe(&mut self) -> Option<u8> {
         if self.cc.parity {
             self.ret();
         }
+        None
     }
 
-    pub fn rpo(&mut self) -> () {
+    pub fn rpo(&mut self) -> Option<u8> {
         if !self.cc.parity {
             self.ret();
         }
+        None
     }
 }
 

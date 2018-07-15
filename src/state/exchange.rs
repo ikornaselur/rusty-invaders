@@ -2,14 +2,16 @@ use super::State;
 use std::mem::swap;
 
 impl State {
-    pub fn xchg(&mut self) -> () {
+    pub fn xchg(&mut self) -> Option<u8> {
         swap(&mut self.h, &mut self.d);
         swap(&mut self.l, &mut self.e);
+        None
     }
 
-    pub fn xthl(&mut self) -> () {
+    pub fn xthl(&mut self) -> Option<u8> {
         swap(&mut self.h, &mut self.memory[(self.sp + 1) as usize]);
         swap(&mut self.l, &mut self.memory[self.sp as usize]);
+        None
     }
 }
 

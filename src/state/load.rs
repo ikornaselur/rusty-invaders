@@ -2,7 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn lxi(&mut self, register: Register) -> () {
+    pub fn lxi(&mut self, register: Register) -> Option<u8> {
         // 10 instrucitons
         let least = self.read_byte().unwrap();
         let most = self.read_byte().unwrap();
@@ -27,26 +27,30 @@ impl State {
                 panic!("lxi doesn't support {:?}", unsupported);
             }
         };
+        None
     }
 
-    pub fn sphl(&mut self) -> () {
+    pub fn sphl(&mut self) -> Option<u8> {
         self.sp = ((self.h as u16) << 8) + self.l as u16;
+        None
     }
 
-    pub fn lda(&mut self) -> () {
+    pub fn lda(&mut self) -> Option<u8> {
         let address = self.read_address().unwrap();
 
         self.a = self.memory[address as usize];
+        None
     }
 
-    pub fn lhld(&mut self) -> () {
+    pub fn lhld(&mut self) -> Option<u8> {
         let address = self.read_address().unwrap();
 
         self.l = self.memory[address as usize];
         self.h = self.memory[(address + 1) as usize];
+        None
     }
 
-    pub fn ldax(&mut self, register: Register) -> () {
+    pub fn ldax(&mut self, register: Register) -> Option<u8> {
         let address = match register {
             Register::B => ((self.b as u16) << 8) + self.c as u16,
             Register::D => ((self.d as u16) << 8) + self.e as u16,
@@ -56,10 +60,12 @@ impl State {
         };
 
         self.a = self.memory[address as usize];
+        None
     }
 
-    pub fn pchl(&mut self) -> () {
+    pub fn pchl(&mut self) -> Option<u8> {
         self.pc = ((self.h as u16) << 8) + self.l as u16;
+        None
     }
 }
 

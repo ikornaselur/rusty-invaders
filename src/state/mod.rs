@@ -183,365 +183,366 @@ impl State {
         bits
     }
 
-    pub fn nop(&mut self) -> () {
+    pub fn nop(&mut self) -> Option<u8> {
         // 4 cycles
-        ()
+        None
     }
 
-    pub fn step(&mut self) -> Option<()> {
+    pub fn step(&mut self) -> Option<(u8, Option<u8>)> {
         if self.exit {
             return None;
         }
-        let byte = self.read_byte();
-        if self.debug {
-            if let Some(byte) = byte {
-                println!("Read byte: 0x{:02X?} at 0x{:04X?}", byte, self.pc - 1);
+        let byte = match self.read_byte() {
+            Some(byte) => byte,
+            None => {
+                panic!("Got no byte when reading");
             }
+        };
+
+        if self.debug {
+            println!("Read byte: 0x{:02X?} at 0x{:04X?}", byte, self.pc - 1);
         }
-        match byte {
+        let output = match byte {
             // NOPs
-            Some(0x00) => self.nop(),
-            Some(0x08) => self.nop(),
-            Some(0x10) => self.nop(),
-            Some(0x18) => self.nop(),
-            Some(0x20) => self.nop(),
-            Some(0x28) => self.nop(),
-            Some(0x30) => self.nop(),
-            Some(0x38) => self.nop(),
+            0x00 => self.nop(),
+            0x08 => self.nop(),
+            0x10 => self.nop(),
+            0x18 => self.nop(),
+            0x20 => self.nop(),
+            0x28 => self.nop(),
+            0x30 => self.nop(),
+            0x38 => self.nop(),
 
             // Instructions with registers
 
             // LXI ?,d16
-            Some(0x01) => self.lxi(Register::B),
-            Some(0x11) => self.lxi(Register::D),
-            Some(0x21) => self.lxi(Register::H),
-            Some(0x31) => self.lxi(Register::SP),
+            0x01 => self.lxi(Register::B),
+            0x11 => self.lxi(Register::D),
+            0x21 => self.lxi(Register::H),
+            0x31 => self.lxi(Register::SP),
 
             // INR ?
-            Some(0x04) => self.inr(Register::B),
-            Some(0x14) => self.inr(Register::D),
-            Some(0x24) => self.inr(Register::H),
-            Some(0x34) => self.inr(Register::M),
-            Some(0x0C) => self.inr(Register::C),
-            Some(0x1C) => self.inr(Register::E),
-            Some(0x2C) => self.inr(Register::L),
-            Some(0x3C) => self.inr(Register::A),
+            0x04 => self.inr(Register::B),
+            0x14 => self.inr(Register::D),
+            0x24 => self.inr(Register::H),
+            0x34 => self.inr(Register::M),
+            0x0C => self.inr(Register::C),
+            0x1C => self.inr(Register::E),
+            0x2C => self.inr(Register::L),
+            0x3C => self.inr(Register::A),
 
             // DCR ?
-            Some(0x05) => self.dcr(Register::B),
-            Some(0x15) => self.dcr(Register::D),
-            Some(0x25) => self.dcr(Register::H),
-            Some(0x35) => self.dcr(Register::M),
-            Some(0x0D) => self.dcr(Register::C),
-            Some(0x1D) => self.dcr(Register::E),
-            Some(0x2D) => self.dcr(Register::L),
-            Some(0x3D) => self.dcr(Register::A),
+            0x05 => self.dcr(Register::B),
+            0x15 => self.dcr(Register::D),
+            0x25 => self.dcr(Register::H),
+            0x35 => self.dcr(Register::M),
+            0x0D => self.dcr(Register::C),
+            0x1D => self.dcr(Register::E),
+            0x2D => self.dcr(Register::L),
+            0x3D => self.dcr(Register::A),
 
             // MVI ?, d8
-            Some(0x06) => self.mvi(Register::B),
-            Some(0x0E) => self.mvi(Register::C),
-            Some(0x16) => self.mvi(Register::D),
-            Some(0x1E) => self.mvi(Register::E),
-            Some(0x26) => self.mvi(Register::H),
-            Some(0x2E) => self.mvi(Register::L),
-            Some(0x36) => self.mvi(Register::M),
-            Some(0x3E) => self.mvi(Register::A),
+            0x06 => self.mvi(Register::B),
+            0x0E => self.mvi(Register::C),
+            0x16 => self.mvi(Register::D),
+            0x1E => self.mvi(Register::E),
+            0x26 => self.mvi(Register::H),
+            0x2E => self.mvi(Register::L),
+            0x36 => self.mvi(Register::M),
+            0x3E => self.mvi(Register::A),
 
             // MOV ?, ?
-            Some(0x40) => self.mov(Register::B, Register::B),
-            Some(0x41) => self.mov(Register::B, Register::C),
-            Some(0x42) => self.mov(Register::B, Register::D),
-            Some(0x43) => self.mov(Register::B, Register::E),
-            Some(0x44) => self.mov(Register::B, Register::H),
-            Some(0x45) => self.mov(Register::B, Register::L),
-            Some(0x46) => self.mov(Register::B, Register::M),
-            Some(0x47) => self.mov(Register::B, Register::A),
-            Some(0x48) => self.mov(Register::C, Register::B),
-            Some(0x49) => self.mov(Register::C, Register::C),
-            Some(0x4A) => self.mov(Register::C, Register::D),
-            Some(0x4B) => self.mov(Register::C, Register::E),
-            Some(0x4C) => self.mov(Register::C, Register::H),
-            Some(0x4D) => self.mov(Register::C, Register::L),
-            Some(0x4E) => self.mov(Register::C, Register::M),
-            Some(0x4F) => self.mov(Register::C, Register::A),
+            0x40 => self.mov(Register::B, Register::B),
+            0x41 => self.mov(Register::B, Register::C),
+            0x42 => self.mov(Register::B, Register::D),
+            0x43 => self.mov(Register::B, Register::E),
+            0x44 => self.mov(Register::B, Register::H),
+            0x45 => self.mov(Register::B, Register::L),
+            0x46 => self.mov(Register::B, Register::M),
+            0x47 => self.mov(Register::B, Register::A),
+            0x48 => self.mov(Register::C, Register::B),
+            0x49 => self.mov(Register::C, Register::C),
+            0x4A => self.mov(Register::C, Register::D),
+            0x4B => self.mov(Register::C, Register::E),
+            0x4C => self.mov(Register::C, Register::H),
+            0x4D => self.mov(Register::C, Register::L),
+            0x4E => self.mov(Register::C, Register::M),
+            0x4F => self.mov(Register::C, Register::A),
 
-            Some(0x50) => self.mov(Register::D, Register::B),
-            Some(0x51) => self.mov(Register::D, Register::C),
-            Some(0x52) => self.mov(Register::D, Register::D),
-            Some(0x53) => self.mov(Register::D, Register::E),
-            Some(0x54) => self.mov(Register::D, Register::H),
-            Some(0x55) => self.mov(Register::D, Register::L),
-            Some(0x56) => self.mov(Register::D, Register::M),
-            Some(0x57) => self.mov(Register::D, Register::A),
-            Some(0x58) => self.mov(Register::E, Register::B),
-            Some(0x59) => self.mov(Register::E, Register::C),
-            Some(0x5A) => self.mov(Register::E, Register::D),
-            Some(0x5B) => self.mov(Register::E, Register::E),
-            Some(0x5C) => self.mov(Register::E, Register::H),
-            Some(0x5D) => self.mov(Register::E, Register::L),
-            Some(0x5E) => self.mov(Register::E, Register::M),
-            Some(0x5F) => self.mov(Register::E, Register::A),
+            0x50 => self.mov(Register::D, Register::B),
+            0x51 => self.mov(Register::D, Register::C),
+            0x52 => self.mov(Register::D, Register::D),
+            0x53 => self.mov(Register::D, Register::E),
+            0x54 => self.mov(Register::D, Register::H),
+            0x55 => self.mov(Register::D, Register::L),
+            0x56 => self.mov(Register::D, Register::M),
+            0x57 => self.mov(Register::D, Register::A),
+            0x58 => self.mov(Register::E, Register::B),
+            0x59 => self.mov(Register::E, Register::C),
+            0x5A => self.mov(Register::E, Register::D),
+            0x5B => self.mov(Register::E, Register::E),
+            0x5C => self.mov(Register::E, Register::H),
+            0x5D => self.mov(Register::E, Register::L),
+            0x5E => self.mov(Register::E, Register::M),
+            0x5F => self.mov(Register::E, Register::A),
 
-            Some(0x60) => self.mov(Register::H, Register::B),
-            Some(0x61) => self.mov(Register::H, Register::C),
-            Some(0x62) => self.mov(Register::H, Register::D),
-            Some(0x63) => self.mov(Register::H, Register::E),
-            Some(0x64) => self.mov(Register::H, Register::H),
-            Some(0x65) => self.mov(Register::H, Register::L),
-            Some(0x66) => self.mov(Register::H, Register::M),
-            Some(0x67) => self.mov(Register::H, Register::A),
-            Some(0x68) => self.mov(Register::L, Register::B),
-            Some(0x69) => self.mov(Register::L, Register::C),
-            Some(0x6A) => self.mov(Register::L, Register::D),
-            Some(0x6B) => self.mov(Register::L, Register::E),
-            Some(0x6C) => self.mov(Register::L, Register::H),
-            Some(0x6D) => self.mov(Register::L, Register::L),
-            Some(0x6E) => self.mov(Register::L, Register::M),
-            Some(0x6F) => self.mov(Register::L, Register::A),
+            0x60 => self.mov(Register::H, Register::B),
+            0x61 => self.mov(Register::H, Register::C),
+            0x62 => self.mov(Register::H, Register::D),
+            0x63 => self.mov(Register::H, Register::E),
+            0x64 => self.mov(Register::H, Register::H),
+            0x65 => self.mov(Register::H, Register::L),
+            0x66 => self.mov(Register::H, Register::M),
+            0x67 => self.mov(Register::H, Register::A),
+            0x68 => self.mov(Register::L, Register::B),
+            0x69 => self.mov(Register::L, Register::C),
+            0x6A => self.mov(Register::L, Register::D),
+            0x6B => self.mov(Register::L, Register::E),
+            0x6C => self.mov(Register::L, Register::H),
+            0x6D => self.mov(Register::L, Register::L),
+            0x6E => self.mov(Register::L, Register::M),
+            0x6F => self.mov(Register::L, Register::A),
 
-            Some(0x70) => self.mov(Register::M, Register::B),
-            Some(0x71) => self.mov(Register::M, Register::C),
-            Some(0x72) => self.mov(Register::M, Register::D),
-            Some(0x73) => self.mov(Register::M, Register::E),
-            Some(0x74) => self.mov(Register::M, Register::H),
-            Some(0x75) => self.mov(Register::M, Register::L),
+            0x70 => self.mov(Register::M, Register::B),
+            0x71 => self.mov(Register::M, Register::C),
+            0x72 => self.mov(Register::M, Register::D),
+            0x73 => self.mov(Register::M, Register::E),
+            0x74 => self.mov(Register::M, Register::H),
+            0x75 => self.mov(Register::M, Register::L),
             // Some(0x76) => self.hlt(),
-            Some(0x77) => self.mov(Register::M, Register::A),
-            Some(0x78) => self.mov(Register::A, Register::B),
-            Some(0x79) => self.mov(Register::A, Register::C),
-            Some(0x7A) => self.mov(Register::A, Register::D),
-            Some(0x7B) => self.mov(Register::A, Register::E),
-            Some(0x7C) => self.mov(Register::A, Register::H),
-            Some(0x7D) => self.mov(Register::A, Register::L),
-            Some(0x7E) => self.mov(Register::A, Register::M),
-            Some(0x7F) => self.mov(Register::A, Register::A),
+            0x77 => self.mov(Register::M, Register::A),
+            0x78 => self.mov(Register::A, Register::B),
+            0x79 => self.mov(Register::A, Register::C),
+            0x7A => self.mov(Register::A, Register::D),
+            0x7B => self.mov(Register::A, Register::E),
+            0x7C => self.mov(Register::A, Register::H),
+            0x7D => self.mov(Register::A, Register::L),
+            0x7E => self.mov(Register::A, Register::M),
+            0x7F => self.mov(Register::A, Register::A),
 
             // ADD ?
-            Some(0x80) => self.add(Register::B),
-            Some(0x81) => self.add(Register::C),
-            Some(0x82) => self.add(Register::D),
-            Some(0x83) => self.add(Register::E),
-            Some(0x84) => self.add(Register::H),
-            Some(0x85) => self.add(Register::L),
-            Some(0x86) => self.add(Register::M),
-            Some(0x87) => self.add(Register::A),
+            0x80 => self.add(Register::B),
+            0x81 => self.add(Register::C),
+            0x82 => self.add(Register::D),
+            0x83 => self.add(Register::E),
+            0x84 => self.add(Register::H),
+            0x85 => self.add(Register::L),
+            0x86 => self.add(Register::M),
+            0x87 => self.add(Register::A),
 
             // ADC ?
-            Some(0x88) => self.adc(Register::B),
-            Some(0x89) => self.adc(Register::C),
-            Some(0x8A) => self.adc(Register::D),
-            Some(0x8B) => self.adc(Register::E),
-            Some(0x8C) => self.adc(Register::H),
-            Some(0x8D) => self.adc(Register::L),
-            Some(0x8E) => self.adc(Register::M),
-            Some(0x8F) => self.adc(Register::A),
+            0x88 => self.adc(Register::B),
+            0x89 => self.adc(Register::C),
+            0x8A => self.adc(Register::D),
+            0x8B => self.adc(Register::E),
+            0x8C => self.adc(Register::H),
+            0x8D => self.adc(Register::L),
+            0x8E => self.adc(Register::M),
+            0x8F => self.adc(Register::A),
 
             // SUB ?
-            Some(0x90) => self.sub(Register::B),
-            Some(0x91) => self.sub(Register::C),
-            Some(0x92) => self.sub(Register::D),
-            Some(0x93) => self.sub(Register::E),
-            Some(0x94) => self.sub(Register::H),
-            Some(0x95) => self.sub(Register::L),
-            Some(0x96) => self.sub(Register::M),
-            Some(0x97) => self.sub(Register::A),
+            0x90 => self.sub(Register::B),
+            0x91 => self.sub(Register::C),
+            0x92 => self.sub(Register::D),
+            0x93 => self.sub(Register::E),
+            0x94 => self.sub(Register::H),
+            0x95 => self.sub(Register::L),
+            0x96 => self.sub(Register::M),
+            0x97 => self.sub(Register::A),
 
             // SBB ?
-            Some(0x98) => self.sbb(Register::B),
-            Some(0x99) => self.sbb(Register::C),
-            Some(0x9A) => self.sbb(Register::D),
-            Some(0x9B) => self.sbb(Register::E),
-            Some(0x9C) => self.sbb(Register::H),
-            Some(0x9D) => self.sbb(Register::L),
-            Some(0x9E) => self.sbb(Register::M),
-            Some(0x9F) => self.sbb(Register::A),
+            0x98 => self.sbb(Register::B),
+            0x99 => self.sbb(Register::C),
+            0x9A => self.sbb(Register::D),
+            0x9B => self.sbb(Register::E),
+            0x9C => self.sbb(Register::H),
+            0x9D => self.sbb(Register::L),
+            0x9E => self.sbb(Register::M),
+            0x9F => self.sbb(Register::A),
 
             // ANA ?
-            Some(0xA0) => self.ana(Register::B),
-            Some(0xA1) => self.ana(Register::C),
-            Some(0xA2) => self.ana(Register::D),
-            Some(0xA3) => self.ana(Register::E),
-            Some(0xA4) => self.ana(Register::H),
-            Some(0xA5) => self.ana(Register::L),
-            Some(0xA6) => self.ana(Register::M),
-            Some(0xA7) => self.ana(Register::A),
+            0xA0 => self.ana(Register::B),
+            0xA1 => self.ana(Register::C),
+            0xA2 => self.ana(Register::D),
+            0xA3 => self.ana(Register::E),
+            0xA4 => self.ana(Register::H),
+            0xA5 => self.ana(Register::L),
+            0xA6 => self.ana(Register::M),
+            0xA7 => self.ana(Register::A),
 
             // XRA ?
-            Some(0xA8) => self.xra(Register::B),
-            Some(0xA9) => self.xra(Register::C),
-            Some(0xAA) => self.xra(Register::D),
-            Some(0xAB) => self.xra(Register::E),
-            Some(0xAC) => self.xra(Register::H),
-            Some(0xAD) => self.xra(Register::L),
-            Some(0xAE) => self.xra(Register::M),
-            Some(0xAF) => self.xra(Register::A),
+            0xA8 => self.xra(Register::B),
+            0xA9 => self.xra(Register::C),
+            0xAA => self.xra(Register::D),
+            0xAB => self.xra(Register::E),
+            0xAC => self.xra(Register::H),
+            0xAD => self.xra(Register::L),
+            0xAE => self.xra(Register::M),
+            0xAF => self.xra(Register::A),
 
             // ORA ?
-            Some(0xB0) => self.ora(Register::B),
-            Some(0xB1) => self.ora(Register::C),
-            Some(0xB2) => self.ora(Register::D),
-            Some(0xB3) => self.ora(Register::E),
-            Some(0xB4) => self.ora(Register::H),
-            Some(0xB5) => self.ora(Register::L),
-            Some(0xB6) => self.ora(Register::M),
-            Some(0xB7) => self.ora(Register::A),
+            0xB0 => self.ora(Register::B),
+            0xB1 => self.ora(Register::C),
+            0xB2 => self.ora(Register::D),
+            0xB3 => self.ora(Register::E),
+            0xB4 => self.ora(Register::H),
+            0xB5 => self.ora(Register::L),
+            0xB6 => self.ora(Register::M),
+            0xB7 => self.ora(Register::A),
 
             // CMP ?
-            Some(0xB8) => self.cmp(Register::B),
-            Some(0xB9) => self.cmp(Register::C),
-            Some(0xBA) => self.cmp(Register::D),
-            Some(0xBB) => self.cmp(Register::E),
-            Some(0xBC) => self.cmp(Register::H),
-            Some(0xBD) => self.cmp(Register::L),
-            Some(0xBE) => self.cmp(Register::M),
-            Some(0xBF) => self.cmp(Register::A),
+            0xB8 => self.cmp(Register::B),
+            0xB9 => self.cmp(Register::C),
+            0xBA => self.cmp(Register::D),
+            0xBB => self.cmp(Register::E),
+            0xBC => self.cmp(Register::H),
+            0xBD => self.cmp(Register::L),
+            0xBE => self.cmp(Register::M),
+            0xBF => self.cmp(Register::A),
 
             // POP ?
-            Some(0xC1) => self.pop(Register::B),
-            Some(0xD1) => self.pop(Register::D),
-            Some(0xE1) => self.pop(Register::H),
-            Some(0xF1) => self.pop(Register::PSW),
+            0xC1 => self.pop(Register::B),
+            0xD1 => self.pop(Register::D),
+            0xE1 => self.pop(Register::H),
+            0xF1 => self.pop(Register::PSW),
 
             // PUSH ?
-            Some(0xC5) => self.push(Register::B),
-            Some(0xD5) => self.push(Register::D),
-            Some(0xE5) => self.push(Register::H),
-            Some(0xF5) => self.push(Register::PSW),
+            0xC5 => self.push(Register::B),
+            0xD5 => self.push(Register::D),
+            0xE5 => self.push(Register::H),
+            0xF5 => self.push(Register::PSW),
 
             // DAD ?
-            Some(0x09) => self.dad(Register::B),
-            Some(0x19) => self.dad(Register::D),
-            Some(0x29) => self.dad(Register::H),
-            Some(0x39) => self.dad(Register::SP),
+            0x09 => self.dad(Register::B),
+            0x19 => self.dad(Register::D),
+            0x29 => self.dad(Register::H),
+            0x39 => self.dad(Register::SP),
 
             // INX ?
-            Some(0x03) => self.inx(Register::B),
-            Some(0x13) => self.inx(Register::D),
-            Some(0x23) => self.inx(Register::H),
-            Some(0x33) => self.inx(Register::SP),
+            0x03 => self.inx(Register::B),
+            0x13 => self.inx(Register::D),
+            0x23 => self.inx(Register::H),
+            0x33 => self.inx(Register::SP),
 
             // DCX ?
-            Some(0x0B) => self.dcx(Register::B),
-            Some(0x1B) => self.dcx(Register::D),
-            Some(0x2B) => self.dcx(Register::H),
-            Some(0x3B) => self.dcx(Register::SP),
+            0x0B => self.dcx(Register::B),
+            0x1B => self.dcx(Register::D),
+            0x2B => self.dcx(Register::H),
+            0x3B => self.dcx(Register::SP),
 
             // STAX ?
-            Some(0x02) => self.stax(Register::B),
-            Some(0x12) => self.stax(Register::D),
+            0x02 => self.stax(Register::B),
+            0x12 => self.stax(Register::D),
 
             // LDAX ?
-            Some(0x0A) => self.ldax(Register::B),
-            Some(0x1A) => self.ldax(Register::D),
+            0x0A => self.ldax(Register::B),
+            0x1A => self.ldax(Register::D),
 
             // Instructions without registers
             // ADI d8
-            Some(0xC6) => self.adi(),
+            0xC6 => self.adi(),
             // SUI d8
-            Some(0xD6) => self.sui(),
+            0xD6 => self.sui(),
             // ANI d8
-            Some(0xE6) => self.ani(),
+            0xE6 => self.ani(),
             // ORI d8
-            Some(0xF6) => self.ori(),
+            0xF6 => self.ori(),
             // ACI d8
-            Some(0xCE) => self.aci(),
+            0xCE => self.aci(),
             // SBI d8
-            Some(0xDE) => self.sbi(),
+            0xDE => self.sbi(),
             // XRI d8
-            Some(0xEE) => self.xri(),
+            0xEE => self.xri(),
             // CPI d8
-            Some(0xFE) => self.cpi(),
+            0xFE => self.cpi(),
 
             // Rotate accumulator
-            Some(0x07) => self.rlc(),
-            Some(0x0F) => self.rrc(),
-            Some(0x17) => self.ral(),
-            Some(0x1F) => self.rar(),
+            0x07 => self.rlc(),
+            0x0F => self.rrc(),
+            0x17 => self.ral(),
+            0x1F => self.rar(),
 
             // Decimal Adjustment Accumulator
-            Some(0x27) => self.daa(),
+            0x27 => self.daa(),
 
             // Set carry
-            Some(0x37) => self.stc(),
+            0x37 => self.stc(),
 
             // Complement accumulator
-            Some(0x2F) => self.cma(),
+            0x2F => self.cma(),
 
             // Complement carry
-            Some(0x3F) => self.cmc(),
+            0x3F => self.cmc(),
 
             // Exchange registers
-            Some(0xEB) => self.xchg(),
+            0xEB => self.xchg(),
 
             // Exchange stack
-            Some(0xE3) => self.xthl(),
+            0xE3 => self.xthl(),
 
             // Load SP from H and L
-            Some(0xF9) => self.sphl(),
+            0xF9 => self.sphl(),
 
             // Store accumulator direct a16
-            Some(0x32) => self.sta(),
+            0x32 => self.sta(),
 
             // Load accumulator direct a16
-            Some(0x3A) => self.lda(),
+            0x3A => self.lda(),
 
             // Store H and L direct a16
-            Some(0x22) => self.shld(),
+            0x22 => self.shld(),
 
             // Load H and L direct a16
-            Some(0x2A) => self.lhld(),
+            0x2A => self.lhld(),
 
             // Load Program Counter
-            Some(0xE9) => self.pchl(),
+            0xE9 => self.pchl(),
 
             // Jumps
-            Some(0xC3) => self.jmp(),
-            Some(0xCB) => self.jmp(),
-            Some(0xDA) => self.jc(),  // Jump if carry
-            Some(0xD2) => self.jnc(), // Jump if no carry
-            Some(0xCA) => self.jz(),  // Jump if zero
-            Some(0xC2) => self.jnz(), // Jump if not zero
-            Some(0xFA) => self.jm(),  // Jump if minus
-            Some(0xF2) => self.jp(),  // Jump if positive
-            Some(0xEA) => self.jpe(), // Jump if parity even
-            Some(0xE2) => self.jpo(), // Jump if parity odd
+            0xC3 => self.jmp(),
+            0xCB => self.jmp(),
+            0xDA => self.jc(),  // Jump if carry
+            0xD2 => self.jnc(), // Jump if no carry
+            0xCA => self.jz(),  // Jump if zero
+            0xC2 => self.jnz(), // Jump if not zero
+            0xFA => self.jm(),  // Jump if minus
+            0xF2 => self.jp(),  // Jump if positive
+            0xEA => self.jpe(), // Jump if parity even
+            0xE2 => self.jpo(), // Jump if parity odd
 
             // Calls
-            Some(0xCD) => self.call(),
-            Some(0xDD) => self.call(),
-            Some(0xED) => self.call(),
-            Some(0xFD) => self.call(),
+            0xCD => self.call(),
+            0xDD => self.call(),
+            0xED => self.call(),
+            0xFD => self.call(),
 
-            Some(0xDC) => self.cc(),  // Call if carry
-            Some(0xD4) => self.cnc(), // Call if no carry
-            Some(0xCC) => self.cz(),  // Call if zero
-            Some(0xC4) => self.cnz(), // Call if not zero
-            Some(0xFC) => self.cm(),  // Call if minus
-            Some(0xF4) => self.cp(),  // Call if plus
-            Some(0xEC) => self.cpe(), // Call if parity even
-            Some(0xE4) => self.cpo(), // Call if parity odd
+            0xDC => self.cc(),  // Call if carry
+            0xD4 => self.cnc(), // Call if no carry
+            0xCC => self.cz(),  // Call if zero
+            0xC4 => self.cnz(), // Call if not zero
+            0xFC => self.cm(),  // Call if minus
+            0xF4 => self.cp(),  // Call if plus
+            0xEC => self.cpe(), // Call if parity even
+            0xE4 => self.cpo(), // Call if parity odd
 
             // Returns
-            Some(0xC9) => self.ret(),
-            Some(0xD9) => self.ret(),
+            0xC9 => self.ret(),
+            0xD9 => self.ret(),
 
-            Some(0xD8) => self.rc(),  // Return if carry
-            Some(0xD0) => self.rnc(), // Return if no carry
-            Some(0xC8) => self.rz(),  // Return if zero
-            Some(0xC0) => self.rnz(), // Return if not zero
-            Some(0xF8) => self.rm(),  // Return if minus
-            Some(0xF0) => self.rp(),  // Return if plus
-            Some(0xE8) => self.rpe(), // Return if parity even
-            Some(0xE0) => self.rpo(), // Return if parity odd
+            0xD8 => self.rc(),  // Return if carry
+            0xD0 => self.rnc(), // Return if no carry
+            0xC8 => self.rz(),  // Return if zero
+            0xC0 => self.rnz(), // Return if not zero
+            0xF8 => self.rm(),  // Return if minus
+            0xF0 => self.rp(),  // Return if plus
+            0xE8 => self.rpe(), // Return if parity even
+            0xE0 => self.rpo(), // Return if parity odd
 
-            Some(byte) => {
+            byte => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
             }
-            None => {
-                return None;
-            }
         };
-        Some(())
+        Some((byte, output))
     }
 }
 

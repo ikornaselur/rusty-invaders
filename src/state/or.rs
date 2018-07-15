@@ -2,7 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn ora(&mut self, register: Register) -> () {
+    pub fn ora(&mut self, register: Register) -> Option<u8> {
         // 4 cycles
         let result = self.a | match register {
             Register::A => self.a,
@@ -23,15 +23,17 @@ impl State {
 
         self.a = result;
         self.set_flags(result, false);
+        None
     }
 
-    pub fn ori(&mut self) -> () {
+    pub fn ori(&mut self) -> Option<u8> {
         let byte = self.read_byte().unwrap();
 
         let result = self.a | byte;
 
         self.a = result;
         self.set_flags(result, false);
+        None
     }
 }
 

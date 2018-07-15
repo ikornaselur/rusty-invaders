@@ -2,7 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn pop(&mut self, register: Register) -> () {
+    pub fn pop(&mut self, register: Register) -> Option<u8> {
         let least = self.read_byte_from_stack().unwrap();
         let most = self.read_byte_from_stack().unwrap();
 
@@ -27,6 +27,7 @@ impl State {
                 panic!("pop doesn't support {:?}", unsupported);
             }
         };
+        None
     }
 }
 
