@@ -1,4 +1,5 @@
 mod add;
+mod interrupts;
 mod and;
 mod call;
 mod carry;
@@ -74,7 +75,7 @@ pub struct State {
     pc: u16,
     memory: Vec<u8>,
     cc: ConditionCodes,
-    int_enable: u8,
+    int_enable: bool,
     exit: bool,
     debug: bool,
     input: IO,
@@ -95,7 +96,7 @@ impl Default for State {
             pc: 0,
             memory: Vec::new(),
             cc: ConditionCodes::default(),
-            int_enable: 0,
+            int_enable: false,
             exit: false,
             debug: false,
             input: IO::new(4),
@@ -192,6 +193,11 @@ impl State {
 
     pub fn nop(&mut self) -> Option<u8> {
         // 4 cycles
+        None
+    }
+
+    pub fn hlt(&mut self) -> Option<u8> {
+        self.exit = true;
         None
     }
 
@@ -542,9 +548,16 @@ impl State {
             0xE8 => self.rpe(), // Return if parity even
             0xE0 => self.rpo(), // Return if parity odd
 
+            // Halt
+            0x76 => self.hlt(),
+
             // IO
             0xD3 => self.output(),
             0xDB => self.input(),
+
+            // Interrupts
+            0xF3 => self.di(),
+            0xFB => self.ei(),
 
             byte => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
