@@ -8,7 +8,7 @@ mod daa;
 mod decrement;
 mod exchange;
 mod increment;
-mod interrupts;
+mod interrupt;
 mod io;
 mod jump;
 mod load;
