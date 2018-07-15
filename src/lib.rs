@@ -28,6 +28,9 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
 fn emulate(mut state: State) -> Result<State, Box<Error>> {
     loop {
         match state.step() {
+            Some((byte, None)) => {
+                println!("Read byte: {:02X?}", byte);
+            }
             None => break,
             _ => (),
         }

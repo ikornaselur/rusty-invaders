@@ -1,5 +1,4 @@
 mod add;
-mod interrupts;
 mod and;
 mod call;
 mod carry;
@@ -9,6 +8,7 @@ mod daa;
 mod decrement;
 mod exchange;
 mod increment;
+mod interrupts;
 mod io;
 mod jump;
 mod load;
@@ -16,6 +16,7 @@ mod mov;
 mod or;
 mod pop;
 mod push;
+mod restart;
 mod returns;
 mod rotate;
 mod store;
@@ -558,6 +559,16 @@ impl State {
             // Interrupts
             0xF3 => self.di(),
             0xFB => self.ei(),
+
+            // Restarts
+            0xC7 => self.rst(0),
+            0xCF => self.rst(1),
+            0xD7 => self.rst(2),
+            0xDF => self.rst(3),
+            0xE7 => self.rst(4),
+            0xEF => self.rst(5),
+            0xF7 => self.rst(6),
+            0xFF => self.rst(7),
 
             byte => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
