@@ -8,6 +8,7 @@ mod daa;
 mod decrement;
 mod exchange;
 mod increment;
+mod io;
 mod jump;
 mod load;
 mod mov;
@@ -19,6 +20,8 @@ mod rotate;
 mod store;
 mod sub;
 mod xor;
+
+use io::IO;
 
 #[derive(Debug)]
 pub enum Register {
@@ -74,6 +77,8 @@ pub struct State {
     int_enable: u8,
     exit: bool,
     debug: bool,
+    input: IO,
+    output: IO,
 }
 
 impl Default for State {
@@ -89,10 +94,12 @@ impl Default for State {
             sp: 0,
             pc: 0,
             memory: Vec::new(),
-            cc: Default::default(),
+            cc: ConditionCodes::default(),
             int_enable: 0,
             exit: false,
             debug: false,
+            input: IO::new(4),
+            output: IO::new(7),
         }
     }
 }
@@ -199,9 +206,6 @@ impl State {
             }
         };
 
-        if self.debug {
-            println!("Read byte: 0x{:02X?} at 0x{:04X?}", byte, self.pc - 1);
-        }
         let output = match byte {
             // NOPs
             0x00 => self.nop(),
@@ -537,6 +541,10 @@ impl State {
             0xF0 => self.rp(),  // Return if plus
             0xE8 => self.rpe(), // Return if parity even
             0xE0 => self.rpo(), // Return if parity odd
+
+            // IO
+            0xD3 => self.output(),
+            0xDB => self.input(),
 
             byte => {
                 panic!("Unknown OP: 0x{:02X?}", byte);

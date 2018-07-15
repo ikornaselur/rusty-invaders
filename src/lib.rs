@@ -4,6 +4,7 @@ use std::io::prelude::*;
 
 use state::State;
 
+pub mod io;
 pub mod state;
 
 pub fn run(config: Config) -> Result<(), Box<Error>> {
@@ -27,13 +28,8 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
 fn emulate(mut state: State) -> Result<State, Box<Error>> {
     loop {
         match state.step() {
-            Some((byte, Some(result))) => {
-                println!("Byte {:02X?} got result: {:b}", byte, result);
-            }
-            Some((byte, None)) => {
-                println!("Byte {:02X?} got no result", byte);
-            }
             None => break,
+            _ => (),
         }
     }
 
