@@ -10,6 +10,8 @@ pub mod clock;
 pub mod io;
 pub mod state;
 
+const FRAME_TIME: Duration = Duration::from_micros(1_000_000 / 60);
+
 pub fn run(config: Config) -> Result<(), Box<Error>> {
     let mut f = File::open(config.filename)?;
     let mut buffer = Vec::new();
@@ -40,16 +42,12 @@ impl Machine {
 
     fn emulate(&mut self) -> () {
         loop {
-            if self.state.int_enabled && self.interrupt_timer.elapsed() > Duration::new(1 / 60, 0) {
+            if self.state.int_enabled && self.interrupt_timer.elapsed() > FRAME_TIME {
                 self.interrupt_timer.reset_last_time();
                 self.state.rst(2);
                 self.state.di();
             }
             match self.state.step() {
-                Some((byte, None)) => {
-                    println!("Read byte: {:02X?}", byte);
-                    ()
-                }
                 None => break,
                 _ => (),
             }

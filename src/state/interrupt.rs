@@ -2,12 +2,12 @@ use super::State;
 
 impl State {
     pub fn ei(&mut self) -> Option<u8> {
-        self.int_enable = true;
+        self.int_enabled = true;
         None
     }
 
     pub fn di(&mut self) -> Option<u8> {
-        self.int_enable = false;
+        self.int_enabled = false;
         None
     }
 }
@@ -19,24 +19,24 @@ mod test {
     #[test]
     fn ei_enables_interrupts() {
         let mut state = State {
-            int_enable: false,
+            int_enabled: false,
             ..State::default()
         };
 
         state.ei();
 
-        assert_eq!(state.int_enable, true);
+        assert_eq!(state.int_enabled, true);
     }
 
     #[test]
     fn di_enables_interrupts() {
         let mut state = State {
-            int_enable: true,
+            int_enabled: true,
             ..State::default()
         };
 
         state.di();
 
-        assert_eq!(state.int_enable, false);
+        assert_eq!(state.int_enabled, false);
     }
 }

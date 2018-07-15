@@ -76,11 +76,10 @@ pub struct State {
     pc: u16,
     memory: Vec<u8>,
     cc: ConditionCodes,
-    int_enable: bool,
+    pub int_enabled: bool,
     exit: bool,
     debug: bool,
-    input: IO,
-    output: IO,
+    io: IO,
 }
 
 impl Default for State {
@@ -97,11 +96,10 @@ impl Default for State {
             pc: 0,
             memory: Vec::new(),
             cc: ConditionCodes::default(),
-            int_enable: false,
+            int_enabled: false,
             exit: false,
             debug: false,
-            input: IO::new(4),
-            output: IO::new(7),
+            io: IO::new(7),
         }
     }
 }
