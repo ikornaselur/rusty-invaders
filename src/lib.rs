@@ -1,9 +1,12 @@
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
+use std::time::Duration;
 
+use clock::Clock;
 use state::State;
 
+pub mod clock;
 pub mod io;
 pub mod state;
 
@@ -12,31 +15,46 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
     let mut buffer = Vec::new();
     f.read_to_end(&mut buffer)?;
 
-    buffer.resize(0x10000, 0);
+    let mut machine = Machine::new(buffer);
+    machine.emulate();
 
-    let state = State::new(buffer, true);
-
-    let _state = match emulate(state) {
-        Ok(state) => state,
-        Err(e) => {
-            panic!("Error from emulate: {}", e);
-        }
-    };
     Ok(())
 }
 
-fn emulate(mut state: State) -> Result<State, Box<Error>> {
-    loop {
-        match state.step() {
-            Some((byte, None)) => {
-                println!("Read byte: {:02X?}", byte);
-            }
-            None => break,
-            _ => (),
+struct Machine {
+    state: State,
+    clock: Clock,
+    interrupt_timer: Clock,
+}
+
+impl Machine {
+    fn new(mut buffer: Vec<u8>) -> Machine {
+        buffer.resize(0x10000, 0);
+
+        Machine {
+            state: State::new(buffer, true),
+            clock: Clock::new(),
+            interrupt_timer: Clock::new(),
         }
     }
 
-    Ok(state)
+    fn emulate(&mut self) -> () {
+        loop {
+            if self.state.int_enabled && self.interrupt_timer.elapsed() > Duration::new(1 / 60, 0) {
+                self.interrupt_timer.reset_last_time();
+                self.state.rst(2);
+                self.state.di();
+            }
+            match self.state.step() {
+                Some((byte, None)) => {
+                    println!("Read byte: {:02X?}", byte);
+                    ()
+                }
+                None => break,
+                _ => (),
+            }
+        }
+    }
 }
 
 pub struct Config {
