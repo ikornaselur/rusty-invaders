@@ -1,14 +1,12 @@
 use super::State;
 
 impl State {
-    pub fn ei(&mut self) -> Option<u8> {
+    pub fn ei(&mut self) -> () {
         self.int_enabled = true;
-        None
     }
 
-    pub fn di(&mut self) -> Option<u8> {
+    pub fn di(&mut self) -> () {
         self.int_enabled = false;
-        None
     }
 }
 

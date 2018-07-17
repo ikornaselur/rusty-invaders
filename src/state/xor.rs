@@ -2,7 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn xra(&mut self, register: Register) -> Option<u8> {
+    pub fn xra(&mut self, register: Register) -> () {
         // 4 cycles
         let result = self.a ^ match register {
             Register::A => self.a,
@@ -23,17 +23,15 @@ impl State {
 
         self.a = result;
         self.set_flags(result, false);
-        None
     }
 
-    pub fn xri(&mut self) -> Option<u8> {
+    pub fn xri(&mut self) -> () {
         let byte = self.read_byte().unwrap();
 
         let result = self.a ^ byte;
 
         self.a = result;
         self.set_flags(result, false);
-        None
     }
 }
 

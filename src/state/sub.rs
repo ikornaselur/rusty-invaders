@@ -2,7 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn sub(&mut self, register: Register) -> Option<u8> {
+    pub fn sub(&mut self, register: Register) -> () {
         // 4 cycles
         let (result, borrow) = match register {
             Register::A => self.a.overflowing_sub(self.a),
@@ -23,19 +23,17 @@ impl State {
 
         self.a = result;
         self.set_flags(result, borrow);
-        None
     }
 
-    pub fn sui(&mut self) -> Option<u8> {
+    pub fn sui(&mut self) -> () {
         let byte = self.read_byte().unwrap();
         let (result, carry) = self.a.overflowing_sub(byte);
 
         self.a = result;
         self.set_flags(result, carry);
-        None
     }
 
-    pub fn sbb(&mut self, register: Register) -> Option<u8> {
+    pub fn sbb(&mut self, register: Register) -> () {
         // 4 cycles
         let byte = match register {
             Register::A => self.a,
@@ -63,10 +61,9 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry || byte_carry);
-        None
     }
 
-    pub fn sbi(&mut self) -> Option<u8> {
+    pub fn sbi(&mut self) -> () {
         let byte = self.read_byte().unwrap();
 
         let (byte, byte_carry) = match self.cc.carry {
@@ -78,7 +75,6 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry || byte_carry);
-        None
     }
 }
 

@@ -2,7 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn inr(&mut self, register: Register) -> Option<u8> {
+    pub fn inr(&mut self, register: Register) -> () {
         // 4 cycles
         match register {
             Register::A => {
@@ -52,10 +52,9 @@ impl State {
                 panic!("add doesn't support {:?}", unsupported);
             }
         };
-        None
     }
 
-    pub fn inx(&mut self, register: Register) -> Option<u8> {
+    pub fn inx(&mut self, register: Register) -> () {
         match register {
             Register::B => {
                 let result = (((self.b as u16) << 8) + self.c as u16).wrapping_add(1);
@@ -79,7 +78,6 @@ impl State {
                 panic!("inx doesn't support {:?}", unsupported);
             }
         }
-        None
     }
 }
 

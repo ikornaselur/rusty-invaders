@@ -1,7 +1,7 @@
 use super::State;
 
 impl State {
-    fn process_call(&mut self, address: u16) -> Option<u8> {
+    fn process_call(&mut self, address: u16) -> () {
         // A specific hack for full cpu test
         if self.debug && address == 5 && self.c == 9 {
             let offset = ((self.d as u16) << 8) + self.e as u16;
@@ -10,7 +10,6 @@ impl State {
             } else if offset == 0x0174 {
                 println!("*** CPU IS OPERATIONAL ***");
                 self.exit = true;
-                return None;
             } else {
                 panic!("UNKNOWN PRINT");
             }
@@ -24,78 +23,68 @@ impl State {
         self.write_byte_to_stack(least);
 
         self.pc = address;
-        None
     }
 
-    pub fn call(&mut self) -> Option<u8> {
+    pub fn call(&mut self) -> () {
         let address = self.read_address().unwrap();
 
         self.process_call(address);
-        None
     }
 
-    pub fn cc(&mut self) -> Option<u8> {
+    pub fn cc(&mut self) -> () {
         let address = self.read_address().unwrap();
         if self.cc.carry {
             self.process_call(address);
         }
-        None
     }
 
-    pub fn cnc(&mut self) -> Option<u8> {
+    pub fn cnc(&mut self) -> () {
         let address = self.read_address().unwrap();
         if !self.cc.carry {
             self.process_call(address);
         }
-        None
     }
 
-    pub fn cz(&mut self) -> Option<u8> {
+    pub fn cz(&mut self) -> () {
         let address = self.read_address().unwrap();
         if self.cc.zero {
             self.process_call(address);
         }
-        None
     }
 
-    pub fn cnz(&mut self) -> Option<u8> {
+    pub fn cnz(&mut self) -> () {
         let address = self.read_address().unwrap();
         if !self.cc.zero {
             self.process_call(address);
         }
-        None
     }
 
-    pub fn cm(&mut self) -> Option<u8> {
+    pub fn cm(&mut self) -> () {
         let address = self.read_address().unwrap();
         if self.cc.sign {
             self.process_call(address);
         }
-        None
     }
 
-    pub fn cp(&mut self) -> Option<u8> {
+    pub fn cp(&mut self) -> () {
         let address = self.read_address().unwrap();
         if !self.cc.sign {
             self.process_call(address);
         }
-        None
     }
 
-    pub fn cpe(&mut self) -> Option<u8> {
+    pub fn cpe(&mut self) -> () {
         let address = self.read_address().unwrap();
         if self.cc.parity {
             self.process_call(address);
         }
-        None
     }
 
-    pub fn cpo(&mut self) -> Option<u8> {
+    pub fn cpo(&mut self) -> () {
         let address = self.read_address().unwrap();
         if !self.cc.parity {
             self.process_call(address);
         }
-        None
     }
 }
 

@@ -190,17 +190,16 @@ impl State {
         bits
     }
 
-    pub fn nop(&mut self) -> Option<u8> {
+    pub fn nop(&mut self) -> () {
         // 4 cycles
-        None
+        ()
     }
 
-    pub fn hlt(&mut self) -> Option<u8> {
+    pub fn hlt(&mut self) -> () {
         self.exit = true;
-        None
     }
 
-    pub fn step(&mut self) -> Option<(u8, Option<u8>)> {
+    pub fn step(&mut self) -> Option<(u8)> {
         if self.exit {
             return None;
         }
@@ -211,7 +210,7 @@ impl State {
             }
         };
 
-        let output = match byte {
+        match byte {
             // NOPs
             0x00 => self.nop(),
             0x08 => self.nop(),
@@ -572,7 +571,7 @@ impl State {
                 panic!("Unknown OP: 0x{:02X?}", byte);
             }
         };
-        Some((byte, output))
+        Some(byte)
     }
 }
 

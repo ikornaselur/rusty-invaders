@@ -25,7 +25,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
 
 struct Machine {
     state: State,
-    clock: Clock,
+    _clock: Clock,
     interrupt_timer: Clock,
 }
 
@@ -35,7 +35,7 @@ impl Machine {
 
         Machine {
             state: State::new(buffer, true),
-            clock: Clock::new(),
+            _clock: Clock::new(),
             interrupt_timer: Clock::new(),
         }
     }
