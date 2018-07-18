@@ -95,16 +95,6 @@ impl Machine {
         sprite.set_position((0f32, SCALE * 256f32));
         sprite.set_scale((SCALE, SCALE));
 
-        while let Some(event) = self.window.poll_event() {
-            match event {
-                Event::Closed
-                | Event::KeyPressed {
-                    code: Key::Escape, ..
-                } => return,
-                _ => {}
-            }
-        }
-
         self.window.clear(&Color::BLACK);
         self.window.draw(&sprite);
         self.window.display();
@@ -112,6 +102,15 @@ impl Machine {
 
     fn emulate(&mut self) -> () {
         loop {
+            while let Some(event) = self.window.poll_event() {
+                match event {
+                    Event::Closed
+                    | Event::KeyPressed {
+                        code: Key::Escape, ..
+                    } => return,
+                    _ => {}
+                }
+            }
             if self.state.int_enabled && self.interrupt_timer.elapsed() > INTERRUPT_TIME {
                 self.interrupt_timer.reset_last_time();
                 self.state.di();
