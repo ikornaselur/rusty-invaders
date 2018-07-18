@@ -159,6 +159,10 @@ impl State {
         self.memory[self.sp as usize] = byte;
     }
 
+    pub fn get_frame(&mut self) -> &[u8] {
+        &self.memory[0x2400..0x4000]
+    }
+
     fn set_flags(&mut self, byte: u8, carry: bool) -> () {
         self.cc.sign = (byte & 0x80) != 0;
         self.cc.zero = byte == 0u8;
@@ -778,5 +782,17 @@ mod test {
         state.write_byte_to_stack(0xFF);
         assert_eq!(state.memory, vec![0xFF, 0xFF, 0xFF]);
         assert_eq!(state.sp, 0);
+    }
+
+    #[test]
+    fn get_frame_returns_whole_frame_buffer() {
+        let mut state = State {
+            memory: vec![0x00; 0x4000],
+            ..State::default()
+        };
+
+        let frame = state.get_frame();
+
+        assert_eq!(frame.len(), 224 * 256 / 8);
     }
 }

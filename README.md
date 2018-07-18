@@ -2,6 +2,15 @@
 
 A test project to learn more about writing emulators and to learn Rust at the same time. This project is the result of following [emulator101](http://emulator101.com/).
 
+## Requirements
+Depends on `sfml` and `csfml` for displaying the graphics output.
+
+On OS X they can be installed with brew
+
+```
+brew install sfml
+brew install csfml
+```
 
 ## Integration test
 The integration test runs a cpudiag binary as described in the [Full 8080 emulation](http://www.emulator101.com/full-8080-emulation.html) from emulator101. The binary checked into this repo has been modified in the following way in a hex editor:
