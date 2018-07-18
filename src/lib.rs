@@ -52,6 +52,24 @@ impl Machine {
         }
     }
 
+    fn input(&mut self) -> () {
+        let mut port1 = 0u8;
+        if Key::Return.is_pressed() {
+            port1 |= 1 << 2;
+        }
+        if Key::Space.is_pressed() {
+            port1 |= 1 << 4;
+        }
+        if Key::Left.is_pressed() {
+            port1 |= 1 << 5;
+        }
+        if Key::Right.is_pressed() {
+            port1 |= 1 << 6;
+        }
+
+        self.state.set_input(1, port1);
+    }
+
     fn draw(&mut self) -> () {
         let mut texture = Texture::new(256, 224).expect("Unable to create texture");
         let mut buffer = Vec::new();
@@ -95,6 +113,7 @@ impl Machine {
                 self.state.di();
                 self.draw();
             }
+            self.input();
             match self.state.step() {
                 None => break,
                 _ => (),

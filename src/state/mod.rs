@@ -163,6 +163,13 @@ impl State {
         &self.memory[0x2400..0x4000]
     }
 
+    pub fn set_input(&mut self, port: usize, byte: u8) -> () {
+        if port < 1 || port > 2 {
+            panic!("Can only write to port 1 and 2");
+        }
+        self.io.set(port, byte);
+    }
+
     fn set_flags(&mut self, byte: u8, carry: bool) -> () {
         self.cc.sign = (byte & 0x80) != 0;
         self.cc.zero = byte == 0u8;
