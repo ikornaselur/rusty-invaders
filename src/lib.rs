@@ -38,6 +38,7 @@ struct Machine {
     cpu_timer: Clock,
     next_interrupt: u8,
     window: RenderWindow,
+    keys: u8,
 }
 
 impl Machine {
@@ -56,28 +57,52 @@ impl Machine {
             cpu_timer: Clock::new(),
             next_interrupt: 1,
             window: window,
+            keys: 0,
         }
     }
 
-    fn input(&mut self) -> () {
-        let mut port1 = 0u8;
-        if Key::C.is_pressed() {
-            port1 |= 1 << 0;
+    fn key_press(&mut self, key: Key) -> () {
+        match key {
+            Key::C => {
+                self.keys |= 1 << 0;
+            }
+            Key::Return => {
+                self.keys |= 1 << 2;
+            }
+            Key::Space => {
+                self.keys |= 1 << 4;
+            }
+            Key::Left => {
+                self.keys |= 1 << 5;
+            }
+            Key::Right => {
+                self.keys |= 1 << 6;
+            }
+            _ => (),
         }
-        if Key::Return.is_pressed() {
-            port1 |= 1 << 2;
-        }
-        if Key::Space.is_pressed() {
-            port1 |= 1 << 4;
-        }
-        if Key::Left.is_pressed() {
-            port1 |= 1 << 5;
-        }
-        if Key::Right.is_pressed() {
-            port1 |= 1 << 6;
-        }
+        self.state.set_input(1, self.keys);
+    }
 
-        self.state.set_input(1, port1);
+    fn key_release(&mut self, key: Key) -> () {
+        match key {
+            Key::C => {
+                self.keys &= !(1 << 0);
+            }
+            Key::Return => {
+                self.keys &= !(1 << 2);
+            }
+            Key::Space => {
+                self.keys &= !(1 << 4);
+            }
+            Key::Left => {
+                self.keys &= !(1 << 5);
+            }
+            Key::Right => {
+                self.keys &= !(1 << 6);
+            }
+            _ => (),
+        }
+        self.state.set_input(1, self.keys);
     }
 
     fn draw(&mut self) -> () {
@@ -128,10 +153,11 @@ impl Machine {
                         | Event::KeyPressed {
                             code: Key::Escape, ..
                         } => return,
+                        Event::KeyPressed { code, .. } => self.key_press(code),
+                        Event::KeyReleased { code, .. } => self.key_release(code),
                         _ => {}
                     }
                 }
-                self.input();
                 self.interrupt_timer.reset_last_time();
                 self.state.di();
                 match self.next_interrupt {
