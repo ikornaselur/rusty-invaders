@@ -20,3 +20,4 @@ The integration test runs a cpudiag binary as described in the [Full 8080 emulat
 ### Resources
 * [Instruction Set](http://pastraiser.com/cpu/i8080/i8080_opcodes.html)
 * [emulator101](http://emulator101.com/)
+* [Computer Archeology](http://computerarcheology.com/Arcade/SpaceInvaders/)
