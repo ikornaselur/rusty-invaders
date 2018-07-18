@@ -15,7 +15,7 @@ pub mod clock;
 pub mod io;
 pub mod state;
 
-const FRAME_TIME: Duration = Duration::from_micros(1_000_000 / 60);
+const INTERRUPT_TIME: Duration = Duration::from_micros(1_000_000 / 120);
 const SCALE: f32 = 8f32;
 
 pub fn run(config: Config) -> Result<(), Box<Error>> {
@@ -32,6 +32,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
 struct Machine {
     state: State,
     interrupt_timer: Clock,
+    next_interrupt: u8,
     window: RenderWindow,
 }
 
@@ -48,6 +49,7 @@ impl Machine {
         Machine {
             state: State::new(buffer, true),
             interrupt_timer: Clock::new(),
+            next_interrupt: 1,
             window: window,
         }
     }
@@ -107,11 +109,21 @@ impl Machine {
 
     fn emulate(&mut self) -> () {
         loop {
-            if self.state.int_enabled && self.interrupt_timer.elapsed() > FRAME_TIME {
+            if self.state.int_enabled && self.interrupt_timer.elapsed() > INTERRUPT_TIME {
                 self.interrupt_timer.reset_last_time();
-                self.state.rst(2);
                 self.state.di();
-                self.draw();
+                match self.next_interrupt {
+                    1 => {
+                        self.state.rst(1);
+                        self.next_interrupt = 2;
+                    }
+                    2 => {
+                        self.draw();
+                        self.state.rst(2);
+                        self.next_interrupt = 1;
+                    }
+                    _ => panic!("Invalid interrupt"),
+                }
             }
             self.input();
             match self.state.step() {
