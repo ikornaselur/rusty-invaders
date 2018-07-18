@@ -56,6 +56,9 @@ impl Machine {
 
     fn input(&mut self) -> () {
         let mut port1 = 0u8;
+        if Key::C.is_pressed() {
+            port1 |= 1 << 0;
+        }
         if Key::Return.is_pressed() {
             port1 |= 1 << 2;
         }
