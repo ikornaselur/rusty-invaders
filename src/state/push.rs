@@ -2,7 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn push(&mut self, register: Register) -> () {
+    pub fn push(&mut self, register: Register) -> u8 {
         let (most, least) = match register {
             Register::B => (self.b, self.c),
             Register::D => (self.d, self.e),
@@ -14,6 +14,8 @@ impl State {
         };
         self.write_byte_to_stack(most);
         self.write_byte_to_stack(least);
+
+        11
     }
 }
 

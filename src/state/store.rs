@@ -2,20 +2,24 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn sta(&mut self) -> () {
+    pub fn sta(&mut self) -> u8 {
         let address = self.read_address().unwrap();
 
         self.memory[address as usize] = self.a;
+
+        13
     }
 
-    pub fn shld(&mut self) -> () {
+    pub fn shld(&mut self) -> u8 {
         let address = self.read_address().unwrap();
 
         self.memory[address as usize] = self.l;
         self.memory[(address + 1) as usize] = self.h;
+
+        16
     }
 
-    pub fn stax(&mut self, register: Register) -> () {
+    pub fn stax(&mut self, register: Register) -> u8 {
         let address = match register {
             Register::B => ((self.b as u16) << 8) + self.c as u16,
             Register::D => ((self.d as u16) << 8) + self.e as u16,
@@ -25,6 +29,8 @@ impl State {
         };
 
         self.memory[address as usize] = self.a;
+
+        13
     }
 }
 

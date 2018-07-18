@@ -1,64 +1,82 @@
 use super::State;
 
 impl State {
-    pub fn jmp(&mut self) -> () {
+    pub fn jmp(&mut self) -> u8 {
         self.pc = self.read_address().unwrap();
+
+        10
     }
 
-    pub fn jc(&mut self) -> () {
+    pub fn jc(&mut self) -> u8 {
         let address = self.read_address().unwrap();
         if self.cc.carry {
             self.pc = address;
         }
+
+        10
     }
 
-    pub fn jnc(&mut self) -> () {
+    pub fn jnc(&mut self) -> u8 {
         let address = self.read_address().unwrap();
         if !self.cc.carry {
             self.pc = address;
         }
+
+        10
     }
 
-    pub fn jz(&mut self) -> () {
+    pub fn jz(&mut self) -> u8 {
         let address = self.read_address().unwrap();
         if self.cc.zero {
             self.pc = address;
         }
+
+        10
     }
 
-    pub fn jnz(&mut self) -> () {
+    pub fn jnz(&mut self) -> u8 {
         let address = self.read_address().unwrap();
         if !self.cc.zero {
             self.pc = address;
         }
+
+        10
     }
 
-    pub fn jm(&mut self) -> () {
+    pub fn jm(&mut self) -> u8 {
         let address = self.read_address().unwrap();
         if self.cc.sign {
             self.pc = address;
         }
+
+        10
     }
 
-    pub fn jp(&mut self) -> () {
+    pub fn jp(&mut self) -> u8 {
         let address = self.read_address().unwrap();
         if !self.cc.sign {
             self.pc = address;
         }
+
+        10
     }
 
-    pub fn jpe(&mut self) -> () {
+    pub fn jpe(&mut self) -> u8 {
         let address = self.read_address().unwrap();
         if self.cc.parity {
             self.pc = address;
         }
+
+        10
     }
 
-    pub fn jpo(&mut self) -> () {
+    pub fn jpo(&mut self) -> u8 {
         let address = self.read_address().unwrap();
         if !self.cc.parity {
             self.pc = address;
         }
+
+        10
     }
 }
 

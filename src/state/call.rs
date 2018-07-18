@@ -25,65 +25,99 @@ impl State {
         self.pc = address;
     }
 
-    pub fn call(&mut self) -> () {
+    pub fn call(&mut self) -> u8 {
         let address = self.read_address().unwrap();
 
         self.process_call(address);
+
+        17
     }
 
-    pub fn cc(&mut self) -> () {
+    pub fn cc(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        if self.cc.carry {
-            self.process_call(address);
+        match self.cc.carry {
+            true => {
+                self.process_call(address);
+                17
+            }
+            false => 11,
         }
     }
 
-    pub fn cnc(&mut self) -> () {
+    pub fn cnc(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        if !self.cc.carry {
-            self.process_call(address);
+        match self.cc.carry {
+            false => {
+                self.process_call(address);
+                17
+            }
+            true => 11,
         }
     }
 
-    pub fn cz(&mut self) -> () {
+    pub fn cz(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        if self.cc.zero {
-            self.process_call(address);
+        match self.cc.zero {
+            true => {
+                self.process_call(address);
+                17
+            }
+            false => 11,
         }
     }
 
-    pub fn cnz(&mut self) -> () {
+    pub fn cnz(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        if !self.cc.zero {
-            self.process_call(address);
+        match self.cc.zero {
+            false => {
+                self.process_call(address);
+                17
+            }
+            true => 11,
         }
     }
 
-    pub fn cm(&mut self) -> () {
+    pub fn cm(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        if self.cc.sign {
-            self.process_call(address);
+        match self.cc.sign {
+            true => {
+                self.process_call(address);
+                17
+            }
+            false => 11,
         }
     }
 
-    pub fn cp(&mut self) -> () {
+    pub fn cp(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        if !self.cc.sign {
-            self.process_call(address);
+        match self.cc.sign {
+            false => {
+                self.process_call(address);
+                17
+            }
+            true => 11,
         }
     }
 
-    pub fn cpe(&mut self) -> () {
+    pub fn cpe(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        if self.cc.parity {
-            self.process_call(address);
+        match self.cc.parity {
+            true => {
+                self.process_call(address);
+                17
+            }
+            false => 11,
         }
     }
 
-    pub fn cpo(&mut self) -> () {
+    pub fn cpo(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        if !self.cc.parity {
-            self.process_call(address);
+        match self.cc.parity {
+            false => {
+                self.process_call(address);
+                17
+            }
+            true => 11,
         }
     }
 }

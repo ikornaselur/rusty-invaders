@@ -2,8 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn cmp(&mut self, register: Register) -> () {
-        // 4 cycles
+    pub fn cmp(&mut self, register: Register) -> u8 {
         let (result, borrow) = match register {
             Register::A => self.a.overflowing_sub(self.a),
             Register::B => self.a.overflowing_sub(self.b),
@@ -22,14 +21,21 @@ impl State {
         };
 
         self.set_flags(result, borrow);
+
+        match register {
+            Register::M => 7,
+            _ => 4,
+        }
     }
 
-    pub fn cpi(&mut self) -> () {
+    pub fn cpi(&mut self) -> u8 {
         let byte = self.read_byte().unwrap();
 
         let (result, borrow) = self.a.overflowing_sub(byte);
 
         self.set_flags(result, borrow);
+
+        7
     }
 }
 

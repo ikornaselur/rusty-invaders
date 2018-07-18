@@ -1,9 +1,10 @@
 use super::State;
 
 impl State {
-    pub fn cma(&mut self) -> () {
-        // 4 cycles
+    pub fn cma(&mut self) -> u8 {
         self.a = !self.a;
+
+        4
     }
 }
 

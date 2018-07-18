@@ -1,14 +1,18 @@
 use super::State;
 
 impl State {
-    pub fn input(&mut self) -> () {
+    pub fn input(&mut self) -> u8 {
         let port = self.read_byte().unwrap();
         self.a = self.io.read(port as usize);
+
+        10
     }
 
-    pub fn output(&mut self) -> () {
+    pub fn output(&mut self) -> u8 {
         let port = self.read_byte().unwrap();
         self.io.write(port as usize, self.a);
+
+        10
     }
 }
 

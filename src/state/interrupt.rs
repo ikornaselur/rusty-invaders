@@ -1,12 +1,16 @@
 use super::State;
 
 impl State {
-    pub fn ei(&mut self) -> () {
+    pub fn ei(&mut self) -> u8 {
         self.int_enabled = true;
+
+        4
     }
 
-    pub fn di(&mut self) -> () {
+    pub fn di(&mut self) -> u8 {
         self.int_enabled = false;
+
+        4
     }
 }
 

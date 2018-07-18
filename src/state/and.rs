@@ -2,8 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn ana(&mut self, register: Register) -> () {
-        // 4 cycles
+    pub fn ana(&mut self, register: Register) -> u8 {
         let result = self.a & match register {
             Register::A => self.a,
             Register::B => self.b,
@@ -23,15 +22,22 @@ impl State {
 
         self.a = result;
         self.set_flags(result, false);
+
+        match register {
+            Register::M => 7,
+            _ => 4,
+        }
     }
 
-    pub fn ani(&mut self) -> () {
+    pub fn ani(&mut self) -> u8 {
         let byte = self.read_byte().unwrap();
 
         let result = self.a & byte;
 
         self.a = result;
         self.set_flags(result, false);
+
+        7
     }
 }
 

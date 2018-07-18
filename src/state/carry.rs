@@ -1,14 +1,14 @@
 use super::State;
 
 impl State {
-    pub fn stc(&mut self) -> () {
-        // 4 cycles
+    pub fn stc(&mut self) -> u8 {
         self.cc.carry = true;
+        4
     }
 
-    pub fn cmc(&mut self) -> () {
-        // 4 cycles
+    pub fn cmc(&mut self) -> u8 {
         self.cc.carry = !self.cc.carry;
+        4
     }
 }
 

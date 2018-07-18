@@ -2,8 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn mov(&mut self, to: Register, from: Register) -> () {
-        // 7 cycles if either is M, else 5
+    pub fn mov(&mut self, to: Register, from: Register) -> u8 {
         let val = match from {
             Register::A => self.a,
             Register::B => self.b,
@@ -37,10 +36,14 @@ impl State {
                 panic!("mov doesn't support moving to {:?}", unsupported);
             }
         };
+
+        match (to, from) {
+            (Register::M, _) | (_, Register::M) => 7,
+            _ => 5,
+        }
     }
 
-    pub fn mvi(&mut self, to: Register) -> () {
-        // 10 cycles if either is M, else 7
+    pub fn mvi(&mut self, to: Register) -> u8 {
         let byte = self.read_byte().unwrap();
 
         match to {
@@ -59,6 +62,11 @@ impl State {
                 panic!("mov doesn't support moving to {:?}", unsupported);
             }
         };
+
+        match to {
+            Register::M => 10,
+            _ => 7,
+        }
     }
 }
 

@@ -2,8 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn dcr(&mut self, register: Register) -> () {
-        // 4 cycles
+    pub fn dcr(&mut self, register: Register) -> u8 {
         match register {
             Register::A => {
                 let (result, carry) = self.a.overflowing_sub(1);
@@ -52,9 +51,14 @@ impl State {
                 panic!("add doesn't support {:?}", unsupported);
             }
         };
+
+        match register {
+            Register::M => 10,
+            _ => 5,
+        }
     }
 
-    pub fn dcx(&mut self, register: Register) -> () {
+    pub fn dcx(&mut self, register: Register) -> u8 {
         match register {
             Register::B => {
                 let result = (((self.b as u16) << 8) + self.c as u16).wrapping_sub(1);
@@ -78,6 +82,8 @@ impl State {
                 panic!("inx doesn't support {:?}", unsupported);
             }
         }
+
+        5
     }
 }
 

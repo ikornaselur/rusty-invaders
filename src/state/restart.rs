@@ -1,7 +1,7 @@
 use super::State;
 
 impl State {
-    pub fn rst(&mut self, rst: usize) -> () {
+    pub fn rst(&mut self, rst: usize) -> u8 {
         if rst > 7 {
             panic!("rst doesn't support {}", rst);
         }
@@ -13,6 +13,8 @@ impl State {
         self.write_byte_to_stack(least);
 
         self.pc = (8 * rst) as u16;
+
+        11
     }
 }
 

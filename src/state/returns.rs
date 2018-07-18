@@ -1,55 +1,89 @@
 use super::State;
 
 impl State {
-    pub fn ret(&mut self) -> () {
+    pub fn ret(&mut self) -> u8 {
         self.pc = self.read_address_from_stack().unwrap();
+
+        10
     }
 
-    pub fn rc(&mut self) -> () {
-        if self.cc.carry {
-            self.ret();
+    pub fn rc(&mut self) -> u8 {
+        match self.cc.carry {
+            true => {
+                self.ret();
+                11
+            }
+            false => 5,
         }
     }
 
-    pub fn rnc(&mut self) -> () {
-        if !self.cc.carry {
-            self.ret();
+    pub fn rnc(&mut self) -> u8 {
+        match self.cc.carry {
+            false => {
+                self.ret();
+                11
+            }
+            true => 5,
         }
     }
 
-    pub fn rz(&mut self) -> () {
-        if self.cc.zero {
-            self.ret();
+    pub fn rz(&mut self) -> u8 {
+        match self.cc.zero {
+            true => {
+                self.ret();
+                11
+            }
+            false => 5,
         }
     }
 
-    pub fn rnz(&mut self) -> () {
-        if !self.cc.zero {
-            self.ret();
+    pub fn rnz(&mut self) -> u8 {
+        match self.cc.zero {
+            false => {
+                self.ret();
+                11
+            }
+            true => 5,
         }
     }
 
-    pub fn rm(&mut self) -> () {
-        if self.cc.sign {
-            self.ret();
+    pub fn rm(&mut self) -> u8 {
+        match self.cc.sign {
+            true => {
+                self.ret();
+                11
+            }
+            false => 5,
         }
     }
 
-    pub fn rp(&mut self) -> () {
-        if !self.cc.sign {
-            self.ret();
+    pub fn rp(&mut self) -> u8 {
+        match self.cc.sign {
+            false => {
+                self.ret();
+                11
+            }
+            true => 5,
         }
     }
 
-    pub fn rpe(&mut self) -> () {
-        if self.cc.parity {
-            self.ret();
+    pub fn rpe(&mut self) -> u8 {
+        match self.cc.parity {
+            true => {
+                self.ret();
+                11
+            }
+            false => 5,
         }
     }
 
-    pub fn rpo(&mut self) -> () {
-        if !self.cc.parity {
-            self.ret();
+    pub fn rpo(&mut self) -> u8 {
+        match self.cc.parity {
+            false => {
+                self.ret();
+                11
+            }
+            true => 5,
         }
     }
 }

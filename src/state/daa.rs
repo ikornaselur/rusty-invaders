@@ -1,8 +1,7 @@
 use super::State;
 
 impl State {
-    pub fn daa(&mut self) -> () {
-        // 4 cycles
+    pub fn daa(&mut self) -> u8 {
         if self.a & 0x0f > 9 {
             self.a += 6;
         }
@@ -11,5 +10,7 @@ impl State {
             self.a = result;
             self.set_flags(result, carry);
         }
+
+        4
     }
 }

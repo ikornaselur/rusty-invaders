@@ -2,8 +2,7 @@ use super::Register;
 use super::State;
 
 impl State {
-    pub fn add(&mut self, register: Register) -> () {
-        // 4 cycles
+    pub fn add(&mut self, register: Register) -> u8 {
         let (result, carry) = match register {
             Register::A => self.a.overflowing_add(self.a),
             Register::B => self.a.overflowing_add(self.b),
@@ -23,17 +22,24 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry);
+
+        match register {
+            Register::M => 7,
+            _ => 4,
+        }
     }
 
-    pub fn adi(&mut self) -> () {
+    pub fn adi(&mut self) -> u8 {
         let byte = self.read_byte().unwrap();
         let (result, carry) = self.a.overflowing_add(byte);
 
         self.a = result;
         self.set_flags(result, carry);
+
+        7
     }
 
-    pub fn dad(&mut self, register: Register) -> () {
+    pub fn dad(&mut self, register: Register) -> u8 {
         let current: u16 = ((self.h as u16) << 8) + self.l as u16;
         let (result, carry) = match register {
             Register::B => current.overflowing_add(((self.b as u16) << 8) + self.c as u16),
@@ -48,12 +54,12 @@ impl State {
         self.l = result as u8;
         self.h = (result >> 8) as u8;
         self.cc.carry = carry;
+
+        10
     }
 
-    pub fn adc(&mut self, register: Register) -> () {
-        // 4 cycles
+    pub fn adc(&mut self, register: Register) -> u8 {
         let byte = match register {
-            //let (result, carry) = match register {
             Register::A => self.a,
             Register::B => self.b,
             Register::C => self.c,
@@ -79,9 +85,14 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry || byte_carry);
+
+        match register {
+            Register::M => 7,
+            _ => 4,
+        }
     }
 
-    pub fn aci(&mut self) -> () {
+    pub fn aci(&mut self) -> u8 {
         let byte = self.read_byte().unwrap();
 
         let (byte, byte_carry) = match self.cc.carry {
@@ -93,6 +104,8 @@ impl State {
 
         self.a = result;
         self.set_flags(result, carry || byte_carry);
+
+        7
     }
 }
 
