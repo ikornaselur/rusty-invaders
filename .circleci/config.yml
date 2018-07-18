@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: rust:1
+      - image: absalon/rusty-invaders-ci:latest
     steps:
       - checkout
       - run:
