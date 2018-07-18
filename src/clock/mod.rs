@@ -1,23 +1,21 @@
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, Instant};
 
 pub struct Clock {
-    last_time: SystemTime,
+    last_time: Instant,
 }
 
 impl Clock {
     pub fn new() -> Clock {
         Clock {
-            last_time: SystemTime::now(),
+            last_time: Instant::now(),
         }
     }
 
     pub fn elapsed(&self) -> Duration {
-        SystemTime::now()
-            .duration_since(self.last_time)
-            .expect("Negative time elapsed")
+        self.last_time.elapsed()
     }
 
     pub fn reset_last_time(&mut self) -> () {
-        self.last_time = SystemTime::now();
+        self.last_time = Instant::now();
     }
 }

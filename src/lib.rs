@@ -134,8 +134,6 @@ impl Machine {
         let cycle_duration = Duration::from_nanos(cycles as u64 * CYCLE_TIME_NANOS);
 
         let elapsed = self.cpu_timer.elapsed();
-        let elapsed = elapsed.subsec_nanos() as u64 + elapsed.as_secs() * 1_000_000_000;
-        let elapsed = Duration::from_nanos(elapsed);
 
         if cycle_duration > elapsed {
             sleep(cycle_duration - elapsed);
