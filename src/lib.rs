@@ -6,6 +6,7 @@ use sfml::window::{Event, Key, Style};
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
+use std::thread::sleep;
 use std::time::Duration;
 
 use clock::Clock;
@@ -15,6 +16,8 @@ pub mod clock;
 pub mod io;
 pub mod state;
 
+// 1 Billion nanoseconds divided by 2 million cycles a second
+const CYCLE_TIME_NANOS: u64 = 1_000_000_000 / 2_000_000;
 const INTERRUPT_TIME: Duration = Duration::from_micros(1_000_000 / 120);
 const SCALE: f32 = 8f32;
 
@@ -32,6 +35,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
 struct Machine {
     state: State,
     interrupt_timer: Clock,
+    cpu_timer: Clock,
     next_interrupt: u8,
     window: RenderWindow,
 }
@@ -49,6 +53,7 @@ impl Machine {
         Machine {
             state: State::new(buffer, true),
             interrupt_timer: Clock::new(),
+            cpu_timer: Clock::new(),
             next_interrupt: 1,
             window: window,
         }
@@ -100,18 +105,33 @@ impl Machine {
         self.window.display();
     }
 
+    fn sync(&mut self, cycles: u8) -> () {
+        let cycle_duration = Duration::from_nanos(cycles as u64 * CYCLE_TIME_NANOS);
+
+        let elapsed = self.cpu_timer.elapsed();
+        let elapsed = elapsed.subsec_nanos() as u64 + elapsed.as_secs() * 1_000_000_000;
+        let elapsed = Duration::from_nanos(elapsed);
+
+        if cycle_duration > elapsed {
+            sleep(cycle_duration - elapsed);
+        }
+
+        self.cpu_timer.reset_last_time();
+    }
+
     fn emulate(&mut self) -> () {
         loop {
-            while let Some(event) = self.window.poll_event() {
-                match event {
-                    Event::Closed
-                    | Event::KeyPressed {
-                        code: Key::Escape, ..
-                    } => return,
-                    _ => {}
-                }
-            }
             if self.state.int_enabled && self.interrupt_timer.elapsed() > INTERRUPT_TIME {
+                while let Some(event) = self.window.poll_event() {
+                    match event {
+                        Event::Closed
+                        | Event::KeyPressed {
+                            code: Key::Escape, ..
+                        } => return,
+                        _ => {}
+                    }
+                }
+                self.input();
                 self.interrupt_timer.reset_last_time();
                 self.state.di();
                 match self.next_interrupt {
@@ -127,11 +147,13 @@ impl Machine {
                     _ => panic!("Invalid interrupt"),
                 }
             }
-            self.input();
-            match self.state.step() {
+
+            let cycles = match self.state.step() {
                 None => break,
-                _ => (),
-            }
+                Some(cycles) => cycles,
+            };
+
+            self.sync(cycles);
         }
     }
 }
