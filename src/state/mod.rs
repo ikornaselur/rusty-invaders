@@ -1,4 +1,3 @@
-mod add;
 mod and;
 mod call;
 mod carry;
@@ -23,6 +22,7 @@ mod store;
 mod sub;
 mod xor;
 
+use cpu::instructions::addition::{aci, adc, add, adi, dad};
 use io::IO;
 
 #[derive(Debug)]
@@ -41,13 +41,13 @@ pub enum Register {
 }
 
 #[derive(Debug, PartialEq)]
-struct ConditionCodes {
-    zero: bool,   // Zero - when arithmetic result is 0
-    sign: bool,   // Sign - when the most significant bit is set
-    parity: bool, // Parity - when the answer has even parity
-    carry: bool,  // Carry - when the instruction resulted in carry
-    zc: u8,
-    pad: u8,
+pub(crate) struct ConditionCodes {
+    pub(crate) zero: bool,   // Zero - when arithmetic result is 0
+    pub(crate) sign: bool,   // Sign - when the most significant bit is set
+    pub(crate) parity: bool, // Parity - when the answer has even parity
+    pub(crate) carry: bool,  // Carry - when the instruction resulted in carry
+    pub(crate) zc: u8,
+    pub(crate) pad: u8,
 }
 
 impl Default for ConditionCodes {
@@ -65,21 +65,21 @@ impl Default for ConditionCodes {
 
 #[derive(Debug, PartialEq)]
 pub struct State {
-    a: u8,
-    b: u8,
-    c: u8,
-    d: u8,
-    e: u8,
-    h: u8,
-    l: u8,
-    sp: u16,
-    pc: u16,
-    memory: Vec<u8>,
-    cc: ConditionCodes,
-    pub int_enabled: bool,
-    exit: bool,
-    debug: bool,
-    io: IO,
+    pub(crate) a: u8,
+    pub(crate) b: u8,
+    pub(crate) c: u8,
+    pub(crate) d: u8,
+    pub(crate) e: u8,
+    pub(crate) h: u8,
+    pub(crate) l: u8,
+    pub(crate) sp: u16,
+    pub(crate) pc: u16,
+    pub(crate) memory: Vec<u8>,
+    pub(crate) cc: ConditionCodes,
+    pub(crate) int_enabled: bool,
+    pub(crate) exit: bool,
+    pub(crate) debug: bool,
+    pub(crate) io: IO,
 }
 
 impl Default for State {
@@ -132,6 +132,19 @@ impl State {
         None
     }
 
+    pub fn read_base_register(&self, register: Register) -> u8 {
+        match register {
+            Register::A => self.a,
+            Register::B => self.b,
+            Register::C => self.c,
+            Register::D => self.d,
+            Register::E => self.e,
+            Register::H => self.h,
+            Register::L => self.l,
+            _ => panic!("Unsupported"),
+        }
+    }
+
     pub fn read_byte_from_stack(&mut self) -> Option<u8> {
         if self.sp as usize >= self.memory.len() {
             None
@@ -170,14 +183,14 @@ impl State {
         self.io.set(port, byte);
     }
 
-    fn set_flags(&mut self, byte: u8, carry: bool) -> () {
+    pub fn set_flags(&mut self, byte: u8, carry: bool) -> () {
         self.cc.sign = (byte & 0x80) != 0;
         self.cc.zero = byte == 0u8;
         self.cc.parity = byte.count_ones() % 2 == 0;
         self.cc.carry = carry;
     }
 
-    fn set_flags_from_bits(&mut self, bits: u8) -> () {
+    pub fn set_flags_from_bits(&mut self, bits: u8) -> () {
         self.cc.sign = bits & 0b1000_0000 != 0;
         self.cc.zero = bits & 0b0100_0000 != 0;
         self.cc.parity = bits & 0b0000_0100 != 0;
@@ -340,24 +353,24 @@ impl State {
             0x7F => self.mov(Register::A, Register::A),
 
             // ADD ?
-            0x80 => self.add(Register::B),
-            0x81 => self.add(Register::C),
-            0x82 => self.add(Register::D),
-            0x83 => self.add(Register::E),
-            0x84 => self.add(Register::H),
-            0x85 => self.add(Register::L),
-            0x86 => self.add(Register::M),
-            0x87 => self.add(Register::A),
+            0x80 => add(self, Register::B),
+            0x81 => add(self, Register::C),
+            0x82 => add(self, Register::D),
+            0x83 => add(self, Register::E),
+            0x84 => add(self, Register::H),
+            0x85 => add(self, Register::L),
+            0x86 => add(self, Register::M),
+            0x87 => add(self, Register::A),
 
             // ADC ?
-            0x88 => self.adc(Register::B),
-            0x89 => self.adc(Register::C),
-            0x8A => self.adc(Register::D),
-            0x8B => self.adc(Register::E),
-            0x8C => self.adc(Register::H),
-            0x8D => self.adc(Register::L),
-            0x8E => self.adc(Register::M),
-            0x8F => self.adc(Register::A),
+            0x88 => adc(self, Register::B),
+            0x89 => adc(self, Register::C),
+            0x8A => adc(self, Register::D),
+            0x8B => adc(self, Register::E),
+            0x8C => adc(self, Register::H),
+            0x8D => adc(self, Register::L),
+            0x8E => adc(self, Register::M),
+            0x8F => adc(self, Register::A),
 
             // SUB ?
             0x90 => self.sub(Register::B),
@@ -432,10 +445,10 @@ impl State {
             0xF5 => self.push(Register::PSW),
 
             // DAD ?
-            0x09 => self.dad(Register::B),
-            0x19 => self.dad(Register::D),
-            0x29 => self.dad(Register::H),
-            0x39 => self.dad(Register::SP),
+            0x09 => dad(self, Register::B),
+            0x19 => dad(self, Register::D),
+            0x29 => dad(self, Register::H),
+            0x39 => dad(self, Register::SP),
 
             // INX ?
             0x03 => self.inx(Register::B),
@@ -459,7 +472,7 @@ impl State {
 
             // Instructions without registers
             // ADI d8
-            0xC6 => self.adi(),
+            0xC6 => adi(self),
             // SUI d8
             0xD6 => self.sui(),
             // ANI d8
@@ -467,7 +480,7 @@ impl State {
             // ORI d8
             0xF6 => self.ori(),
             // ACI d8
-            0xCE => self.aci(),
+            0xCE => aci(self),
             // SBI d8
             0xDE => self.sbi(),
             // XRI d8

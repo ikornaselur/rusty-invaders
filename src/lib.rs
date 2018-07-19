@@ -13,6 +13,7 @@ use clock::Clock;
 use state::State;
 
 pub mod clock;
+pub mod cpu;
 pub mod io;
 pub mod state;
 

@@ -1,120 +1,171 @@
-use super::Register;
-use super::State;
+use state::{Register, State};
 
-impl State {
-    pub fn add(&mut self, register: Register) -> u8 {
-        let (result, carry) = match register {
-            Register::A => self.a.overflowing_add(self.a),
-            Register::B => self.a.overflowing_add(self.b),
-            Register::C => self.a.overflowing_add(self.c),
-            Register::D => self.a.overflowing_add(self.d),
-            Register::E => self.a.overflowing_add(self.e),
-            Register::H => self.a.overflowing_add(self.h),
-            Register::L => self.a.overflowing_add(self.l),
-            Register::M => {
-                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
-                self.a.overflowing_add(self.memory[offset as usize])
-            }
-            unsupported => {
-                panic!("add doesn't support {:?}", unsupported);
-            }
-        };
-
-        self.a = result;
-        self.set_flags(result, carry);
-
-        match register {
-            Register::M => 7,
-            _ => 4,
+/// Perform accumulator addition from a register
+///
+/// Sets condition flags
+///
+/// Cycles: 7 for register M, else 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+/// * `register` - The register to add to the accumulator
+///
+pub fn add(state: &mut State, register: Register) -> u8 {
+    let (result, carry) = match register {
+        Register::A => state.a.overflowing_add(state.a),
+        Register::B => state.a.overflowing_add(state.b),
+        Register::C => state.a.overflowing_add(state.c),
+        Register::D => state.a.overflowing_add(state.d),
+        Register::E => state.a.overflowing_add(state.e),
+        Register::H => state.a.overflowing_add(state.h),
+        Register::L => state.a.overflowing_add(state.l),
+        Register::M => {
+            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
+            state.a.overflowing_add(state.memory[offset as usize])
         }
-    }
-
-    pub fn adi(&mut self) -> u8 {
-        let byte = self.read_byte().unwrap();
-        let (result, carry) = self.a.overflowing_add(byte);
-
-        self.a = result;
-        self.set_flags(result, carry);
-
-        7
-    }
-
-    pub fn dad(&mut self, register: Register) -> u8 {
-        let current: u16 = (u16::from(self.h) << 8) + u16::from(self.l);
-        let (result, carry) = match register {
-            Register::B => current.overflowing_add((u16::from(self.b) << 8) + u16::from(self.c)),
-            Register::D => current.overflowing_add((u16::from(self.d) << 8) + u16::from(self.e)),
-            Register::H => current.overflowing_add((u16::from(self.h) << 8) + u16::from(self.l)),
-            Register::SP => current.overflowing_add(self.sp),
-            unsupported => {
-                panic!("dad doesn't support {:?}", unsupported);
-            }
-        };
-
-        self.l = result as u8;
-        self.h = (result >> 8) as u8;
-        self.cc.carry = carry;
-
-        10
-    }
-
-    pub fn adc(&mut self, register: Register) -> u8 {
-        let byte = match register {
-            Register::A => self.a,
-            Register::B => self.b,
-            Register::C => self.c,
-            Register::D => self.d,
-            Register::E => self.e,
-            Register::H => self.h,
-            Register::L => self.l,
-            Register::M => {
-                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
-                self.memory[offset as usize]
-            }
-            unsupported => {
-                panic!("adc doesn't support {:?}", unsupported);
-            }
-        };
-
-        let (byte, byte_carry) = if self.cc.carry {
-            byte.overflowing_add(1)
-        } else {
-            (byte, false)
-        };
-
-        let (result, carry) = self.a.overflowing_add(byte);
-
-        self.a = result;
-        self.set_flags(result, carry || byte_carry);
-
-        match register {
-            Register::M => 7,
-            _ => 4,
+        unsupported => {
+            panic!("add doesn't support {:?}", unsupported);
         }
+    };
+
+    state.a = result;
+    state.set_flags(result, carry);
+
+    match register {
+        Register::M => 7,
+        _ => 4,
     }
+}
 
-    pub fn aci(&mut self) -> u8 {
-        let byte = self.read_byte().unwrap();
+/// Perform accumulator addition with the next immediate byte
+///
+/// Sets condition flags
+///
+/// Cycles: 7
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn adi(state: &mut State) -> u8 {
+    let byte = state.read_byte().unwrap();
+    let (result, carry) = state.a.overflowing_add(byte);
 
-        let (byte, byte_carry) = if self.cc.carry {
-            byte.overflowing_add(1)
-        } else {
-            (byte, false)
-        };
+    state.a = result;
+    state.set_flags(result, carry);
 
-        let (result, carry) = self.a.overflowing_add(byte);
+    7
+}
 
-        self.a = result;
-        self.set_flags(result, carry || byte_carry);
+/// Perform double addition to the pseudo register M
+///
+/// Sets carry flag
+///
+/// Cycles: 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+/// * `register` - The double register pair to add to M
+///
+pub fn dad(state: &mut State, register: Register) -> u8 {
+    let current: u16 = (u16::from(state.h) << 8) + u16::from(state.l);
+    let (result, carry) = match register {
+        Register::B => current.overflowing_add((u16::from(state.b) << 8) + u16::from(state.c)),
+        Register::D => current.overflowing_add((u16::from(state.d) << 8) + u16::from(state.e)),
+        Register::H => current.overflowing_add((u16::from(state.h) << 8) + u16::from(state.l)),
+        Register::SP => current.overflowing_add(state.sp),
+        unsupported => {
+            panic!("dad doesn't support {:?}", unsupported);
+        }
+    };
 
-        7
+    state.l = result as u8;
+    state.h = (result >> 8) as u8;
+    state.cc.carry = carry;
+
+    10
+}
+
+/// Perform accumulator addition from a register with the carry bit
+///
+/// Sets condition codes
+///
+/// Cycles: 7 if register M, else 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+/// * `register` - The register to add to the accumulator
+///
+pub fn adc(state: &mut State, register: Register) -> u8 {
+    let byte = match register {
+        Register::A => state.a,
+        Register::B => state.b,
+        Register::C => state.c,
+        Register::D => state.d,
+        Register::E => state.e,
+        Register::H => state.h,
+        Register::L => state.l,
+        Register::M => {
+            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
+            state.memory[offset as usize]
+        }
+        unsupported => {
+            panic!("adc doesn't support {:?}", unsupported);
+        }
+    };
+
+    let (byte, byte_carry) = if state.cc.carry {
+        byte.overflowing_add(1)
+    } else {
+        (byte, false)
+    };
+
+    let (result, carry) = state.a.overflowing_add(byte);
+
+    state.a = result;
+    state.set_flags(result, carry || byte_carry);
+
+    match register {
+        Register::M => 7,
+        _ => 4,
     }
+}
+
+/// Perform accumulator addition with the next immediate byte and carry bit
+///
+/// Sets condition codes
+///
+/// Cycles: 7
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn aci(state: &mut State) -> u8 {
+    let byte = state.read_byte().unwrap();
+
+    let (byte, byte_carry) = if state.cc.carry {
+        byte.overflowing_add(1)
+    } else {
+        (byte, false)
+    };
+
+    let (result, carry) = state.a.overflowing_add(byte);
+
+    state.a = result;
+    state.set_flags(result, carry || byte_carry);
+
+    7
 }
 
 #[cfg(test)]
 mod test {
-    use super::super::ConditionCodes;
     use super::*;
+    use state::ConditionCodes;
+    use state::State;
 
     #[test]
     fn add_b_adds_b_to_accumulator() {
@@ -124,7 +175,7 @@ mod test {
             ..State::default()
         };
 
-        state.add(Register::B);
+        add(&mut state, Register::B);
 
         assert_eq!(state.a, 3);
     }
@@ -137,7 +188,7 @@ mod test {
             ..State::default()
         };
 
-        state.add(Register::C);
+        add(&mut state, Register::C);
 
         assert_eq!(state.a, 3);
     }
@@ -150,7 +201,7 @@ mod test {
             ..State::default()
         };
 
-        state.add(Register::D);
+        add(&mut state, Register::D);
 
         assert_eq!(state.a, 3);
     }
@@ -163,7 +214,7 @@ mod test {
             ..State::default()
         };
 
-        state.add(Register::E);
+        add(&mut state, Register::E);
 
         assert_eq!(state.a, 3);
     }
@@ -176,7 +227,7 @@ mod test {
             ..State::default()
         };
 
-        state.add(Register::H);
+        add(&mut state, Register::H);
 
         assert_eq!(state.a, 3);
     }
@@ -189,7 +240,7 @@ mod test {
             ..State::default()
         };
 
-        state.add(Register::L);
+        add(&mut state, Register::L);
 
         assert_eq!(state.a, 3);
     }
@@ -201,7 +252,7 @@ mod test {
             ..State::default()
         };
 
-        state.add(Register::A);
+        add(&mut state, Register::A);
 
         assert_eq!(state.a, 2);
     }
@@ -216,7 +267,7 @@ mod test {
             ..State::default()
         };
 
-        state.add(Register::M);
+        add(&mut state, Register::M);
 
         assert_eq!(state.a, 6);
     }
@@ -229,11 +280,11 @@ mod test {
             ..State::default()
         };
 
-        state.adi();
+        adi(&mut state);
         assert_eq!(state.a, 0);
         assert_eq!(state.cc.carry, true);
 
-        state.adi();
+        adi(&mut state);
         assert_eq!(state.a, 5);
         assert_eq!(state.cc.carry, false);
     }
@@ -248,7 +299,7 @@ mod test {
             ..State::default()
         };
 
-        state.dad(Register::B);
+        dad(&mut state, Register::B);
 
         assert_eq!(state.h, 0xD5);
         assert_eq!(state.l, 0x1A);
@@ -265,7 +316,7 @@ mod test {
             ..State::default()
         };
 
-        state.dad(Register::D);
+        dad(&mut state, Register::D);
 
         assert_eq!(state.h, 0xD5);
         assert_eq!(state.l, 0x1A);
@@ -280,7 +331,7 @@ mod test {
             ..State::default()
         };
 
-        state.dad(Register::H);
+        dad(&mut state, Register::H);
 
         assert_eq!(state.h, 0x22);
         assert_eq!(state.l, 0x44);
@@ -296,7 +347,7 @@ mod test {
             ..State::default()
         };
 
-        state.dad(Register::SP);
+        dad(&mut state, Register::SP);
 
         assert_eq!(state.h, 0x22);
         assert_eq!(state.l, 0x33);
@@ -315,7 +366,7 @@ mod test {
             ..State::default()
         };
 
-        state.adc(Register::B);
+        adc(&mut state, Register::B);
 
         assert_eq!(state.a, 4);
         assert_eq!(state.cc.carry, false);
@@ -333,7 +384,7 @@ mod test {
             ..State::default()
         };
 
-        state.adc(Register::B);
+        adc(&mut state, Register::B);
 
         assert_eq!(state.a, 255u8);
         assert_eq!(state.cc.carry, true);
@@ -351,7 +402,7 @@ mod test {
             ..State::default()
         };
 
-        state.adc(Register::B);
+        adc(&mut state, Register::B);
 
         assert_eq!(state.a, 0);
         assert_eq!(state.cc.carry, true);
@@ -369,7 +420,7 @@ mod test {
             ..State::default()
         };
 
-        state.adc(Register::C);
+        adc(&mut state, Register::C);
 
         assert_eq!(state.a, 4);
         assert_eq!(state.cc.carry, false);
@@ -387,7 +438,7 @@ mod test {
             ..State::default()
         };
 
-        state.adc(Register::D);
+        adc(&mut state, Register::D);
 
         assert_eq!(state.a, 4);
         assert_eq!(state.cc.carry, false);
@@ -405,7 +456,7 @@ mod test {
             ..State::default()
         };
 
-        state.adc(Register::E);
+        adc(&mut state, Register::E);
 
         assert_eq!(state.a, 4);
         assert_eq!(state.cc.carry, false);
@@ -423,7 +474,7 @@ mod test {
             ..State::default()
         };
 
-        state.adc(Register::H);
+        adc(&mut state, Register::H);
 
         assert_eq!(state.a, 4);
         assert_eq!(state.cc.carry, false);
@@ -441,7 +492,7 @@ mod test {
             ..State::default()
         };
 
-        state.adc(Register::L);
+        adc(&mut state, Register::L);
 
         assert_eq!(state.a, 4);
         assert_eq!(state.cc.carry, false);
@@ -460,7 +511,8 @@ mod test {
             },
             ..State::default()
         };
-        state.adc(Register::M);
+
+        adc(&mut state, Register::M);
 
         assert_eq!(state.a, 7);
         assert_eq!(state.cc.carry, false);
@@ -477,7 +529,7 @@ mod test {
             ..State::default()
         };
 
-        state.adc(Register::A);
+        adc(&mut state, Register::A);
 
         assert_eq!(state.a, 3);
         assert_eq!(state.cc.carry, false);
@@ -491,19 +543,19 @@ mod test {
             ..State::default()
         };
 
-        state.aci();
+        aci(&mut state);
         assert_eq!(state.a, 0xFE);
         assert_eq!(state.cc.carry, true);
 
-        state.aci();
+        aci(&mut state);
         assert_eq!(state.a, 0xFE);
         assert_eq!(state.cc.carry, true);
 
-        state.aci();
+        aci(&mut state);
         assert_eq!(state.a, 0xFF);
         assert_eq!(state.cc.carry, false);
 
-        state.aci();
+        aci(&mut state);
         assert_eq!(state.a, 0x00);
         assert_eq!(state.cc.carry, true);
     }
