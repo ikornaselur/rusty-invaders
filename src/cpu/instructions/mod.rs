@@ -5,3 +5,4 @@ pub mod carry;
 pub mod compare;
 pub mod complement;
 pub mod daa;
+pub mod decrement;

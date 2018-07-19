@@ -1,4 +1,3 @@
-mod decrement;
 mod exchange;
 mod increment;
 mod interrupt;
@@ -23,6 +22,7 @@ use cpu::instructions::carry::{cmc, stc};
 use cpu::instructions::compare::{cmp, cpi};
 use cpu::instructions::complement::cma;
 use cpu::instructions::daa::daa;
+use cpu::instructions::decrement::{dcr, dcx};
 
 use io::IO;
 
@@ -252,14 +252,14 @@ impl State {
             0x3C => self.inr(Register::A),
 
             // DCR ?
-            0x05 => self.dcr(Register::B),
-            0x15 => self.dcr(Register::D),
-            0x25 => self.dcr(Register::H),
-            0x35 => self.dcr(Register::M),
-            0x0D => self.dcr(Register::C),
-            0x1D => self.dcr(Register::E),
-            0x2D => self.dcr(Register::L),
-            0x3D => self.dcr(Register::A),
+            0x05 => dcr(self, Register::B),
+            0x15 => dcr(self, Register::D),
+            0x25 => dcr(self, Register::H),
+            0x35 => dcr(self, Register::M),
+            0x0D => dcr(self, Register::C),
+            0x1D => dcr(self, Register::E),
+            0x2D => dcr(self, Register::L),
+            0x3D => dcr(self, Register::A),
 
             // MVI ?, d8
             0x06 => self.mvi(Register::B),
@@ -445,10 +445,10 @@ impl State {
             0x33 => self.inx(Register::SP),
 
             // DCX ?
-            0x0B => self.dcx(Register::B),
-            0x1B => self.dcx(Register::D),
-            0x2B => self.dcx(Register::H),
-            0x3B => self.dcx(Register::SP),
+            0x0B => dcx(self, Register::B),
+            0x1B => dcx(self, Register::D),
+            0x2B => dcx(self, Register::H),
+            0x3B => dcx(self, Register::SP),
 
             // STAX ?
             0x02 => self.stax(Register::B),
