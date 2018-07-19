@@ -1,17 +1,31 @@
-use super::State;
+use state::State;
 
-impl State {
-    pub fn ei(&mut self) -> u8 {
-        self.int_enabled = true;
+/// Enable interrupts
+///
+/// Cycles: 4
+///
+/// # Arguments
+///
+/// * `state` - The state to enable interrupts in
+///
+pub fn ei(state: &mut State) -> u8 {
+    state.int_enabled = true;
 
-        4
-    }
+    4
+}
 
-    pub fn di(&mut self) -> u8 {
-        self.int_enabled = false;
+/// Disable interrupts
+///
+/// Cycles: 4
+///
+/// # Arguments
+///
+/// * `state` - The state to disable interrupts in
+///
+pub fn di(state: &mut State) -> u8 {
+    state.int_enabled = false;
 
-        4
-    }
+    4
 }
 
 #[cfg(test)]
@@ -25,7 +39,7 @@ mod test {
             ..State::default()
         };
 
-        state.ei();
+        ei(&mut state);
 
         assert_eq!(state.int_enabled, true);
     }
@@ -37,7 +51,7 @@ mod test {
             ..State::default()
         };
 
-        state.di();
+        di(&mut state);
 
         assert_eq!(state.int_enabled, false);
     }

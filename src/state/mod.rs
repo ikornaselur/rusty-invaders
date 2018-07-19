@@ -1,4 +1,3 @@
-mod interrupt;
 mod io;
 mod jump;
 mod load;
@@ -23,6 +22,7 @@ use cpu::instructions::daa::daa;
 use cpu::instructions::decrement::{dcr, dcx};
 use cpu::instructions::exchange::{xchg, xthl};
 use cpu::instructions::increment::{inr, inx};
+use cpu::instructions::interrupt::{di, ei};
 
 use io::IO;
 
@@ -566,8 +566,8 @@ impl State {
             0xDB => self.input(),
 
             // Interrupts
-            0xF3 => self.di(),
-            0xFB => self.ei(),
+            0xF3 => di(self),
+            0xFB => ei(self),
 
             // Restarts
             0xC7 => self.rst(0),

@@ -10,6 +10,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 use clock::Clock;
+use cpu::instructions::interrupt::di;
 use state::State;
 
 pub mod clock;
@@ -158,7 +159,7 @@ impl Machine {
                     }
                 }
                 self.interrupt_timer.reset_last_time();
-                self.state.di();
+                di(&mut self.state);
                 match self.next_interrupt {
                     1 => {
                         self.state.rst(1);
