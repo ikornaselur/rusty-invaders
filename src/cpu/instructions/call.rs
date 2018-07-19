@@ -1,123 +1,193 @@
-use super::State;
+use state::State;
 
-impl State {
-    fn process_call(&mut self, address: u16) -> () {
-        // A specific hack for full cpu test
-        if self.debug && address == 5 && self.c == 9 {
-            let offset = (u16::from(self.d) << 8) + u16::from(self.e);
-            if offset == 0x018B {
-                panic!("CPU HAS FAILED");
-            } else if offset == 0x0174 {
-                println!("*** CPU IS OPERATIONAL ***");
-                self.exit = true;
-            } else {
-                panic!("UNKNOWN PRINT");
-            }
+fn process_call(state: &mut State, address: u16) -> () {
+    // A specific hack for full cpu test
+    if state.debug && address == 5 && state.c == 9 {
+        let offset = (u16::from(state.d) << 8) + u16::from(state.e);
+        if offset == 0x018B {
+            panic!("CPU HAS FAILED");
+        } else if offset == 0x0174 {
+            println!("*** CPU IS OPERATIONAL ***");
+            state.exit = true;
+        } else {
+            panic!("UNKNOWN PRINT");
         }
-        // End of said hack
-
-        let least = self.pc as u8;
-        let most = (self.pc >> 8) as u8;
-
-        self.write_byte_to_stack(most);
-        self.write_byte_to_stack(least);
-
-        self.pc = address;
     }
+    // End of said hack
 
-    pub fn call(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
+    let least = state.pc as u8;
+    let most = (state.pc >> 8) as u8;
 
-        self.process_call(address);
+    state.write_byte_to_stack(most);
+    state.write_byte_to_stack(least);
 
+    state.pc = address;
+}
+
+/// Jump to the specified address
+///
+/// Cycles: 17
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn call(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+
+    process_call(state, address);
+
+    17
+}
+
+/// Jump to the specified address if carry bit is set
+///
+/// Cycles: 17 if jump taken, else 11
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn cc(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.carry {
+        process_call(state, address);
+        17
+    } else {
+        11
+    }
+}
+
+/// Jump to the specified address if carry bit is not set
+///
+/// Cycles: 17 if jump taken, else 11
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn cnc(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.carry {
+        11
+    } else {
+        process_call(state, address);
         17
     }
+}
 
-    pub fn cc(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.carry {
-            self.process_call(address);
-            17
-        } else {
-            11
-        }
+/// Jump to the specified address if zero bit is set
+///
+/// Cycles: 17 if jump taken, else 11
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn cz(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.zero {
+        process_call(state, address);
+        17
+    } else {
+        11
     }
+}
 
-    pub fn cnc(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.carry {
-            11
-        } else {
-            self.process_call(address);
-            17
-        }
+/// Jump to the specified address if zero bit is not set
+///
+/// Cycles: 17 if jump taken, else 11
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn cnz(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.zero {
+        11
+    } else {
+        process_call(state, address);
+        17
     }
+}
 
-    pub fn cz(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.zero {
-            self.process_call(address);
-            17
-        } else {
-            11
-        }
+/// Jump to the specified address if sign bit is set
+///
+/// Cycles: 17 if jump taken, else 11
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn cm(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.sign {
+        process_call(state, address);
+        17
+    } else {
+        11
     }
+}
 
-    pub fn cnz(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.zero {
-            11
-        } else {
-            self.process_call(address);
-            17
-        }
+/// Jump to the specified address if sign bit is not set
+///
+/// Cycles: 17 if jump taken, else 11
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn cp(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.sign {
+        11
+    } else {
+        process_call(state, address);
+        17
     }
+}
 
-    pub fn cm(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.sign {
-            self.process_call(address);
-            17
-        } else {
-            11
-        }
+/// Jump to the specified address if parity bit is set
+///
+/// Cycles: 17 if jump taken, else 11
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn cpe(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.parity {
+        process_call(state, address);
+        17
+    } else {
+        11
     }
+}
 
-    pub fn cp(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.sign {
-            11
-        } else {
-            self.process_call(address);
-            17
-        }
-    }
-
-    pub fn cpe(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.parity {
-            self.process_call(address);
-            17
-        } else {
-            11
-        }
-    }
-
-    pub fn cpo(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.parity {
-            11
-        } else {
-            self.process_call(address);
-            17
-        }
+/// Jump to the specified address if parity bit is not set
+///
+/// Cycles: 17 if jump taken, else 11
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the addition in
+///
+pub fn cpo(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.parity {
+        11
+    } else {
+        process_call(state, address);
+        17
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::super::ConditionCodes;
     use super::*;
+    use state::ConditionCodes;
 
     #[test]
     fn call_pushes_the_address_after_to_the_stack_and_jumps() {
@@ -128,7 +198,7 @@ mod test {
             ..State::default()
         };
 
-        state.call();
+        call(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
@@ -151,7 +221,7 @@ mod test {
             ..State::default()
         };
 
-        state.cc();
+        cc(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 8);
@@ -159,7 +229,7 @@ mod test {
 
         state.pc = 6;
         state.cc.carry = true;
-        state.cc();
+        cc(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
@@ -179,7 +249,7 @@ mod test {
             ..State::default()
         };
 
-        state.cnc();
+        cnc(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 8);
@@ -187,7 +257,7 @@ mod test {
 
         state.pc = 6;
         state.cc.carry = false;
-        state.cnc();
+        cnc(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
@@ -207,7 +277,7 @@ mod test {
             ..State::default()
         };
 
-        state.cz();
+        cz(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 8);
@@ -215,7 +285,7 @@ mod test {
 
         state.pc = 6;
         state.cc.zero = true;
-        state.cz();
+        cz(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
@@ -235,7 +305,7 @@ mod test {
             ..State::default()
         };
 
-        state.cnz();
+        cnz(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 8);
@@ -243,7 +313,7 @@ mod test {
 
         state.pc = 6;
         state.cc.zero = false;
-        state.cnz();
+        cnz(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
@@ -263,7 +333,7 @@ mod test {
             ..State::default()
         };
 
-        state.cm();
+        cm(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 8);
@@ -271,7 +341,7 @@ mod test {
 
         state.pc = 6;
         state.cc.sign = true;
-        state.cm();
+        cm(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
@@ -291,7 +361,7 @@ mod test {
             ..State::default()
         };
 
-        state.cp();
+        cp(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 8);
@@ -299,7 +369,7 @@ mod test {
 
         state.pc = 6;
         state.cc.sign = false;
-        state.cp();
+        cp(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
@@ -319,7 +389,7 @@ mod test {
             ..State::default()
         };
 
-        state.cpe();
+        cpe(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 8);
@@ -327,7 +397,7 @@ mod test {
 
         state.pc = 6;
         state.cc.parity = true;
-        state.cpe();
+        cpe(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
@@ -347,7 +417,7 @@ mod test {
             ..State::default()
         };
 
-        state.cpo();
+        cpo(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 8);
@@ -355,7 +425,7 @@ mod test {
 
         state.pc = 6;
         state.cc.parity = false;
-        state.cpo();
+        cpo(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);

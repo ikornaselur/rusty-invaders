@@ -1,4 +1,3 @@
-mod call;
 mod carry;
 mod compare;
 mod complement;
@@ -23,6 +22,7 @@ mod xor;
 
 use cpu::instructions::addition::{aci, adc, add, adi, dad};
 use cpu::instructions::and::{ana, ani};
+use cpu::instructions::call::{call, cc, cm, cnc, cnz, cp, cpe, cpo, cz};
 use io::IO;
 
 #[derive(Debug)]
@@ -543,19 +543,19 @@ impl State {
             0xE2 => self.jpo(), // Jump if parity odd
 
             // Calls
-            0xCD => self.call(),
-            0xDD => self.call(),
-            0xED => self.call(),
-            0xFD => self.call(),
+            0xCD => call(self),
+            0xDD => call(self),
+            0xED => call(self),
+            0xFD => call(self),
 
-            0xDC => self.cc(),  // Call if carry
-            0xD4 => self.cnc(), // Call if no carry
-            0xCC => self.cz(),  // Call if zero
-            0xC4 => self.cnz(), // Call if not zero
-            0xFC => self.cm(),  // Call if minus
-            0xF4 => self.cp(),  // Call if plus
-            0xEC => self.cpe(), // Call if parity even
-            0xE4 => self.cpo(), // Call if parity odd
+            0xDC => cc(self),  // Call if carry
+            0xD4 => cnc(self), // Call if no carry
+            0xCC => cz(self),  // Call if zero
+            0xC4 => cnz(self), // Call if not zero
+            0xFC => cm(self),  // Call if minus
+            0xF4 => cp(self),  // Call if plus
+            0xEC => cpe(self), // Call if parity even
+            0xE4 => cpo(self), // Call if parity odd
 
             // Returns
             0xC9 => self.ret(),

@@ -165,7 +165,6 @@ pub fn aci(state: &mut State) -> u8 {
 mod test {
     use super::*;
     use state::ConditionCodes;
-    use state::State;
 
     #[test]
     fn add_b_adds_b_to_accumulator() {

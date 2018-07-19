@@ -63,7 +63,7 @@ pub fn ani(state: &mut State) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use state::{ConditionCodes, State};
+    use state::ConditionCodes;
 
     #[test]
     fn ana_resets_carry_bit() {
