@@ -1,4 +1,3 @@
-mod daa;
 mod decrement;
 mod exchange;
 mod increment;
@@ -23,6 +22,7 @@ use cpu::instructions::call::{call, cc, cm, cnc, cnz, cp, cpe, cpo, cz};
 use cpu::instructions::carry::{cmc, stc};
 use cpu::instructions::compare::{cmp, cpi};
 use cpu::instructions::complement::cma;
+use cpu::instructions::daa::daa;
 
 use io::IO;
 
@@ -483,7 +483,7 @@ impl State {
             0x1F => self.rar(),
 
             // Decimal Adjustment Accumulator
-            0x27 => self.daa(),
+            0x27 => daa(self),
 
             // Set carry
             0x37 => stc(self),

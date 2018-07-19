@@ -4,3 +4,4 @@ pub mod call;
 pub mod carry;
 pub mod compare;
 pub mod complement;
+pub mod daa;
