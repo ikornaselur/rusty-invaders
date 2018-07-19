@@ -40,7 +40,7 @@ impl State {
                 self.set_flags(result, carry);
             }
             Register::M => {
-                let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
+                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
                 let byte = self.memory[offset as usize];
 
                 let (result, carry) = byte.overflowing_add(1);
@@ -61,17 +61,17 @@ impl State {
     pub fn inx(&mut self, register: Register) -> u8 {
         match register {
             Register::B => {
-                let result = (((self.b as u16) << 8) + self.c as u16).wrapping_add(1);
+                let result = ((u16::from(self.b) << 8) + u16::from(self.c)).wrapping_add(1);
                 self.b = (result >> 8) as u8;
                 self.c = result as u8;
             }
             Register::D => {
-                let result = (((self.d as u16) << 8) + self.e as u16).wrapping_add(1);
+                let result = ((u16::from(self.d) << 8) + u16::from(self.e)).wrapping_add(1);
                 self.d = (result >> 8) as u8;
                 self.e = result as u8;
             }
             Register::H => {
-                let result = (((self.h as u16) << 8) + self.l as u16).wrapping_add(1);
+                let result = ((u16::from(self.h) << 8) + u16::from(self.l)).wrapping_add(1);
                 self.h = (result >> 8) as u8;
                 self.l = result as u8;
             }

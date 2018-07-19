@@ -4,7 +4,7 @@ impl State {
     fn process_call(&mut self, address: u16) -> () {
         // A specific hack for full cpu test
         if self.debug && address == 5 && self.c == 9 {
-            let offset = ((self.d as u16) << 8) + self.e as u16;
+            let offset = (u16::from(self.d) << 8) + u16::from(self.e);
             if offset == 0x018B {
                 panic!("CPU HAS FAILED");
             } else if offset == 0x0174 {
@@ -35,89 +35,81 @@ impl State {
 
     pub fn cc(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        match self.cc.carry {
-            true => {
-                self.process_call(address);
-                17
-            }
-            false => 11,
+        if self.cc.carry {
+            self.process_call(address);
+            17
+        } else {
+            11
         }
     }
 
     pub fn cnc(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        match self.cc.carry {
-            false => {
-                self.process_call(address);
-                17
-            }
-            true => 11,
+        if self.cc.carry {
+            11
+        } else {
+            self.process_call(address);
+            17
         }
     }
 
     pub fn cz(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        match self.cc.zero {
-            true => {
-                self.process_call(address);
-                17
-            }
-            false => 11,
+        if self.cc.zero {
+            self.process_call(address);
+            17
+        } else {
+            11
         }
     }
 
     pub fn cnz(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        match self.cc.zero {
-            false => {
-                self.process_call(address);
-                17
-            }
-            true => 11,
+        if self.cc.zero {
+            11
+        } else {
+            self.process_call(address);
+            17
         }
     }
 
     pub fn cm(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        match self.cc.sign {
-            true => {
-                self.process_call(address);
-                17
-            }
-            false => 11,
+        if self.cc.sign {
+            self.process_call(address);
+            17
+        } else {
+            11
         }
     }
 
     pub fn cp(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        match self.cc.sign {
-            false => {
-                self.process_call(address);
-                17
-            }
-            true => 11,
+        if self.cc.sign {
+            11
+        } else {
+            self.process_call(address);
+            17
         }
     }
 
     pub fn cpe(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        match self.cc.parity {
-            true => {
-                self.process_call(address);
-                17
-            }
-            false => 11,
+        if self.cc.parity {
+            self.process_call(address);
+            17
+        } else {
+            11
         }
     }
 
     pub fn cpo(&mut self) -> u8 {
         let address = self.read_address().unwrap();
-        match self.cc.parity {
-            false => {
-                self.process_call(address);
-                17
-            }
-            true => 11,
+        if self.cc.parity {
+            11
+        } else {
+            self.process_call(address);
+            17
         }
     }
 }

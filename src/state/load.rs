@@ -20,7 +20,7 @@ impl State {
                 self.h = most;
             }
             Register::SP => {
-                self.sp = ((most as u16) << 8) + least as u16;
+                self.sp = (u16::from(most) << 8) + u16::from(least);
             }
             unsupported => {
                 panic!("lxi doesn't support {:?}", unsupported);
@@ -31,7 +31,7 @@ impl State {
     }
 
     pub fn sphl(&mut self) -> u8 {
-        self.sp = ((self.h as u16) << 8) + self.l as u16;
+        self.sp = (u16::from(self.h) << 8) + u16::from(self.l);
 
         5
     }
@@ -55,8 +55,8 @@ impl State {
 
     pub fn ldax(&mut self, register: Register) -> u8 {
         let address = match register {
-            Register::B => ((self.b as u16) << 8) + self.c as u16,
-            Register::D => ((self.d as u16) << 8) + self.e as u16,
+            Register::B => (u16::from(self.b) << 8) + u16::from(self.c),
+            Register::D => (u16::from(self.d) << 8) + u16::from(self.e),
             unsupported => {
                 panic!("stax doesn't support {:?}", unsupported);
             }
@@ -68,7 +68,7 @@ impl State {
     }
 
     pub fn pchl(&mut self) -> u8 {
-        self.pc = ((self.h as u16) << 8) + self.l as u16;
+        self.pc = (u16::from(self.h) << 8) + u16::from(self.l);
 
         5
     }

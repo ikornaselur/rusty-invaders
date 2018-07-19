@@ -19,7 +19,7 @@ pub mod state;
 // 1 Billion nanoseconds divided by 2 million cycles a second
 const CYCLE_TIME_NANOS: u64 = 1_000_000_000 / 2_000_000;
 const INTERRUPT_TIME: Duration = Duration::from_micros(1_000_000 / 120);
-const SCALE: f32 = 8f32;
+const SCALE: u32 = 8;
 
 pub fn run(config: Config) -> Result<(), Box<Error>> {
     let mut f = File::open(config.filename)?;
@@ -45,7 +45,7 @@ impl Machine {
     fn new(mut buffer: Vec<u8>) -> Machine {
         buffer.resize(0x10000, 0);
         let window = RenderWindow::new(
-            (224 * (SCALE as u32), 256 * (SCALE as u32)),
+            (224 * SCALE, 256 * SCALE),
             "Rusty Invaders",
             Style::CLOSE,
             &Default::default(),
@@ -56,7 +56,7 @@ impl Machine {
             interrupt_timer: Clock::new(),
             cpu_timer: Clock::new(),
             next_interrupt: 1,
-            window: window,
+            window,
             keys: 0,
         }
     }
@@ -64,7 +64,7 @@ impl Machine {
     fn key_press(&mut self, key: Key) -> () {
         match key {
             Key::C => {
-                self.keys |= 1 << 0;
+                self.keys |= 1;
             }
             Key::Return => {
                 self.keys |= 1 << 2;
@@ -86,7 +86,7 @@ impl Machine {
     fn key_release(&mut self, key: Key) -> () {
         match key {
             Key::C => {
-                self.keys &= !(1 << 0);
+                self.keys &= !1;
             }
             Key::Return => {
                 self.keys &= !(1 << 2);
@@ -122,8 +122,8 @@ impl Machine {
 
         let mut sprite = Sprite::with_texture(&texture);
         sprite.set_rotation(270f32);
-        sprite.set_position((0f32, SCALE * 256f32));
-        sprite.set_scale((SCALE, SCALE));
+        sprite.set_position((0f32, SCALE as f32 * 256f32));
+        sprite.set_scale((SCALE as f32, SCALE as f32));
 
         self.window.clear(&Color::BLACK);
         self.window.draw(&sprite);
@@ -131,7 +131,7 @@ impl Machine {
     }
 
     fn sync(&mut self, cycles: u8) -> () {
-        let cycle_duration = Duration::from_nanos(cycles as u64 * CYCLE_TIME_NANOS);
+        let cycle_duration = Duration::from_nanos(u64::from(cycles) * CYCLE_TIME_NANOS);
 
         let elapsed = self.cpu_timer.elapsed();
 

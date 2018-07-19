@@ -4,6 +4,12 @@ pub struct Clock {
     last_time: Instant,
 }
 
+impl Default for Clock {
+    fn default() -> Clock {
+        Clock::new()
+    }
+}
+
 impl Clock {
     pub fn new() -> Clock {
         Clock {

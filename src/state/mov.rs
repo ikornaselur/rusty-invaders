@@ -12,7 +12,7 @@ impl State {
             Register::H => self.h,
             Register::L => self.l,
             Register::M => {
-                let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
+                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
                 self.memory[offset as usize]
             }
             unsupported => {
@@ -29,7 +29,7 @@ impl State {
             Register::H => self.h = val,
             Register::L => self.l = val,
             Register::M => {
-                let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
+                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
                 self.memory[offset as usize] = val;
             }
             unsupported => {
@@ -55,7 +55,7 @@ impl State {
             Register::H => self.h = byte,
             Register::L => self.l = byte,
             Register::M => {
-                let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
+                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
                 self.memory[offset as usize] = byte;
             }
             unsupported => {

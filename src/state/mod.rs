@@ -107,8 +107,8 @@ impl Default for State {
 impl State {
     pub fn new(memory: Vec<u8>, debug: bool) -> State {
         State {
-            memory: memory,
-            debug: debug,
+            memory,
+            debug,
             ..State::default()
         }
     }
@@ -126,7 +126,7 @@ impl State {
     pub fn read_address(&mut self) -> Option<u16> {
         if let Some(least) = self.read_byte() {
             if let Some(most) = self.read_byte() {
-                return Some(((most as u16) << 8) + least as u16);
+                return Some((u16::from(most) << 8) + u16::from(least));
             }
         }
         None
@@ -145,7 +145,7 @@ impl State {
     pub fn read_address_from_stack(&mut self) -> Option<u16> {
         if let Some(least) = self.read_byte_from_stack() {
             if let Some(most) = self.read_byte_from_stack() {
-                return Some(((most as u16) << 8) + least as u16);
+                return Some((u16::from(most) << 8) + u16::from(least));
             }
         }
         None

@@ -21,8 +21,8 @@ impl State {
 
     pub fn stax(&mut self, register: Register) -> u8 {
         let address = match register {
-            Register::B => ((self.b as u16) << 8) + self.c as u16,
-            Register::D => ((self.d as u16) << 8) + self.e as u16,
+            Register::B => (u16::from(self.b) << 8) + u16::from(self.c),
+            Register::D => (u16::from(self.d) << 8) + u16::from(self.e),
             unsupported => {
                 panic!("stax doesn't support {:?}", unsupported);
             }

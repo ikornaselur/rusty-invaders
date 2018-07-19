@@ -28,7 +28,7 @@ impl IO {
     pub fn write(&mut self, port: usize, value: u8) -> () {
         match port {
             2 => self.shift_offset = value & 0x7,
-            4 => self.shift_value = (self.shift_value >> 8) | (value as u16) << 8,
+            4 => self.shift_value = (self.shift_value >> 8) | u16::from(value) << 8,
             6 => (),
             _ => self.ports[port] = value,
         }

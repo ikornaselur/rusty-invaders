@@ -12,7 +12,7 @@ impl State {
             Register::H => self.a.overflowing_add(self.h),
             Register::L => self.a.overflowing_add(self.l),
             Register::M => {
-                let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
+                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
                 self.a.overflowing_add(self.memory[offset as usize])
             }
             unsupported => {
@@ -40,11 +40,11 @@ impl State {
     }
 
     pub fn dad(&mut self, register: Register) -> u8 {
-        let current: u16 = ((self.h as u16) << 8) + self.l as u16;
+        let current: u16 = (u16::from(self.h) << 8) + u16::from(self.l);
         let (result, carry) = match register {
-            Register::B => current.overflowing_add(((self.b as u16) << 8) + self.c as u16),
-            Register::D => current.overflowing_add(((self.d as u16) << 8) + self.e as u16),
-            Register::H => current.overflowing_add(((self.h as u16) << 8) + self.l as u16),
+            Register::B => current.overflowing_add((u16::from(self.b) << 8) + u16::from(self.c)),
+            Register::D => current.overflowing_add((u16::from(self.d) << 8) + u16::from(self.e)),
+            Register::H => current.overflowing_add((u16::from(self.h) << 8) + u16::from(self.l)),
             Register::SP => current.overflowing_add(self.sp),
             unsupported => {
                 panic!("dad doesn't support {:?}", unsupported);
@@ -68,7 +68,7 @@ impl State {
             Register::H => self.h,
             Register::L => self.l,
             Register::M => {
-                let offset: u16 = ((self.h as u16) << 8) + self.l as u16;
+                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
                 self.memory[offset as usize]
             }
             unsupported => {
@@ -76,9 +76,10 @@ impl State {
             }
         };
 
-        let (byte, byte_carry) = match self.cc.carry {
-            true => byte.overflowing_add(1),
-            false => (byte, false),
+        let (byte, byte_carry) = if self.cc.carry {
+            byte.overflowing_add(1)
+        } else {
+            (byte, false)
         };
 
         let (result, carry) = self.a.overflowing_add(byte);
@@ -95,9 +96,10 @@ impl State {
     pub fn aci(&mut self) -> u8 {
         let byte = self.read_byte().unwrap();
 
-        let (byte, byte_carry) = match self.cc.carry {
-            true => byte.overflowing_add(1),
-            false => (byte, false),
+        let (byte, byte_carry) = if self.cc.carry {
+            byte.overflowing_add(1)
+        } else {
+            (byte, false)
         };
 
         let (result, carry) = self.a.overflowing_add(byte);
