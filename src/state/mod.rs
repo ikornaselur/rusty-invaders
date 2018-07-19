@@ -1,4 +1,3 @@
-mod increment;
 mod interrupt;
 mod io;
 mod jump;
@@ -23,6 +22,7 @@ use cpu::instructions::complement::cma;
 use cpu::instructions::daa::daa;
 use cpu::instructions::decrement::{dcr, dcx};
 use cpu::instructions::exchange::{xchg, xthl};
+use cpu::instructions::increment::{inr, inx};
 
 use io::IO;
 
@@ -242,14 +242,14 @@ impl State {
             0x31 => self.lxi(Register::SP),
 
             // INR ?
-            0x04 => self.inr(Register::B),
-            0x14 => self.inr(Register::D),
-            0x24 => self.inr(Register::H),
-            0x34 => self.inr(Register::M),
-            0x0C => self.inr(Register::C),
-            0x1C => self.inr(Register::E),
-            0x2C => self.inr(Register::L),
-            0x3C => self.inr(Register::A),
+            0x04 => inr(self, Register::B),
+            0x14 => inr(self, Register::D),
+            0x24 => inr(self, Register::H),
+            0x34 => inr(self, Register::M),
+            0x0C => inr(self, Register::C),
+            0x1C => inr(self, Register::E),
+            0x2C => inr(self, Register::L),
+            0x3C => inr(self, Register::A),
 
             // DCR ?
             0x05 => dcr(self, Register::B),
@@ -439,10 +439,10 @@ impl State {
             0x39 => dad(self, Register::SP),
 
             // INX ?
-            0x03 => self.inx(Register::B),
-            0x13 => self.inx(Register::D),
-            0x23 => self.inx(Register::H),
-            0x33 => self.inx(Register::SP),
+            0x03 => inx(self, Register::B),
+            0x13 => inx(self, Register::D),
+            0x23 => inx(self, Register::H),
+            0x33 => inx(self, Register::SP),
 
             // DCX ?
             0x0B => dcx(self, Register::B),
