@@ -1,4 +1,3 @@
-mod complement;
 mod daa;
 mod decrement;
 mod exchange;
@@ -23,6 +22,7 @@ use cpu::instructions::and::{ana, ani};
 use cpu::instructions::call::{call, cc, cm, cnc, cnz, cp, cpe, cpo, cz};
 use cpu::instructions::carry::{cmc, stc};
 use cpu::instructions::compare::{cmp, cpi};
+use cpu::instructions::complement::cma;
 
 use io::IO;
 
@@ -489,7 +489,7 @@ impl State {
             0x37 => stc(self),
 
             // Complement accumulator
-            0x2F => self.cma(),
+            0x2F => cma(self),
 
             // Complement carry
             0x3F => cmc(self),
