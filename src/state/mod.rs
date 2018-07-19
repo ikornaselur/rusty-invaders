@@ -1,4 +1,3 @@
-mod io;
 mod jump;
 mod load;
 mod mov;
@@ -23,6 +22,7 @@ use cpu::instructions::decrement::{dcr, dcx};
 use cpu::instructions::exchange::{xchg, xthl};
 use cpu::instructions::increment::{inr, inx};
 use cpu::instructions::interrupt::{di, ei};
+use cpu::instructions::io::{input, output};
 
 use io::IO;
 
@@ -562,8 +562,8 @@ impl State {
             0x76 => self.hlt(),
 
             // IO
-            0xD3 => self.output(),
-            0xDB => self.input(),
+            0xD3 => output(self),
+            0xDB => input(self),
 
             // Interrupts
             0xF3 => di(self),

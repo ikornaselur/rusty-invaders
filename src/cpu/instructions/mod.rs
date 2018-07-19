@@ -9,3 +9,4 @@ pub mod decrement;
 pub mod exchange;
 pub mod increment;
 pub mod interrupt;
+pub mod io;
