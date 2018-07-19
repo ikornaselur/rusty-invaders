@@ -1,4 +1,3 @@
-mod exchange;
 mod increment;
 mod interrupt;
 mod io;
@@ -23,6 +22,7 @@ use cpu::instructions::compare::{cmp, cpi};
 use cpu::instructions::complement::cma;
 use cpu::instructions::daa::daa;
 use cpu::instructions::decrement::{dcr, dcx};
+use cpu::instructions::exchange::{xchg, xthl};
 
 use io::IO;
 
@@ -495,10 +495,10 @@ impl State {
             0x3F => cmc(self),
 
             // Exchange registers
-            0xEB => self.xchg(),
+            0xEB => xchg(self),
 
             // Exchange stack
-            0xE3 => self.xthl(),
+            0xE3 => xthl(self),
 
             // Load SP from H and L
             0xF9 => self.sphl(),

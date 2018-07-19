@@ -6,3 +6,4 @@ pub mod compare;
 pub mod complement;
 pub mod daa;
 pub mod decrement;
+pub mod exchange;

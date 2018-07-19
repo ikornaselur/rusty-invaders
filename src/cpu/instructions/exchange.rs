@@ -1,20 +1,34 @@
-use super::State;
+use state::State;
 use std::mem::swap;
 
-impl State {
-    pub fn xchg(&mut self) -> u8 {
-        swap(&mut self.h, &mut self.d);
-        swap(&mut self.l, &mut self.e);
+/// Swap the contents of register pairs HL with DE
+///
+/// Cycles: 5
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the swap in
+///
+pub fn xchg(state: &mut State) -> u8 {
+    swap(&mut state.h, &mut state.d);
+    swap(&mut state.l, &mut state.e);
 
-        5
-    }
+    5
+}
 
-    pub fn xthl(&mut self) -> u8 {
-        swap(&mut self.h, &mut self.memory[(self.sp + 1) as usize]);
-        swap(&mut self.l, &mut self.memory[self.sp as usize]);
+/// Swap the contents of register pairs HL with the top of the stack
+///
+/// Cycles: 18
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the swap in
+///
+pub fn xthl(state: &mut State) -> u8 {
+    swap(&mut state.h, &mut state.memory[(state.sp + 1) as usize]);
+    swap(&mut state.l, &mut state.memory[state.sp as usize]);
 
-        18
-    }
+    18
 }
 
 #[cfg(test)]
@@ -31,7 +45,7 @@ mod test {
             ..State::default()
         };
 
-        state.xchg();
+        xchg(&mut state);
 
         assert_eq!(state.d, 0xBE);
         assert_eq!(state.e, 0xEF);
@@ -49,7 +63,7 @@ mod test {
             ..State::default()
         };
 
-        state.xthl();
+        xthl(&mut state);
 
         assert_eq!(state.h, 0xAD);
         assert_eq!(state.l, 0xDE);
