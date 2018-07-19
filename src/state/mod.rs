@@ -1,5 +1,3 @@
-mod carry;
-mod compare;
 mod complement;
 mod daa;
 mod decrement;
@@ -23,6 +21,9 @@ mod xor;
 use cpu::instructions::addition::{aci, adc, add, adi, dad};
 use cpu::instructions::and::{ana, ani};
 use cpu::instructions::call::{call, cc, cm, cnc, cnz, cp, cpe, cpo, cz};
+use cpu::instructions::carry::{cmc, stc};
+use cpu::instructions::compare::{cmp, cpi};
+
 use io::IO;
 
 #[derive(Debug)]
@@ -130,19 +131,6 @@ impl State {
             }
         }
         None
-    }
-
-    pub fn read_base_register(&self, register: Register) -> u8 {
-        match register {
-            Register::A => self.a,
-            Register::B => self.b,
-            Register::C => self.c,
-            Register::D => self.d,
-            Register::E => self.e,
-            Register::H => self.h,
-            Register::L => self.l,
-            _ => panic!("Unsupported"),
-        }
     }
 
     pub fn read_byte_from_stack(&mut self) -> Option<u8> {
@@ -423,14 +411,14 @@ impl State {
             0xB7 => self.ora(Register::A),
 
             // CMP ?
-            0xB8 => self.cmp(Register::B),
-            0xB9 => self.cmp(Register::C),
-            0xBA => self.cmp(Register::D),
-            0xBB => self.cmp(Register::E),
-            0xBC => self.cmp(Register::H),
-            0xBD => self.cmp(Register::L),
-            0xBE => self.cmp(Register::M),
-            0xBF => self.cmp(Register::A),
+            0xB8 => cmp(self, Register::B),
+            0xB9 => cmp(self, Register::C),
+            0xBA => cmp(self, Register::D),
+            0xBB => cmp(self, Register::E),
+            0xBC => cmp(self, Register::H),
+            0xBD => cmp(self, Register::L),
+            0xBE => cmp(self, Register::M),
+            0xBF => cmp(self, Register::A),
 
             // POP ?
             0xC1 => self.pop(Register::B),
@@ -486,7 +474,7 @@ impl State {
             // XRI d8
             0xEE => self.xri(),
             // CPI d8
-            0xFE => self.cpi(),
+            0xFE => cpi(self),
 
             // Rotate accumulator
             0x07 => self.rlc(),
@@ -498,13 +486,13 @@ impl State {
             0x27 => self.daa(),
 
             // Set carry
-            0x37 => self.stc(),
+            0x37 => stc(self),
 
             // Complement accumulator
             0x2F => self.cma(),
 
             // Complement carry
-            0x3F => self.cmc(),
+            0x3F => cmc(self),
 
             // Exchange registers
             0xEB => self.xchg(),

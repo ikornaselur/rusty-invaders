@@ -1,42 +1,60 @@
-use super::Register;
-use super::State;
+use state::{Register, State};
 
-impl State {
-    pub fn cmp(&mut self, register: Register) -> u8 {
-        let (result, borrow) = match register {
-            Register::A => self.a.overflowing_sub(self.a),
-            Register::B => self.a.overflowing_sub(self.b),
-            Register::C => self.a.overflowing_sub(self.c),
-            Register::D => self.a.overflowing_sub(self.d),
-            Register::E => self.a.overflowing_sub(self.e),
-            Register::H => self.a.overflowing_sub(self.h),
-            Register::L => self.a.overflowing_sub(self.l),
-            Register::M => {
-                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
-                self.a.overflowing_sub(self.memory[offset as usize])
-            }
-            unsupported => {
-                panic!("sub doesn't support {:?}", unsupported);
-            }
-        };
-
-        self.set_flags(result, borrow);
-
-        match register {
-            Register::M => 7,
-            _ => 4,
+/// Compare a register to the accumulator and set the flags based on the comparison
+///
+/// Sets conditions flags
+///
+/// Cycles: 7 for register M, else 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the comparison in
+/// * `register` - The register to compare to the accumulator
+///
+pub fn cmp(state: &mut State, register: Register) -> u8 {
+    let (result, borrow) = match register {
+        Register::A => state.a.overflowing_sub(state.a),
+        Register::B => state.a.overflowing_sub(state.b),
+        Register::C => state.a.overflowing_sub(state.c),
+        Register::D => state.a.overflowing_sub(state.d),
+        Register::E => state.a.overflowing_sub(state.e),
+        Register::H => state.a.overflowing_sub(state.h),
+        Register::L => state.a.overflowing_sub(state.l),
+        Register::M => {
+            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
+            state.a.overflowing_sub(state.memory[offset as usize])
         }
+        unsupported => {
+            panic!("sub doesn't support {:?}", unsupported);
+        }
+    };
+
+    state.set_flags(result, borrow);
+
+    match register {
+        Register::M => 7,
+        _ => 4,
     }
+}
 
-    pub fn cpi(&mut self) -> u8 {
-        let byte = self.read_byte().unwrap();
+/// Compare the accumulator to the next immediate byte and set the flags based on the comparison
+///
+/// Sets conditions flags
+///
+/// Cycles: 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the comparison in
+///
+pub fn cpi(state: &mut State) -> u8 {
+    let byte = state.read_byte().unwrap();
 
-        let (result, borrow) = self.a.overflowing_sub(byte);
+    let (result, borrow) = state.a.overflowing_sub(byte);
 
-        self.set_flags(result, borrow);
+    state.set_flags(result, borrow);
 
-        7
-    }
+    7
 }
 
 #[cfg(test)]
@@ -51,7 +69,7 @@ mod test {
             ..State::default()
         };
 
-        state.cmp(Register::B);
+        cmp(&mut state, Register::B);
 
         assert_eq!(state.a, 10);
         assert_eq!(state.b, 9);
@@ -70,7 +88,7 @@ mod test {
             ..State::default()
         };
 
-        state.cmp(Register::B);
+        cmp(&mut state, Register::B);
 
         assert_eq!(state.a, 10);
         assert_eq!(state.b, 10);
@@ -89,7 +107,7 @@ mod test {
             ..State::default()
         };
 
-        state.cmp(Register::B);
+        cmp(&mut state, Register::B);
 
         assert_eq!(state.a, 10);
         assert_eq!(state.b, 11);
@@ -108,7 +126,7 @@ mod test {
             ..State::default()
         };
 
-        state.cpi();
+        cpi(&mut state);
 
         assert_eq!(state.a, 10);
 
@@ -126,7 +144,7 @@ mod test {
             ..State::default()
         };
 
-        state.cpi();
+        cpi(&mut state);
 
         assert_eq!(state.a, 10);
 
@@ -144,7 +162,7 @@ mod test {
             ..State::default()
         };
 
-        state.cpi();
+        cpi(&mut state);
 
         assert_eq!(state.a, 10);
 
