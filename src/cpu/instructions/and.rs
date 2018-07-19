@@ -1,50 +1,69 @@
-use super::Register;
-use super::State;
+use state::{Register, State};
 
-impl State {
-    pub fn ana(&mut self, register: Register) -> u8 {
-        let result = self.a & match register {
-            Register::A => self.a,
-            Register::B => self.b,
-            Register::C => self.c,
-            Register::D => self.d,
-            Register::E => self.e,
-            Register::H => self.h,
-            Register::L => self.l,
-            Register::M => {
-                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
-                self.memory[offset as usize]
-            }
-            unsupported => {
-                panic!("ana doesn't support {:?}", unsupported);
-            }
-        };
-
-        self.a = result;
-        self.set_flags(result, false);
-
-        match register {
-            Register::M => 7,
-            _ => 4,
+/// Perform an and between accumulator and register and put the results into the accumulator
+///
+/// Sets condition flags
+///
+/// Cycles: 7 for register M, else 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the and in
+/// * `register` - The register to perform the and with
+///
+pub fn ana(state: &mut State, register: Register) -> u8 {
+    let result = state.a & match register {
+        Register::A => state.a,
+        Register::B => state.b,
+        Register::C => state.c,
+        Register::D => state.d,
+        Register::E => state.e,
+        Register::H => state.h,
+        Register::L => state.l,
+        Register::M => {
+            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
+            state.memory[offset as usize]
         }
+        unsupported => {
+            panic!("ana doesn't support {:?}", unsupported);
+        }
+    };
+
+    state.a = result;
+    state.set_flags(result, false);
+
+    match register {
+        Register::M => 7,
+        _ => 4,
     }
+}
 
-    pub fn ani(&mut self) -> u8 {
-        let byte = self.read_byte().unwrap();
+/// Perform an and between accumulator and the next immediate byte and put the results into the
+/// accumulator
+///
+/// Sets condition flags
+///
+/// Cycles: 7
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the and in
+///
+pub fn ani(state: &mut State) -> u8 {
+    let byte = state.read_byte().unwrap();
 
-        let result = self.a & byte;
+    let result = state.a & byte;
 
-        self.a = result;
-        self.set_flags(result, false);
+    state.a = result;
+    state.set_flags(result, false);
 
-        7
-    }
+    7
 }
 
 #[cfg(test)]
 mod test {
-    use super::super::ConditionCodes;
     use super::*;
+    use state::{ConditionCodes, State};
 
     #[test]
     fn ana_resets_carry_bit() {
@@ -58,7 +77,7 @@ mod test {
             ..State::default()
         };
 
-        state.ana(Register::B);
+        ana(&mut state, Register::B);
 
         assert_eq!(state.cc.carry, false);
     }
@@ -71,7 +90,7 @@ mod test {
             ..State::default()
         };
 
-        state.ana(Register::B);
+        ana(&mut state, Register::B);
 
         assert_eq!(state.a, 0b0000_1100);
     }
@@ -84,7 +103,7 @@ mod test {
             ..State::default()
         };
 
-        state.ana(Register::C);
+        ana(&mut state, Register::C);
 
         assert_eq!(state.a, 0b0000_1100);
     }
@@ -97,7 +116,7 @@ mod test {
             ..State::default()
         };
 
-        state.ana(Register::D);
+        ana(&mut state, Register::D);
 
         assert_eq!(state.a, 0b0000_1100);
     }
@@ -110,7 +129,7 @@ mod test {
             ..State::default()
         };
 
-        state.ana(Register::E);
+        ana(&mut state, Register::E);
 
         assert_eq!(state.a, 0b0000_1100);
     }
@@ -123,7 +142,7 @@ mod test {
             ..State::default()
         };
 
-        state.ana(Register::H);
+        ana(&mut state, Register::H);
 
         assert_eq!(state.a, 0b0000_1100);
     }
@@ -136,7 +155,7 @@ mod test {
             ..State::default()
         };
 
-        state.ana(Register::L);
+        ana(&mut state, Register::L);
 
         assert_eq!(state.a, 0b0000_1100);
     }
@@ -148,7 +167,7 @@ mod test {
             ..State::default()
         };
 
-        state.ana(Register::A);
+        ana(&mut state, Register::A);
 
         assert_eq!(state.a, 0b1111_1100);
     }
@@ -163,7 +182,7 @@ mod test {
             ..State::default()
         };
 
-        state.ana(Register::M);
+        ana(&mut state, Register::M);
 
         assert_eq!(state.a, 0b0000_1100);
     }
@@ -180,11 +199,11 @@ mod test {
             ..State::default()
         };
 
-        state.ani();
+        ani(&mut state);
         assert_eq!(state.a, 0b0011_0000);
         assert_eq!(state.cc.carry, false);
 
-        state.ani();
+        ani(&mut state);
         assert_eq!(state.a, 0b0010_0000);
         assert_eq!(state.cc.carry, false);
     }

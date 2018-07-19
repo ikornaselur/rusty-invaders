@@ -1,4 +1,3 @@
-mod and;
 mod call;
 mod carry;
 mod compare;
@@ -23,6 +22,7 @@ mod sub;
 mod xor;
 
 use cpu::instructions::addition::{aci, adc, add, adi, dad};
+use cpu::instructions::and::{ana, ani};
 use io::IO;
 
 #[derive(Debug)]
@@ -393,14 +393,14 @@ impl State {
             0x9F => self.sbb(Register::A),
 
             // ANA ?
-            0xA0 => self.ana(Register::B),
-            0xA1 => self.ana(Register::C),
-            0xA2 => self.ana(Register::D),
-            0xA3 => self.ana(Register::E),
-            0xA4 => self.ana(Register::H),
-            0xA5 => self.ana(Register::L),
-            0xA6 => self.ana(Register::M),
-            0xA7 => self.ana(Register::A),
+            0xA0 => ana(self, Register::B),
+            0xA1 => ana(self, Register::C),
+            0xA2 => ana(self, Register::D),
+            0xA3 => ana(self, Register::E),
+            0xA4 => ana(self, Register::H),
+            0xA5 => ana(self, Register::L),
+            0xA6 => ana(self, Register::M),
+            0xA7 => ana(self, Register::A),
 
             // XRA ?
             0xA8 => self.xra(Register::B),
@@ -476,7 +476,7 @@ impl State {
             // SUI d8
             0xD6 => self.sui(),
             // ANI d8
-            0xE6 => self.ani(),
+            0xE6 => ani(self),
             // ORI d8
             0xF6 => self.ori(),
             // ACI d8
