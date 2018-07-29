@@ -24,12 +24,11 @@ use cpu::instructions::store::{shld, sta, stax};
 use cpu::instructions::subtraction::{sbb, sbi, sub, sui};
 use cpu::instructions::xor::{xra, xri};
 use cpu::register::Register;
-
 use machine::io::IO;
 
-pub mod flags;
-pub mod instructions;
-pub mod register;
+mod flags;
+mod instructions;
+mod register;
 
 #[derive(Debug, PartialEq)]
 pub struct CPU {
@@ -136,6 +135,14 @@ impl CPU {
             panic!("Can only write to port 1 and 2");
         }
         self.io.set(port, byte);
+    }
+
+    pub fn interrupt(&mut self, interrupt_num: usize) -> () {
+        rst(self, interrupt_num);
+    }
+
+    pub fn disable_interrupt(&mut self) -> () {
+        di(self);
     }
 
     pub fn nop(&mut self) -> u8 {

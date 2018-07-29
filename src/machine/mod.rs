@@ -6,8 +6,6 @@ use sfml::window::{Event, Key, Style};
 use std::thread::sleep;
 use std::time::Duration;
 
-use cpu::instructions::interrupt::di;
-use cpu::instructions::restart::rst;
 use cpu::CPU;
 use machine::clock::Clock;
 
@@ -144,15 +142,15 @@ impl Machine {
                     }
                 }
                 self.interrupt_timer.reset_last_time();
-                di(&mut self.cpu);
+                self.cpu.disable_interrupt();
                 match self.next_interrupt {
                     1 => {
-                        rst(&mut self.cpu, 1);
+                        self.cpu.interrupt(1);
                         self.next_interrupt = 2;
                     }
                     2 => {
                         self.draw();
-                        rst(&mut self.cpu, 2);
+                        self.cpu.interrupt(2);
                         self.next_interrupt = 1;
                     }
                     _ => panic!("Invalid interrupt"),
