@@ -95,15 +95,15 @@ pub fn rar(state: &mut State) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use state::ConditionCodes;
+    use cpu::flags::Flags;
 
     #[test]
     fn rlc_rotates_accumulator_left() {
         let mut state = State {
             a: 0b0111_0010,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -123,9 +123,9 @@ mod test {
     fn ral_rotates_accumulator_left_through_carry() {
         let mut state = State {
             a: 0b0111_0010,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -145,9 +145,9 @@ mod test {
     fn rrc_rotates_accumulator_right() {
         let mut state = State {
             a: 0b1111_0010,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -167,9 +167,9 @@ mod test {
     fn rar_rotates_accumulator_right_through_carry() {
         let mut state = State {
             a: 0b1111_0011,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };

@@ -145,7 +145,7 @@ pub fn sbi(state: &mut State) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use state::ConditionCodes;
+    use cpu::flags::Flags;
 
     #[test]
     fn sub_a_subs_a_from_accumulator() {
@@ -313,9 +313,9 @@ mod test {
         let mut state = State {
             a: 4,
             b: 10,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -331,9 +331,9 @@ mod test {
         let mut state = State {
             a: 4,
             b: 10,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -349,9 +349,9 @@ mod test {
         let mut state = State {
             a: 4,
             b: 1,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -367,9 +367,9 @@ mod test {
         let mut state = State {
             a: 4,
             b: 1,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -385,9 +385,9 @@ mod test {
         let mut state = State {
             a: 5,
             c: 10,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -403,9 +403,9 @@ mod test {
         let mut state = State {
             a: 5,
             d: 10,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -421,9 +421,9 @@ mod test {
         let mut state = State {
             a: 5,
             e: 10,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -439,9 +439,9 @@ mod test {
         let mut state = State {
             a: 5,
             h: 10,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -459,9 +459,9 @@ mod test {
             a: 5,
             h: 0x00,
             l: 0x05,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -476,9 +476,9 @@ mod test {
         let mut state = State {
             a: 4,
             l: 2,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -495,9 +495,9 @@ mod test {
         let mut state = State {
             a: u8::max_value(),
             b: u8::max_value(),
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };

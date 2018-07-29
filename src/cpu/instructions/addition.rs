@@ -177,7 +177,7 @@ pub fn aci(state: &mut State) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use state::ConditionCodes;
+    use cpu::flags::Flags;
 
     #[test]
     fn add_b_adds_b_to_accumulator() {
@@ -371,9 +371,9 @@ mod test {
         let mut state = State {
             a: 1,
             b: 2,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -389,9 +389,9 @@ mod test {
         let mut state = State {
             a: u8::max_value(),
             b: u8::max_value(),
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -407,9 +407,9 @@ mod test {
         let mut state = State {
             a: u8::max_value(),
             b: 0,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -425,9 +425,9 @@ mod test {
         let mut state = State {
             a: 1,
             c: 2,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -443,9 +443,9 @@ mod test {
         let mut state = State {
             a: 1,
             d: 2,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -461,9 +461,9 @@ mod test {
         let mut state = State {
             a: 1,
             e: 2,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -479,9 +479,9 @@ mod test {
         let mut state = State {
             a: 1,
             h: 2,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -497,9 +497,9 @@ mod test {
         let mut state = State {
             a: 1,
             l: 2,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -517,9 +517,9 @@ mod test {
             a: 1,
             h: 0x00,
             l: 0x05,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -534,9 +534,9 @@ mod test {
     fn adc_a_adds_a_with_carry_to_accumulator() {
         let mut state = State {
             a: 1,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };

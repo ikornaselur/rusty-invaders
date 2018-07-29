@@ -171,7 +171,7 @@ pub fn jpo(state: &mut State) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use state::ConditionCodes;
+    use cpu::flags::Flags;
 
     #[test]
     fn jmp_sets_pc_to_new_address() {
@@ -189,9 +189,9 @@ mod test {
     fn jc_sets_pc_to_new_address_if_carry_flag_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -210,9 +210,9 @@ mod test {
     fn jnc_sets_pc_to_new_address_if_carry_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -231,9 +231,9 @@ mod test {
     fn jz_sets_pc_to_new_address_if_zero_flag_is_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: ConditionCodes {
+            cc: Flags {
                 zero: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -252,9 +252,9 @@ mod test {
     fn jnz_sets_pc_to_new_address_if_zero_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: ConditionCodes {
+            cc: Flags {
                 zero: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -273,9 +273,9 @@ mod test {
     fn jm_sets_pc_to_new_address_if_sign_flag_is_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: ConditionCodes {
+            cc: Flags {
                 sign: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -294,9 +294,9 @@ mod test {
     fn jp_sets_pc_to_new_address_if_sign_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: ConditionCodes {
+            cc: Flags {
                 sign: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -315,9 +315,9 @@ mod test {
     fn jpe_sets_pc_to_new_address_if_parity_flag_is_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: ConditionCodes {
+            cc: Flags {
                 parity: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -336,9 +336,9 @@ mod test {
     fn jpo_sets_pc_to_new_address_if_parity_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: ConditionCodes {
+            cc: Flags {
                 parity: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };

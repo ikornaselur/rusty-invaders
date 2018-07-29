@@ -1,3 +1,4 @@
+use cpu::flags::Flags;
 use cpu::instructions::addition::{aci, adc, add, adi, dad};
 use cpu::instructions::and::{ana, ani};
 use cpu::instructions::call::{call, cc, cm, cnc, cnz, cp, cpe, cpo, cz};
@@ -27,29 +28,6 @@ use cpu::register::Register;
 use io::IO;
 
 #[derive(Debug, PartialEq)]
-pub(crate) struct ConditionCodes {
-    pub(crate) zero: bool,   // Zero - when arithmetic result is 0
-    pub(crate) sign: bool,   // Sign - when the most significant bit is set
-    pub(crate) parity: bool, // Parity - when the answer has even parity
-    pub(crate) carry: bool,  // Carry - when the instruction resulted in carry
-    pub(crate) zc: u8,
-    pub(crate) pad: u8,
-}
-
-impl Default for ConditionCodes {
-    fn default() -> ConditionCodes {
-        ConditionCodes {
-            zero: false,
-            sign: false,
-            parity: false,
-            carry: false,
-            zc: 0,
-            pad: 0,
-        }
-    }
-}
-
-#[derive(Debug, PartialEq)]
 pub struct State {
     pub(crate) a: u8,
     pub(crate) b: u8,
@@ -61,7 +39,7 @@ pub struct State {
     pub(crate) sp: u16,
     pub(crate) pc: u16,
     pub(crate) memory: Vec<u8>,
-    pub(crate) cc: ConditionCodes,
+    pub(crate) cc: Flags,
     pub(crate) int_enabled: bool,
     pub(crate) exit: bool,
     pub(crate) debug: bool,
@@ -81,7 +59,7 @@ impl Default for State {
             sp: 0,
             pc: 0,
             memory: Vec::new(),
-            cc: ConditionCodes::default(),
+            cc: Flags::default(),
             int_enabled: false,
             exit: false,
             debug: false,

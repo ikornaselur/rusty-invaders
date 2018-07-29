@@ -31,7 +31,7 @@ pub fn push(state: &mut State, register: Register) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use state::ConditionCodes;
+    use cpu::flags::Flags;
 
     #[test]
     fn push_from_register_b_pushed_bytes_onto_the_stack_from_b_and_c() {
@@ -87,12 +87,12 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0],
             a: 0xAA,
             sp: 0x0004,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
                 sign: true,
                 zero: true,
                 parity: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };

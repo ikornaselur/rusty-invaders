@@ -68,16 +68,16 @@ pub fn xri(state: &mut State) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use state::ConditionCodes;
+    use cpu::flags::Flags;
 
     #[test]
     fn xra_resets_carry_bit() {
         let mut state = State {
             a: 123,
             b: 123,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -197,9 +197,9 @@ mod test {
         let mut state = State {
             memory: vec![0b0011_0101, 0b0010_0110],
             a: 0b0111_0000,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };

@@ -222,7 +222,7 @@ pub fn cpo(state: &mut State) -> u8 {
 #[cfg(test)]
 mod test {
     use super::*;
-    use state::ConditionCodes;
+    use cpu::flags::Flags;
 
     #[test]
     fn call_pushes_the_address_after_to_the_stack_and_jumps() {
@@ -249,9 +249,9 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -277,9 +277,9 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
-            cc: ConditionCodes {
+            cc: Flags {
                 carry: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -305,9 +305,9 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
-            cc: ConditionCodes {
+            cc: Flags {
                 zero: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -333,9 +333,9 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
-            cc: ConditionCodes {
+            cc: Flags {
                 zero: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -361,9 +361,9 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
-            cc: ConditionCodes {
+            cc: Flags {
                 sign: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -389,9 +389,9 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
-            cc: ConditionCodes {
+            cc: Flags {
                 sign: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -417,9 +417,9 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
-            cc: ConditionCodes {
+            cc: Flags {
                 parity: false,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
@@ -445,9 +445,9 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
-            cc: ConditionCodes {
+            cc: Flags {
                 parity: true,
-                ..ConditionCodes::default()
+                ..Flags::default()
             },
             ..State::default()
         };
