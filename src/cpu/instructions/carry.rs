@@ -11,7 +11,7 @@ use state::State;
 /// * `state` - The state to set the flag in
 ///
 pub fn stc(state: &mut State) -> u8 {
-    state.cc.carry = true;
+    state.flags.carry = true;
     4
 }
 
@@ -26,7 +26,7 @@ pub fn stc(state: &mut State) -> u8 {
 /// * `state` - The state to complement the flag in
 ///
 pub fn cmc(state: &mut State) -> u8 {
-    state.cc.carry = !state.cc.carry;
+    state.flags.carry = !state.flags.carry;
     4
 }
 
@@ -40,7 +40,7 @@ mod test {
 
         stc(&mut state);
 
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
     }
 
     #[test]
@@ -48,12 +48,12 @@ mod test {
         let mut state = State { ..State::default() };
 
         cmc(&mut state);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
 
         cmc(&mut state);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
 
         cmc(&mut state);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
     }
 }

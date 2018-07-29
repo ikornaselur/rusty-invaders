@@ -76,7 +76,7 @@ mod test {
         let mut state = State {
             a: 123,
             b: 123,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -85,7 +85,7 @@ mod test {
 
         ana(&mut state, Register::B);
 
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -198,7 +198,7 @@ mod test {
         let mut state = State {
             memory: vec![0b0011_0101, 0b0010_0010],
             a: 0b1111_0000,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -207,10 +207,10 @@ mod test {
 
         ani(&mut state);
         assert_eq!(state.a, 0b0011_0000);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
 
         ani(&mut state);
         assert_eq!(state.a, 0b0010_0000);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 }

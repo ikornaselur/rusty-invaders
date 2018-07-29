@@ -28,7 +28,7 @@ pub fn jmp(state: &mut State) -> u8 {
 ///
 pub fn jc(state: &mut State) -> u8 {
     let address = state.read_address().unwrap();
-    if state.cc.carry {
+    if state.flags.carry {
         state.pc = address;
     }
 
@@ -47,7 +47,7 @@ pub fn jc(state: &mut State) -> u8 {
 ///
 pub fn jnc(state: &mut State) -> u8 {
     let address = state.read_address().unwrap();
-    if !state.cc.carry {
+    if !state.flags.carry {
         state.pc = address;
     }
 
@@ -66,7 +66,7 @@ pub fn jnc(state: &mut State) -> u8 {
 ///
 pub fn jz(state: &mut State) -> u8 {
     let address = state.read_address().unwrap();
-    if state.cc.zero {
+    if state.flags.zero {
         state.pc = address;
     }
 
@@ -85,7 +85,7 @@ pub fn jz(state: &mut State) -> u8 {
 ///
 pub fn jnz(state: &mut State) -> u8 {
     let address = state.read_address().unwrap();
-    if !state.cc.zero {
+    if !state.flags.zero {
         state.pc = address;
     }
 
@@ -104,7 +104,7 @@ pub fn jnz(state: &mut State) -> u8 {
 ///
 pub fn jm(state: &mut State) -> u8 {
     let address = state.read_address().unwrap();
-    if state.cc.sign {
+    if state.flags.sign {
         state.pc = address;
     }
 
@@ -123,7 +123,7 @@ pub fn jm(state: &mut State) -> u8 {
 ///
 pub fn jp(state: &mut State) -> u8 {
     let address = state.read_address().unwrap();
-    if !state.cc.sign {
+    if !state.flags.sign {
         state.pc = address;
     }
 
@@ -142,7 +142,7 @@ pub fn jp(state: &mut State) -> u8 {
 ///
 pub fn jpe(state: &mut State) -> u8 {
     let address = state.read_address().unwrap();
-    if state.cc.parity {
+    if state.flags.parity {
         state.pc = address;
     }
 
@@ -161,7 +161,7 @@ pub fn jpe(state: &mut State) -> u8 {
 ///
 pub fn jpo(state: &mut State) -> u8 {
     let address = state.read_address().unwrap();
-    if !state.cc.parity {
+    if !state.flags.parity {
         state.pc = address;
     }
 
@@ -189,7 +189,7 @@ mod test {
     fn jc_sets_pc_to_new_address_if_carry_flag_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: Flags {
+            flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
@@ -200,7 +200,7 @@ mod test {
 
         assert_eq!(state.pc, 2);
 
-        state.cc.carry = true;
+        state.flags.carry = true;
         jc(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
@@ -210,7 +210,7 @@ mod test {
     fn jnc_sets_pc_to_new_address_if_carry_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -221,7 +221,7 @@ mod test {
 
         assert_eq!(state.pc, 2);
 
-        state.cc.carry = false;
+        state.flags.carry = false;
         jnc(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
@@ -231,7 +231,7 @@ mod test {
     fn jz_sets_pc_to_new_address_if_zero_flag_is_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: Flags {
+            flags: Flags {
                 zero: false,
                 ..Flags::default()
             },
@@ -242,7 +242,7 @@ mod test {
 
         assert_eq!(state.pc, 2);
 
-        state.cc.zero = true;
+        state.flags.zero = true;
         jz(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
@@ -252,7 +252,7 @@ mod test {
     fn jnz_sets_pc_to_new_address_if_zero_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: Flags {
+            flags: Flags {
                 zero: true,
                 ..Flags::default()
             },
@@ -263,7 +263,7 @@ mod test {
 
         assert_eq!(state.pc, 2);
 
-        state.cc.zero = false;
+        state.flags.zero = false;
         jnz(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
@@ -273,7 +273,7 @@ mod test {
     fn jm_sets_pc_to_new_address_if_sign_flag_is_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: Flags {
+            flags: Flags {
                 sign: false,
                 ..Flags::default()
             },
@@ -284,7 +284,7 @@ mod test {
 
         assert_eq!(state.pc, 2);
 
-        state.cc.sign = true;
+        state.flags.sign = true;
         jm(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
@@ -294,7 +294,7 @@ mod test {
     fn jp_sets_pc_to_new_address_if_sign_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: Flags {
+            flags: Flags {
                 sign: true,
                 ..Flags::default()
             },
@@ -305,7 +305,7 @@ mod test {
 
         assert_eq!(state.pc, 2);
 
-        state.cc.sign = false;
+        state.flags.sign = false;
         jp(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
@@ -315,7 +315,7 @@ mod test {
     fn jpe_sets_pc_to_new_address_if_parity_flag_is_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: Flags {
+            flags: Flags {
                 parity: false,
                 ..Flags::default()
             },
@@ -326,7 +326,7 @@ mod test {
 
         assert_eq!(state.pc, 2);
 
-        state.cc.parity = true;
+        state.flags.parity = true;
         jpe(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
@@ -336,7 +336,7 @@ mod test {
     fn jpo_sets_pc_to_new_address_if_parity_flag_is_not_set() {
         let mut state = State {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
-            cc: Flags {
+            flags: Flags {
                 parity: true,
                 ..Flags::default()
             },
@@ -347,7 +347,7 @@ mod test {
 
         assert_eq!(state.pc, 2);
 
-        state.cc.parity = false;
+        state.flags.parity = false;
         jpo(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);

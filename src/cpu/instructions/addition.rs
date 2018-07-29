@@ -91,7 +91,7 @@ pub fn dad(state: &mut State, register: Register) -> u8 {
 
     state.l = result as u8;
     state.h = (result >> 8) as u8;
-    state.cc.carry = carry;
+    state.flags.carry = carry;
 
     10
 }
@@ -128,7 +128,7 @@ pub fn adc(state: &mut State, register: Register) -> u8 {
         }
     };
 
-    let (byte, byte_carry) = if state.cc.carry {
+    let (byte, byte_carry) = if state.flags.carry {
         byte.overflowing_add(1)
     } else {
         (byte, false)
@@ -160,7 +160,7 @@ pub fn adc(state: &mut State, register: Register) -> u8 {
 pub fn aci(state: &mut State) -> u8 {
     let byte = state.read_byte().unwrap();
 
-    let (byte, byte_carry) = if state.cc.carry {
+    let (byte, byte_carry) = if state.flags.carry {
         byte.overflowing_add(1)
     } else {
         (byte, false)
@@ -294,11 +294,11 @@ mod test {
 
         adi(&mut state);
         assert_eq!(state.a, 0);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
 
         adi(&mut state);
         assert_eq!(state.a, 5);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -315,7 +315,7 @@ mod test {
 
         assert_eq!(state.h, 0xD5);
         assert_eq!(state.l, 0x1A);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -332,7 +332,7 @@ mod test {
 
         assert_eq!(state.h, 0xD5);
         assert_eq!(state.l, 0x1A);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -347,7 +347,7 @@ mod test {
 
         assert_eq!(state.h, 0x22);
         assert_eq!(state.l, 0x44);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -363,7 +363,7 @@ mod test {
 
         assert_eq!(state.h, 0x22);
         assert_eq!(state.l, 0x33);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -371,7 +371,7 @@ mod test {
         let mut state = State {
             a: 1,
             b: 2,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -381,7 +381,7 @@ mod test {
         adc(&mut state, Register::B);
 
         assert_eq!(state.a, 4);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -389,7 +389,7 @@ mod test {
         let mut state = State {
             a: u8::max_value(),
             b: u8::max_value(),
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -399,7 +399,7 @@ mod test {
         adc(&mut state, Register::B);
 
         assert_eq!(state.a, 255u8);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
     }
 
     #[test]
@@ -407,7 +407,7 @@ mod test {
         let mut state = State {
             a: u8::max_value(),
             b: 0,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -417,7 +417,7 @@ mod test {
         adc(&mut state, Register::B);
 
         assert_eq!(state.a, 0);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
     }
 
     #[test]
@@ -425,7 +425,7 @@ mod test {
         let mut state = State {
             a: 1,
             c: 2,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -435,7 +435,7 @@ mod test {
         adc(&mut state, Register::C);
 
         assert_eq!(state.a, 4);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -443,7 +443,7 @@ mod test {
         let mut state = State {
             a: 1,
             d: 2,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -453,7 +453,7 @@ mod test {
         adc(&mut state, Register::D);
 
         assert_eq!(state.a, 4);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -461,7 +461,7 @@ mod test {
         let mut state = State {
             a: 1,
             e: 2,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -471,7 +471,7 @@ mod test {
         adc(&mut state, Register::E);
 
         assert_eq!(state.a, 4);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -479,7 +479,7 @@ mod test {
         let mut state = State {
             a: 1,
             h: 2,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -489,7 +489,7 @@ mod test {
         adc(&mut state, Register::H);
 
         assert_eq!(state.a, 4);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -497,7 +497,7 @@ mod test {
         let mut state = State {
             a: 1,
             l: 2,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -507,7 +507,7 @@ mod test {
         adc(&mut state, Register::L);
 
         assert_eq!(state.a, 4);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -517,7 +517,7 @@ mod test {
             a: 1,
             h: 0x00,
             l: 0x05,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -527,14 +527,14 @@ mod test {
         adc(&mut state, Register::M);
 
         assert_eq!(state.a, 7);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
     fn adc_a_adds_a_with_carry_to_accumulator() {
         let mut state = State {
             a: 1,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -544,7 +544,7 @@ mod test {
         adc(&mut state, Register::A);
 
         assert_eq!(state.a, 3);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -557,18 +557,18 @@ mod test {
 
         aci(&mut state);
         assert_eq!(state.a, 0xFE);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
 
         aci(&mut state);
         assert_eq!(state.a, 0xFE);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
 
         aci(&mut state);
         assert_eq!(state.a, 0xFF);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
 
         aci(&mut state);
         assert_eq!(state.a, 0x00);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
     }
 }

@@ -39,7 +39,7 @@ pub struct State {
     pub(crate) sp: u16,
     pub(crate) pc: u16,
     pub(crate) memory: Vec<u8>,
-    pub(crate) cc: Flags,
+    pub(crate) flags: Flags,
     pub(crate) int_enabled: bool,
     pub(crate) exit: bool,
     pub(crate) debug: bool,
@@ -59,7 +59,7 @@ impl Default for State {
             sp: 0,
             pc: 0,
             memory: Vec::new(),
-            cc: Flags::default(),
+            flags: Flags::default(),
             int_enabled: false,
             exit: false,
             debug: false,
@@ -135,17 +135,17 @@ impl State {
     }
 
     pub fn set_flags(&mut self, byte: u8, carry: bool) -> () {
-        self.cc.sign = (byte & 0x80) != 0;
-        self.cc.zero = byte == 0u8;
-        self.cc.parity = byte.count_ones() % 2 == 0;
-        self.cc.carry = carry;
+        self.flags.sign = (byte & 0x80) != 0;
+        self.flags.zero = byte == 0u8;
+        self.flags.parity = byte.count_ones() % 2 == 0;
+        self.flags.carry = carry;
     }
 
     pub fn set_flags_from_bits(&mut self, bits: u8) -> () {
-        self.cc.sign = bits & 0b1000_0000 != 0;
-        self.cc.zero = bits & 0b0100_0000 != 0;
-        self.cc.parity = bits & 0b0000_0100 != 0;
-        self.cc.carry = bits & 0b0000_0001 != 0;
+        self.flags.sign = bits & 0b1000_0000 != 0;
+        self.flags.zero = bits & 0b0100_0000 != 0;
+        self.flags.parity = bits & 0b0000_0100 != 0;
+        self.flags.carry = bits & 0b0000_0001 != 0;
     }
 
     pub fn nop(&mut self) -> u8 {
@@ -542,11 +542,11 @@ mod test {
 
         let signed: u8 = 0b1000_0000;
         state.set_flags(signed, false);
-        assert_eq!(state.cc.sign, true);
+        assert_eq!(state.flags.sign, true);
 
         let unsigned: u8 = 0b0111_1111;
         state.set_flags(unsigned, false);
-        assert_eq!(state.cc.sign, false);
+        assert_eq!(state.flags.sign, false);
     }
 
     #[test]
@@ -554,10 +554,10 @@ mod test {
         let mut state = State::default();
 
         state.set_flags(0, true);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
 
         state.set_flags(0, false);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 
     #[test]
@@ -569,26 +569,26 @@ mod test {
         let even3: u8 = 0b0001_1011;
 
         state.set_flags(even1, false);
-        assert_eq!(state.cc.parity, true);
+        assert_eq!(state.flags.parity, true);
 
         state.set_flags(even2, false);
-        assert_eq!(state.cc.parity, true);
+        assert_eq!(state.flags.parity, true);
 
         state.set_flags(even3, false);
-        assert_eq!(state.cc.parity, true);
+        assert_eq!(state.flags.parity, true);
 
         let odd1: u8 = 0b0000_0001;
         let odd2: u8 = 0b0101_0001;
         let odd3: u8 = 0b1011_0101;
 
         state.set_flags(odd1, false);
-        assert_eq!(state.cc.parity, false);
+        assert_eq!(state.flags.parity, false);
 
         state.set_flags(odd2, false);
-        assert_eq!(state.cc.parity, false);
+        assert_eq!(state.flags.parity, false);
 
         state.set_flags(odd3, false);
-        assert_eq!(state.cc.parity, false);
+        assert_eq!(state.flags.parity, false);
     }
 
     #[test]
@@ -601,34 +601,34 @@ mod test {
         let carry = 0b0000_0001;
 
         state.set_flags_from_bits(sign);
-        assert_eq!(state.cc.sign, true);
-        assert_eq!(state.cc.zero, false);
-        assert_eq!(state.cc.parity, false);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.sign, true);
+        assert_eq!(state.flags.zero, false);
+        assert_eq!(state.flags.parity, false);
+        assert_eq!(state.flags.carry, false);
 
         state.set_flags_from_bits(zero);
-        assert_eq!(state.cc.sign, false);
-        assert_eq!(state.cc.zero, true);
-        assert_eq!(state.cc.parity, false);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.sign, false);
+        assert_eq!(state.flags.zero, true);
+        assert_eq!(state.flags.parity, false);
+        assert_eq!(state.flags.carry, false);
 
         state.set_flags_from_bits(parity);
-        assert_eq!(state.cc.sign, false);
-        assert_eq!(state.cc.zero, false);
-        assert_eq!(state.cc.parity, true);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.sign, false);
+        assert_eq!(state.flags.zero, false);
+        assert_eq!(state.flags.parity, true);
+        assert_eq!(state.flags.carry, false);
 
         state.set_flags_from_bits(carry);
-        assert_eq!(state.cc.sign, false);
-        assert_eq!(state.cc.zero, false);
-        assert_eq!(state.cc.parity, false);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.sign, false);
+        assert_eq!(state.flags.zero, false);
+        assert_eq!(state.flags.parity, false);
+        assert_eq!(state.flags.carry, true);
 
         state.set_flags_from_bits(0b1111_1111);
-        assert_eq!(state.cc.sign, true);
-        assert_eq!(state.cc.zero, true);
-        assert_eq!(state.cc.parity, true);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.sign, true);
+        assert_eq!(state.flags.zero, true);
+        assert_eq!(state.flags.parity, true);
+        assert_eq!(state.flags.carry, true);
     }
 
     #[test]

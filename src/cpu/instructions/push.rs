@@ -17,7 +17,7 @@ pub fn push(state: &mut State, register: Register) -> u8 {
         Register::B => (state.b, state.c),
         Register::D => (state.d, state.e),
         Register::H => (state.h, state.l),
-        Register::PSW => (state.a, state.cc.as_bits()),
+        Register::PSW => (state.a, state.flags.as_bits()),
         unsupported => {
             panic!("pop doesn't support {:?}", unsupported);
         }
@@ -87,7 +87,7 @@ mod test {
             memory: vec![0, 0, 0, 0, 0, 0],
             a: 0xAA,
             sp: 0x0004,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 sign: true,
                 zero: true,

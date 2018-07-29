@@ -36,7 +36,7 @@ pub fn ral(state: &mut State) -> u8 {
     let carry = state.a >> 7 == 1;
     let mut result = state.a << 1;
 
-    if state.cc.carry {
+    if state.flags.carry {
         result |= 0x01;
     }
 
@@ -82,7 +82,7 @@ pub fn rar(state: &mut State) -> u8 {
     let carry = state.a & 0x01 == 1;
     let mut result = state.a >> 1;
 
-    if state.cc.carry {
+    if state.flags.carry {
         result |= 0x01 << 7;
     }
 
@@ -101,7 +101,7 @@ mod test {
     fn rlc_rotates_accumulator_left() {
         let mut state = State {
             a: 0b0111_0010,
-            cc: Flags {
+            flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
@@ -111,19 +111,19 @@ mod test {
         rlc(&mut state);
 
         assert_eq!(state.a, 0b1110_0100);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
 
         rlc(&mut state);
 
         assert_eq!(state.a, 0b1100_1001);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
     }
 
     #[test]
     fn ral_rotates_accumulator_left_through_carry() {
         let mut state = State {
             a: 0b0111_0010,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -133,19 +133,19 @@ mod test {
         ral(&mut state);
 
         assert_eq!(state.a, 0b1110_0101);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
 
         ral(&mut state);
 
         assert_eq!(state.a, 0b1100_1010);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
     }
 
     #[test]
     fn rrc_rotates_accumulator_right() {
         let mut state = State {
             a: 0b1111_0010,
-            cc: Flags {
+            flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
@@ -155,19 +155,19 @@ mod test {
         rrc(&mut state);
 
         assert_eq!(state.a, 0b0111_1001);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
 
         rrc(&mut state);
 
         assert_eq!(state.a, 0b1011_1100);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
     }
 
     #[test]
     fn rar_rotates_accumulator_right_through_carry() {
         let mut state = State {
             a: 0b1111_0011,
-            cc: Flags {
+            flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
@@ -177,16 +177,16 @@ mod test {
         rar(&mut state);
 
         assert_eq!(state.a, 0b0111_1001);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
 
         rar(&mut state);
 
         assert_eq!(state.a, 0b1011_1100);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
 
         rar(&mut state);
 
         assert_eq!(state.a, 0b1101_1110);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.carry, false);
     }
 }

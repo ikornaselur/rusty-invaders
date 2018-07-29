@@ -102,17 +102,17 @@ mod test {
 
         assert_eq!(state.a, 0x26);
         assert_eq!(state.sp, 5);
-        assert_eq!(state.cc.sign, false);
-        assert_eq!(state.cc.zero, true);
-        assert_eq!(state.cc.parity, true);
-        assert_eq!(state.cc.carry, false);
+        assert_eq!(state.flags.sign, false);
+        assert_eq!(state.flags.zero, true);
+        assert_eq!(state.flags.parity, true);
+        assert_eq!(state.flags.carry, false);
 
         pop(&mut state, Register::PSW);
         assert_eq!(state.a, 0x37);
         assert_eq!(state.sp, 7);
-        assert_eq!(state.cc.sign, true);
-        assert_eq!(state.cc.zero, false);
-        assert_eq!(state.cc.parity, false);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.sign, true);
+        assert_eq!(state.flags.zero, false);
+        assert_eq!(state.flags.parity, false);
+        assert_eq!(state.flags.carry, true);
     }
 }

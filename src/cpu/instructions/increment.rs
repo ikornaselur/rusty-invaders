@@ -138,7 +138,7 @@ mod test {
         inr(&mut state, Register::B);
 
         assert_eq!(state.b, 0x00);
-        assert_eq!(state.cc.carry, true);
+        assert_eq!(state.flags.carry, true);
     }
 
     #[test]

@@ -80,10 +80,10 @@ mod test {
         assert_eq!(state.a, 10);
         assert_eq!(state.b, 9);
 
-        assert_eq!(state.cc.carry, false);
-        assert_eq!(state.cc.zero, false);
-        assert_eq!(state.cc.sign, false);
-        assert_eq!(state.cc.parity, false);
+        assert_eq!(state.flags.carry, false);
+        assert_eq!(state.flags.zero, false);
+        assert_eq!(state.flags.sign, false);
+        assert_eq!(state.flags.parity, false);
     }
 
     #[test]
@@ -99,10 +99,10 @@ mod test {
         assert_eq!(state.a, 10);
         assert_eq!(state.b, 10);
 
-        assert_eq!(state.cc.carry, false);
-        assert_eq!(state.cc.zero, true);
-        assert_eq!(state.cc.sign, false);
-        assert_eq!(state.cc.parity, true);
+        assert_eq!(state.flags.carry, false);
+        assert_eq!(state.flags.zero, true);
+        assert_eq!(state.flags.sign, false);
+        assert_eq!(state.flags.parity, true);
     }
 
     #[test]
@@ -118,10 +118,10 @@ mod test {
         assert_eq!(state.a, 10);
         assert_eq!(state.b, 11);
 
-        assert_eq!(state.cc.carry, true);
-        assert_eq!(state.cc.zero, false);
-        assert_eq!(state.cc.sign, true);
-        assert_eq!(state.cc.parity, true);
+        assert_eq!(state.flags.carry, true);
+        assert_eq!(state.flags.zero, false);
+        assert_eq!(state.flags.sign, true);
+        assert_eq!(state.flags.parity, true);
     }
 
     #[test]
@@ -136,10 +136,10 @@ mod test {
 
         assert_eq!(state.a, 10);
 
-        assert_eq!(state.cc.carry, false);
-        assert_eq!(state.cc.zero, false);
-        assert_eq!(state.cc.sign, false);
-        assert_eq!(state.cc.parity, false);
+        assert_eq!(state.flags.carry, false);
+        assert_eq!(state.flags.zero, false);
+        assert_eq!(state.flags.sign, false);
+        assert_eq!(state.flags.parity, false);
     }
 
     #[test]
@@ -154,10 +154,10 @@ mod test {
 
         assert_eq!(state.a, 10);
 
-        assert_eq!(state.cc.carry, false);
-        assert_eq!(state.cc.zero, true);
-        assert_eq!(state.cc.sign, false);
-        assert_eq!(state.cc.parity, true);
+        assert_eq!(state.flags.carry, false);
+        assert_eq!(state.flags.zero, true);
+        assert_eq!(state.flags.sign, false);
+        assert_eq!(state.flags.parity, true);
     }
 
     #[test]
@@ -172,9 +172,9 @@ mod test {
 
         assert_eq!(state.a, 10);
 
-        assert_eq!(state.cc.carry, true);
-        assert_eq!(state.cc.zero, false);
-        assert_eq!(state.cc.sign, true);
-        assert_eq!(state.cc.parity, true);
+        assert_eq!(state.flags.carry, true);
+        assert_eq!(state.flags.zero, false);
+        assert_eq!(state.flags.sign, true);
+        assert_eq!(state.flags.parity, true);
     }
 }

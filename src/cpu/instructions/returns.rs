@@ -28,7 +28,7 @@ pub fn ret(state: &mut State) -> u8 {
 /// * `state` - The state to perform the return in
 ///
 pub fn rc(state: &mut State) -> u8 {
-    if state.cc.carry {
+    if state.flags.carry {
         ret(state);
         11
     } else {
@@ -48,7 +48,7 @@ pub fn rc(state: &mut State) -> u8 {
 /// * `state` - The state to perform the return in
 ///
 pub fn rnc(state: &mut State) -> u8 {
-    if state.cc.carry {
+    if state.flags.carry {
         5
     } else {
         ret(state);
@@ -68,7 +68,7 @@ pub fn rnc(state: &mut State) -> u8 {
 /// * `state` - The state to perform the return in
 ///
 pub fn rz(state: &mut State) -> u8 {
-    if state.cc.zero {
+    if state.flags.zero {
         ret(state);
         11
     } else {
@@ -88,7 +88,7 @@ pub fn rz(state: &mut State) -> u8 {
 /// * `state` - The state to perform the return in
 ///
 pub fn rnz(state: &mut State) -> u8 {
-    if state.cc.zero {
+    if state.flags.zero {
         5
     } else {
         ret(state);
@@ -108,7 +108,7 @@ pub fn rnz(state: &mut State) -> u8 {
 /// * `state` - The state to perform the return in
 ///
 pub fn rm(state: &mut State) -> u8 {
-    if state.cc.sign {
+    if state.flags.sign {
         ret(state);
         11
     } else {
@@ -128,7 +128,7 @@ pub fn rm(state: &mut State) -> u8 {
 /// * `state` - The state to perform the return in
 ///
 pub fn rp(state: &mut State) -> u8 {
-    if state.cc.sign {
+    if state.flags.sign {
         5
     } else {
         ret(state);
@@ -148,7 +148,7 @@ pub fn rp(state: &mut State) -> u8 {
 /// * `state` - The state to perform the return in
 ///
 pub fn rpe(state: &mut State) -> u8 {
-    if state.cc.parity {
+    if state.flags.parity {
         ret(state);
         11
     } else {
@@ -168,7 +168,7 @@ pub fn rpe(state: &mut State) -> u8 {
 /// * `state` - The state to perform the return in
 ///
 pub fn rpo(state: &mut State) -> u8 {
-    if state.cc.parity {
+    if state.flags.parity {
         5
     } else {
         ret(state);
@@ -202,7 +202,7 @@ mod test {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
-            cc: Flags {
+            flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
@@ -215,7 +215,7 @@ mod test {
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.cc.carry = true;
+        state.flags.carry = true;
         rc(&mut state);
 
         assert_eq!(state.sp, 3);
@@ -228,7 +228,7 @@ mod test {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
-            cc: Flags {
+            flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
@@ -241,7 +241,7 @@ mod test {
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.cc.carry = false;
+        state.flags.carry = false;
         rnc(&mut state);
 
         assert_eq!(state.sp, 3);
@@ -254,7 +254,7 @@ mod test {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
-            cc: Flags {
+            flags: Flags {
                 zero: false,
                 ..Flags::default()
             },
@@ -267,7 +267,7 @@ mod test {
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.cc.zero = true;
+        state.flags.zero = true;
         rz(&mut state);
 
         assert_eq!(state.sp, 3);
@@ -280,7 +280,7 @@ mod test {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
-            cc: Flags {
+            flags: Flags {
                 zero: true,
                 ..Flags::default()
             },
@@ -293,7 +293,7 @@ mod test {
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.cc.zero = false;
+        state.flags.zero = false;
         rnz(&mut state);
 
         assert_eq!(state.sp, 3);
@@ -306,7 +306,7 @@ mod test {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
-            cc: Flags {
+            flags: Flags {
                 sign: false,
                 ..Flags::default()
             },
@@ -319,7 +319,7 @@ mod test {
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.cc.sign = true;
+        state.flags.sign = true;
         rm(&mut state);
 
         assert_eq!(state.sp, 3);
@@ -332,7 +332,7 @@ mod test {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
-            cc: Flags {
+            flags: Flags {
                 sign: true,
                 ..Flags::default()
             },
@@ -345,7 +345,7 @@ mod test {
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.cc.sign = false;
+        state.flags.sign = false;
         rp(&mut state);
 
         assert_eq!(state.sp, 3);
@@ -358,7 +358,7 @@ mod test {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
-            cc: Flags {
+            flags: Flags {
                 parity: false,
                 ..Flags::default()
             },
@@ -371,7 +371,7 @@ mod test {
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.cc.parity = true;
+        state.flags.parity = true;
         rpe(&mut state);
 
         assert_eq!(state.sp, 3);
@@ -384,7 +384,7 @@ mod test {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
-            cc: Flags {
+            flags: Flags {
                 parity: true,
                 ..Flags::default()
             },
@@ -397,7 +397,7 @@ mod test {
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.cc.parity = false;
+        state.flags.parity = false;
         rpo(&mut state);
 
         assert_eq!(state.sp, 3);
