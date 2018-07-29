@@ -1,5 +1,5 @@
 use cpu::register::Register;
-use state::State;
+use cpu::state::State;
 
 /// Decrement a register
 ///

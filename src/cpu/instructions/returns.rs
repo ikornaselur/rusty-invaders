@@ -1,4 +1,4 @@
-use state::State;
+use cpu::state::State;
 
 /// Perform an unconditional return to an address
 ///

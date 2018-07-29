@@ -1,4 +1,4 @@
-use state::State;
+use cpu::state::State;
 
 /// Read the input from a port
 ///

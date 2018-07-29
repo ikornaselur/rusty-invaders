@@ -1,4 +1,4 @@
-use state::State;
+use cpu::state::State;
 
 /// Perform decimal adjustment, ignoring the Auxiliary Carry
 ///

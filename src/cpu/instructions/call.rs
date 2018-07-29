@@ -1,4 +1,4 @@
-use state::State;
+use cpu::state::State;
 
 fn process_call(state: &mut State, address: u16) -> () {
     // A specific hack for full cpu test

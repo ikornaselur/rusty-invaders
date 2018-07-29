@@ -1,5 +1,5 @@
 use cpu::register::Register;
-use state::State;
+use cpu::state::State;
 
 /// Perform accumulator addition from a register
 ///

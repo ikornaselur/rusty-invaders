@@ -1,4 +1,4 @@
-use state::State;
+use cpu::state::State;
 
 /// Write the next byte address to the stack and jump to a predefined RST address at the start
 ///

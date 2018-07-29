@@ -1,4 +1,4 @@
-use state::State;
+use cpu::state::State;
 
 /// Perform a unconditional jump to an address
 ///

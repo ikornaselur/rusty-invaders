@@ -3,7 +3,7 @@ extern crate rusty_invaders;
 use std::fs::File;
 use std::io::prelude::*;
 
-use rusty_invaders::state::State;
+use rusty_invaders::cpu::state::State;
 
 #[test]
 fn full_cpu_test() {

@@ -1,4 +1,4 @@
-use state::State;
+use cpu::state::State;
 use std::mem::swap;
 
 /// Swap the contents of register pairs HL with DE

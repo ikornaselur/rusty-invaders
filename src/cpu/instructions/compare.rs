@@ -1,5 +1,5 @@
 use cpu::register::Register;
-use state::State;
+use cpu::state::State;
 
 /// Compare a register to the accumulator and set the flags based on the comparison
 ///
