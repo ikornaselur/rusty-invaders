@@ -1,5 +1,3 @@
-mod xor;
-
 use cpu::instructions::addition::{aci, adc, add, adi, dad};
 use cpu::instructions::and::{ana, ani};
 use cpu::instructions::call::{call, cc, cm, cnc, cnz, cp, cpe, cpo, cz};
@@ -23,6 +21,7 @@ use cpu::instructions::returns::{rc, ret, rm, rnc, rnz, rp, rpe, rpo, rz};
 use cpu::instructions::rotate::{ral, rar, rlc, rrc};
 use cpu::instructions::store::{shld, sta, stax};
 use cpu::instructions::subtraction::{sbb, sbi, sub, sui};
+use cpu::instructions::xor::{xra, xri};
 
 use io::IO;
 
@@ -390,14 +389,14 @@ impl State {
             0xA7 => ana(self, Register::A),
 
             // XRA ?
-            0xA8 => self.xra(Register::B),
-            0xA9 => self.xra(Register::C),
-            0xAA => self.xra(Register::D),
-            0xAB => self.xra(Register::E),
-            0xAC => self.xra(Register::H),
-            0xAD => self.xra(Register::L),
-            0xAE => self.xra(Register::M),
-            0xAF => self.xra(Register::A),
+            0xA8 => xra(self, Register::B),
+            0xA9 => xra(self, Register::C),
+            0xAA => xra(self, Register::D),
+            0xAB => xra(self, Register::E),
+            0xAC => xra(self, Register::H),
+            0xAD => xra(self, Register::L),
+            0xAE => xra(self, Register::M),
+            0xAF => xra(self, Register::A),
 
             // ORA ?
             0xB0 => ora(self, Register::B),
@@ -471,7 +470,7 @@ impl State {
             // SBI d8
             0xDE => sbi(self),
             // XRI d8
-            0xEE => self.xri(),
+            0xEE => xri(self),
             // CPI d8
             0xFE => cpi(self),
 

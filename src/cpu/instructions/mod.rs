@@ -21,3 +21,4 @@ pub mod returns;
 pub mod rotate;
 pub mod store;
 pub mod subtraction;
+pub mod xor;

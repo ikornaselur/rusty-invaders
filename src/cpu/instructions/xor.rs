@@ -1,50 +1,73 @@
-use super::Register;
-use super::State;
+use state::{Register, State};
 
-impl State {
-    pub fn xra(&mut self, register: Register) -> u8 {
-        let result = self.a ^ match register {
-            Register::A => self.a,
-            Register::B => self.b,
-            Register::C => self.c,
-            Register::D => self.d,
-            Register::E => self.e,
-            Register::H => self.h,
-            Register::L => self.l,
-            Register::M => {
-                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
-                self.memory[offset as usize]
-            }
-            unsupported => {
-                panic!("xra doesn't support {:?}", unsupported);
-            }
-        };
-
-        self.a = result;
-        self.set_flags(result, false);
-
-        match register {
-            Register::M => 7,
-            _ => 4,
+/// Logical xor accumulator to register
+///
+/// Sets condition flags
+///
+/// # Cycles
+///
+/// * Register M: 7
+/// * Other: 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the xor in
+/// * `register` - The register to perform the xor with
+///
+pub fn xra(state: &mut State, register: Register) -> u8 {
+    let result = state.a ^ match register {
+        Register::A => state.a,
+        Register::B => state.b,
+        Register::C => state.c,
+        Register::D => state.d,
+        Register::E => state.e,
+        Register::H => state.h,
+        Register::L => state.l,
+        Register::M => {
+            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
+            state.memory[offset as usize]
         }
+        unsupported => {
+            panic!("xra doesn't support {:?}", unsupported);
+        }
+    };
+
+    state.a = result;
+    state.set_flags(result, false);
+
+    match register {
+        Register::M => 7,
+        _ => 4,
     }
+}
 
-    pub fn xri(&mut self) -> u8 {
-        let byte = self.read_byte().unwrap();
+/// Logical xor accumulator to the immediate byte
+///
+/// Sets condition flags
+///
+/// # Cycles
+///
+/// 7
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the xor in
+///
+pub fn xri(state: &mut State) -> u8 {
+    let byte = state.read_byte().unwrap();
 
-        let result = self.a ^ byte;
+    let result = state.a ^ byte;
 
-        self.a = result;
-        self.set_flags(result, false);
+    state.a = result;
+    state.set_flags(result, false);
 
-        7
-    }
+    7
 }
 
 #[cfg(test)]
 mod test {
-    use super::super::ConditionCodes;
     use super::*;
+    use state::ConditionCodes;
 
     #[test]
     fn xra_resets_carry_bit() {
@@ -58,7 +81,7 @@ mod test {
             ..State::default()
         };
 
-        state.xra(Register::B);
+        xra(&mut state, Register::B);
 
         assert_eq!(state.cc.carry, false);
     }
@@ -71,7 +94,7 @@ mod test {
             ..State::default()
         };
 
-        state.xra(Register::B);
+        xra(&mut state, Register::B);
 
         assert_eq!(state.a, 0b0010_0100);
     }
@@ -84,7 +107,7 @@ mod test {
             ..State::default()
         };
 
-        state.xra(Register::C);
+        xra(&mut state, Register::C);
 
         assert_eq!(state.a, 0b0010_0100);
     }
@@ -97,7 +120,7 @@ mod test {
             ..State::default()
         };
 
-        state.xra(Register::D);
+        xra(&mut state, Register::D);
 
         assert_eq!(state.a, 0b0010_0100);
     }
@@ -110,7 +133,7 @@ mod test {
             ..State::default()
         };
 
-        state.xra(Register::E);
+        xra(&mut state, Register::E);
 
         assert_eq!(state.a, 0b0010_0100);
     }
@@ -123,7 +146,7 @@ mod test {
             ..State::default()
         };
 
-        state.xra(Register::H);
+        xra(&mut state, Register::H);
 
         assert_eq!(state.a, 0b0010_0100);
     }
@@ -136,7 +159,7 @@ mod test {
             ..State::default()
         };
 
-        state.xra(Register::L);
+        xra(&mut state, Register::L);
 
         assert_eq!(state.a, 0b0010_0100);
     }
@@ -148,7 +171,7 @@ mod test {
             ..State::default()
         };
 
-        state.xra(Register::A);
+        xra(&mut state, Register::A);
 
         assert_eq!(state.a, 0b0000_0000);
     }
@@ -163,7 +186,7 @@ mod test {
             ..State::default()
         };
 
-        state.xra(Register::M);
+        xra(&mut state, Register::M);
 
         assert_eq!(state.a, 0b0010_0100);
     }
@@ -180,11 +203,11 @@ mod test {
             ..State::default()
         };
 
-        state.xri();
+        xri(&mut state);
         assert_eq!(state.a, 0b0100_0101);
         assert_eq!(state.cc.carry, false);
 
-        state.xri();
+        xri(&mut state);
         assert_eq!(state.a, 0b0110_0011);
         assert_eq!(state.cc.carry, false);
     }
