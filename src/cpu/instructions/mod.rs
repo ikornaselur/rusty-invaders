@@ -14,3 +14,4 @@ pub mod jump;
 pub mod load;
 pub mod mov;
 pub mod or;
+pub mod pop;

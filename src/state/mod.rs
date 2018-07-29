@@ -1,4 +1,3 @@
-mod pop;
 mod push;
 mod restart;
 mod returns;
@@ -23,6 +22,7 @@ use cpu::instructions::jump::{jc, jm, jmp, jnc, jnz, jp, jpe, jpo, jz};
 use cpu::instructions::load::{lda, ldax, lhld, lxi, pchl, sphl};
 use cpu::instructions::mov::{mov, mvi};
 use cpu::instructions::or::{ora, ori};
+use cpu::instructions::pop::pop;
 
 use io::IO;
 
@@ -420,10 +420,10 @@ impl State {
             0xBF => cmp(self, Register::A),
 
             // POP ?
-            0xC1 => self.pop(Register::B),
-            0xD1 => self.pop(Register::D),
-            0xE1 => self.pop(Register::H),
-            0xF1 => self.pop(Register::PSW),
+            0xC1 => pop(self, Register::B),
+            0xD1 => pop(self, Register::D),
+            0xE1 => pop(self, Register::H),
+            0xF1 => pop(self, Register::PSW),
 
             // PUSH ?
             0xC5 => self.push(Register::B),

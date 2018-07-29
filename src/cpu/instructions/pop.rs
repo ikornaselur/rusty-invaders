@@ -1,35 +1,43 @@
-use super::Register;
-use super::State;
+use state::{Register, State};
 
-impl State {
-    pub fn pop(&mut self, register: Register) -> u8 {
-        let least = self.read_byte_from_stack().unwrap();
-        let most = self.read_byte_from_stack().unwrap();
+/// Pop data off the stack into the specified register pair
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the pop in
+/// * `register` - The register pair to pop the data into
+///
+pub fn pop(state: &mut State, register: Register) -> u8 {
+    let least = state.read_byte_from_stack().unwrap();
+    let most = state.read_byte_from_stack().unwrap();
 
-        match register {
-            Register::B => {
-                self.c = least;
-                self.b = most;
-            }
-            Register::D => {
-                self.e = least;
-                self.d = most;
-            }
-            Register::H => {
-                self.l = least;
-                self.h = most;
-            }
-            Register::PSW => {
-                self.set_flags_from_bits(least);
-                self.a = most;
-            }
-            unsupported => {
-                panic!("pop doesn't support {:?}", unsupported);
-            }
-        };
+    match register {
+        Register::B => {
+            state.c = least;
+            state.b = most;
+        }
+        Register::D => {
+            state.e = least;
+            state.d = most;
+        }
+        Register::H => {
+            state.l = least;
+            state.h = most;
+        }
+        Register::PSW => {
+            state.set_flags_from_bits(least);
+            state.a = most;
+        }
+        unsupported => {
+            panic!("pop doesn't support {:?}", unsupported);
+        }
+    };
 
-        10
-    }
+    10
 }
 
 #[cfg(test)]
@@ -44,7 +52,7 @@ mod test {
             ..State::default()
         };
 
-        state.pop(Register::B);
+        pop(&mut state, Register::B);
 
         assert_eq!(state.c, 0x15);
         assert_eq!(state.b, 0x26);
@@ -59,7 +67,7 @@ mod test {
             ..State::default()
         };
 
-        state.pop(Register::D);
+        pop(&mut state, Register::D);
 
         assert_eq!(state.e, 0x15);
         assert_eq!(state.d, 0x26);
@@ -74,7 +82,7 @@ mod test {
             ..State::default()
         };
 
-        state.pop(Register::H);
+        pop(&mut state, Register::H);
 
         assert_eq!(state.l, 0x15);
         assert_eq!(state.h, 0x26);
@@ -89,7 +97,7 @@ mod test {
             ..State::default()
         };
 
-        state.pop(Register::PSW);
+        pop(&mut state, Register::PSW);
 
         assert_eq!(state.a, 0x26);
         assert_eq!(state.sp, 5);
@@ -98,7 +106,7 @@ mod test {
         assert_eq!(state.cc.parity, true);
         assert_eq!(state.cc.carry, false);
 
-        state.pop(Register::PSW);
+        pop(&mut state, Register::PSW);
         assert_eq!(state.a, 0x37);
         assert_eq!(state.sp, 7);
         assert_eq!(state.cc.sign, true);
