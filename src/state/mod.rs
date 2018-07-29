@@ -1,4 +1,3 @@
-mod sub;
 mod xor;
 
 use cpu::instructions::addition::{aci, adc, add, adi, dad};
@@ -23,6 +22,7 @@ use cpu::instructions::restart::rst;
 use cpu::instructions::returns::{rc, ret, rm, rnc, rnz, rp, rpe, rpo, rz};
 use cpu::instructions::rotate::{ral, rar, rlc, rrc};
 use cpu::instructions::store::{shld, sta, stax};
+use cpu::instructions::subtraction::{sbb, sbi, sub, sui};
 
 use io::IO;
 
@@ -360,24 +360,24 @@ impl State {
             0x8F => adc(self, Register::A),
 
             // SUB ?
-            0x90 => self.sub(Register::B),
-            0x91 => self.sub(Register::C),
-            0x92 => self.sub(Register::D),
-            0x93 => self.sub(Register::E),
-            0x94 => self.sub(Register::H),
-            0x95 => self.sub(Register::L),
-            0x96 => self.sub(Register::M),
-            0x97 => self.sub(Register::A),
+            0x90 => sub(self, Register::B),
+            0x91 => sub(self, Register::C),
+            0x92 => sub(self, Register::D),
+            0x93 => sub(self, Register::E),
+            0x94 => sub(self, Register::H),
+            0x95 => sub(self, Register::L),
+            0x96 => sub(self, Register::M),
+            0x97 => sub(self, Register::A),
 
             // SBB ?
-            0x98 => self.sbb(Register::B),
-            0x99 => self.sbb(Register::C),
-            0x9A => self.sbb(Register::D),
-            0x9B => self.sbb(Register::E),
-            0x9C => self.sbb(Register::H),
-            0x9D => self.sbb(Register::L),
-            0x9E => self.sbb(Register::M),
-            0x9F => self.sbb(Register::A),
+            0x98 => sbb(self, Register::B),
+            0x99 => sbb(self, Register::C),
+            0x9A => sbb(self, Register::D),
+            0x9B => sbb(self, Register::E),
+            0x9C => sbb(self, Register::H),
+            0x9D => sbb(self, Register::L),
+            0x9E => sbb(self, Register::M),
+            0x9F => sbb(self, Register::A),
 
             // ANA ?
             0xA0 => ana(self, Register::B),
@@ -461,7 +461,7 @@ impl State {
             // ADI d8
             0xC6 => adi(self),
             // SUI d8
-            0xD6 => self.sui(),
+            0xD6 => sui(self),
             // ANI d8
             0xE6 => ani(self),
             // ORI d8
@@ -469,7 +469,7 @@ impl State {
             // ACI d8
             0xCE => aci(self),
             // SBI d8
-            0xDE => self.sbi(),
+            0xDE => sbi(self),
             // XRI d8
             0xEE => self.xri(),
             // CPI d8

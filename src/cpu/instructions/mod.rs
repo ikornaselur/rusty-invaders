@@ -20,3 +20,4 @@ pub mod restart;
 pub mod returns;
 pub mod rotate;
 pub mod store;
+pub mod subtraction;

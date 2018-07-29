@@ -1,101 +1,150 @@
-use super::Register;
-use super::State;
+use state::{Register, State};
 
-impl State {
-    pub fn sub(&mut self, register: Register) -> u8 {
-        let (result, borrow) = match register {
-            Register::A => self.a.overflowing_sub(self.a),
-            Register::B => self.a.overflowing_sub(self.b),
-            Register::C => self.a.overflowing_sub(self.c),
-            Register::D => self.a.overflowing_sub(self.d),
-            Register::E => self.a.overflowing_sub(self.e),
-            Register::H => self.a.overflowing_sub(self.h),
-            Register::L => self.a.overflowing_sub(self.l),
-            Register::M => {
-                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
-                self.a.overflowing_sub(self.memory[offset as usize])
-            }
-            unsupported => {
-                panic!("sub doesn't support {:?}", unsupported);
-            }
-        };
-
-        self.a = result;
-        self.set_flags(result, borrow);
-
-        match register {
-            Register::M => 7,
-            _ => 4,
+/// Perform accumulator subtraction from a register
+///
+/// Sets condition flags
+///
+/// # Cycles
+///
+/// * Register M: 7
+/// * Other: 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the subtraction in
+/// * `register` - The register to subtract from the accumulator
+///
+pub fn sub(state: &mut State, register: Register) -> u8 {
+    let (result, borrow) = match register {
+        Register::A => state.a.overflowing_sub(state.a),
+        Register::B => state.a.overflowing_sub(state.b),
+        Register::C => state.a.overflowing_sub(state.c),
+        Register::D => state.a.overflowing_sub(state.d),
+        Register::E => state.a.overflowing_sub(state.e),
+        Register::H => state.a.overflowing_sub(state.h),
+        Register::L => state.a.overflowing_sub(state.l),
+        Register::M => {
+            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
+            state.a.overflowing_sub(state.memory[offset as usize])
         }
-    }
-
-    pub fn sui(&mut self) -> u8 {
-        let byte = self.read_byte().unwrap();
-        let (result, carry) = self.a.overflowing_sub(byte);
-
-        self.a = result;
-        self.set_flags(result, carry);
-
-        7
-    }
-
-    pub fn sbb(&mut self, register: Register) -> u8 {
-        let byte = match register {
-            Register::A => self.a,
-            Register::B => self.b,
-            Register::C => self.c,
-            Register::D => self.d,
-            Register::E => self.e,
-            Register::H => self.h,
-            Register::L => self.l,
-            Register::M => {
-                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
-                self.memory[offset as usize]
-            }
-            unsupported => {
-                panic!("sbb doesn't support {:?}", unsupported);
-            }
-        };
-
-        let (byte, byte_carry) = if self.cc.carry {
-            byte.overflowing_add(1)
-        } else {
-            (byte, false)
-        };
-
-        let (result, carry) = self.a.overflowing_sub(byte);
-
-        self.a = result;
-        self.set_flags(result, carry || byte_carry);
-
-        match register {
-            Register::M => 7,
-            _ => 4,
+        unsupported => {
+            panic!("sub doesn't support {:?}", unsupported);
         }
+    };
+
+    state.a = result;
+    state.set_flags(result, borrow);
+
+    match register {
+        Register::M => 7,
+        _ => 4,
     }
+}
 
-    pub fn sbi(&mut self) -> u8 {
-        let byte = self.read_byte().unwrap();
+/// Perform accumulator subtraction with the next immediate byte
+///
+/// Sets the condition flags
+///
+/// # Cycles
+///
+/// 7
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the subtraction in
+///
+pub fn sui(state: &mut State) -> u8 {
+    let byte = state.read_byte().unwrap();
+    let (result, carry) = state.a.overflowing_sub(byte);
 
-        let (byte, byte_carry) = if self.cc.carry {
-            byte.overflowing_add(1)
-        } else {
-            (byte, false)
-        };
+    state.a = result;
+    state.set_flags(result, carry);
 
-        let (result, carry) = self.a.overflowing_sub(byte);
+    7
+}
 
-        self.a = result;
-        self.set_flags(result, carry || byte_carry);
+/// Perform accumulator subtraction from a register with the carry bit
+///
+/// Sets condition codes
+///
+/// # Cycles
+///
+/// * Register M: 7
+/// * Other: 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the subtraction in
+/// * `register` - The register to subtract from the accumulator
+///
+pub fn sbb(state: &mut State, register: Register) -> u8 {
+    let byte = match register {
+        Register::A => state.a,
+        Register::B => state.b,
+        Register::C => state.c,
+        Register::D => state.d,
+        Register::E => state.e,
+        Register::H => state.h,
+        Register::L => state.l,
+        Register::M => {
+            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
+            state.memory[offset as usize]
+        }
+        unsupported => {
+            panic!("sbb doesn't support {:?}", unsupported);
+        }
+    };
 
-        7
+    let (byte, byte_carry) = if state.cc.carry {
+        byte.overflowing_add(1)
+    } else {
+        (byte, false)
+    };
+
+    let (result, carry) = state.a.overflowing_sub(byte);
+
+    state.a = result;
+    state.set_flags(result, carry || byte_carry);
+
+    match register {
+        Register::M => 7,
+        _ => 4,
     }
+}
+
+/// Perform accumulator subtraction with the next immediate byte and carry bit
+///
+/// Sets condition codes
+///
+/// # Cycles
+///
+/// 7
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the subtraction in
+///
+pub fn sbi(state: &mut State) -> u8 {
+    let byte = state.read_byte().unwrap();
+
+    let (byte, byte_carry) = if state.cc.carry {
+        byte.overflowing_add(1)
+    } else {
+        (byte, false)
+    };
+
+    let (result, carry) = state.a.overflowing_sub(byte);
+
+    state.a = result;
+    state.set_flags(result, carry || byte_carry);
+
+    7
 }
 
 #[cfg(test)]
 mod test {
-    use super::super::ConditionCodes;
     use super::*;
+    use state::ConditionCodes;
 
     #[test]
     fn sub_a_subs_a_from_accumulator() {
@@ -104,7 +153,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::A);
+        sub(&mut state, Register::A);
 
         assert_eq!(state.a, 0);
     }
@@ -117,7 +166,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::B);
+        sub(&mut state, Register::B);
 
         assert_eq!(state.a, 7);
     }
@@ -130,7 +179,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::C);
+        sub(&mut state, Register::C);
 
         assert_eq!(state.a, 7);
     }
@@ -143,7 +192,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::D);
+        sub(&mut state, Register::D);
 
         assert_eq!(state.a, 7);
     }
@@ -156,7 +205,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::E);
+        sub(&mut state, Register::E);
 
         assert_eq!(state.a, 7);
     }
@@ -169,7 +218,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::H);
+        sub(&mut state, Register::H);
 
         assert_eq!(state.a, 7);
     }
@@ -182,7 +231,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::L);
+        sub(&mut state, Register::L);
 
         assert_eq!(state.a, 7);
     }
@@ -197,7 +246,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::M);
+        sub(&mut state, Register::M);
 
         assert_eq!(state.a, 7);
     }
@@ -210,7 +259,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::B);
+        sub(&mut state, Register::B);
 
         assert_eq!(state.cc.carry, false);
     }
@@ -223,7 +272,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::B);
+        sub(&mut state, Register::B);
 
         assert_eq!(state.cc.carry, true);
     }
@@ -235,7 +284,7 @@ mod test {
             ..State::default()
         };
 
-        state.sub(Register::A);
+        sub(&mut state, Register::A);
 
         assert_eq!(state.cc.carry, false);
         assert_eq!(state.a, 0);
@@ -249,11 +298,11 @@ mod test {
             ..State::default()
         };
 
-        state.sui();
+        sui(&mut state);
         assert_eq!(state.a, 255);
         assert_eq!(state.cc.carry, true);
 
-        state.sui();
+        sui(&mut state);
         assert_eq!(state.a, 250);
         assert_eq!(state.cc.carry, false);
     }
@@ -270,7 +319,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::B);
+        sbb(&mut state, Register::B);
 
         assert_eq!(state.a, 249);
         assert_eq!(state.cc.carry, true);
@@ -288,7 +337,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::B);
+        sbb(&mut state, Register::B);
 
         assert_eq!(state.a, 250);
         assert_eq!(state.cc.carry, true);
@@ -306,7 +355,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::B);
+        sbb(&mut state, Register::B);
 
         assert_eq!(state.a, 2);
         assert_eq!(state.cc.carry, false);
@@ -324,7 +373,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::B);
+        sbb(&mut state, Register::B);
 
         assert_eq!(state.a, 3);
         assert_eq!(state.cc.carry, false);
@@ -342,7 +391,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::C);
+        sbb(&mut state, Register::C);
 
         assert_eq!(state.a, 250);
         assert_eq!(state.cc.carry, true);
@@ -360,7 +409,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::D);
+        sbb(&mut state, Register::D);
 
         assert_eq!(state.a, 250);
         assert_eq!(state.cc.carry, true);
@@ -378,7 +427,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::E);
+        sbb(&mut state, Register::E);
 
         assert_eq!(state.a, 250);
         assert_eq!(state.cc.carry, true);
@@ -396,7 +445,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::H);
+        sbb(&mut state, Register::H);
 
         assert_eq!(state.a, 250);
         assert_eq!(state.cc.carry, true);
@@ -416,7 +465,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::M);
+        sbb(&mut state, Register::M);
 
         assert_eq!(state.a, 250);
     }
@@ -433,7 +482,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::L);
+        sbb(&mut state, Register::L);
 
         assert_eq!(state.a, 1);
         assert_eq!(state.cc.carry, false);
@@ -452,7 +501,7 @@ mod test {
             ..State::default()
         };
 
-        state.sbb(Register::B);
+        sbb(&mut state, Register::B);
 
         assert_eq!(state.a, 255);
         assert_eq!(state.cc.carry, true);
@@ -466,19 +515,19 @@ mod test {
             ..State::default()
         };
 
-        state.sbi();
+        sbi(&mut state);
         assert_eq!(state.a, 0x01);
         assert_eq!(state.cc.carry, true);
 
-        state.sbi();
+        sbi(&mut state);
         assert_eq!(state.a, 0x01);
         assert_eq!(state.cc.carry, true);
 
-        state.sbi();
+        sbi(&mut state);
         assert_eq!(state.a, 0x00);
         assert_eq!(state.cc.carry, false);
 
-        state.sbi();
+        sbi(&mut state);
         assert_eq!(state.a, 0xFF);
         assert_eq!(state.cc.carry, true);
     }
