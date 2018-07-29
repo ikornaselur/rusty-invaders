@@ -9,6 +9,5 @@ pub enum Register {
     L,
     M,
     SP,
-    PC,
     PSW,
 }
