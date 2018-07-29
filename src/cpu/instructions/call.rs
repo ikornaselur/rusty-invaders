@@ -24,7 +24,8 @@ fn process_call(state: &mut State, address: u16) -> () {
     state.pc = address;
 }
 
-/// Jump to the specified address
+/// Call a subroutine at a specified address, storing the address of the next instruction on the
+/// stack
 ///
 /// # Cycles
 ///
@@ -42,12 +43,13 @@ pub fn call(state: &mut State) -> u8 {
     17
 }
 
-/// Jump to the specified address if carry bit is set
+/// Call a subroutine at a specified address, if the carry bit is set, storing the address of the
+/// next instruction on the stack
 ///
 /// # Cycles
 ///
-/// * If jump: 17
-/// * If not jump: 11
+/// * If subroutine called: 17
+/// * If subroutine not called: 11
 ///
 /// # Arguments
 ///
@@ -63,12 +65,13 @@ pub fn cc(state: &mut State) -> u8 {
     }
 }
 
-/// Jump to the specified address if carry bit is not set
+/// Call a subroutine at a specified address, if the carry bit is not set, storing the address of
+/// the next instruction on the stack
 ///
 /// # Cycles
 ///
-/// * If jump: 17
-/// * If not jump: 11
+/// * If subroutine called: 17
+/// * If subroutine not called: 11
 ///
 /// # Arguments
 ///
@@ -84,12 +87,13 @@ pub fn cnc(state: &mut State) -> u8 {
     }
 }
 
-/// Jump to the specified address if zero bit is set
+/// Call a subroutine at a specified address, if the zero bit is set, storing the address of the
+/// next instruction on the stack
 ///
 /// # Cycles
 ///
-/// * If jump: 17
-/// * If not jump: 11
+/// * If subroutine called: 17
+/// * If subroutine not called: 11
 ///
 /// # Arguments
 ///
@@ -105,12 +109,13 @@ pub fn cz(state: &mut State) -> u8 {
     }
 }
 
-/// Jump to the specified address if zero bit is not set
+/// Call a subroutine at a specified address, if the zero bit is not set, storing the address of
+/// the next instruction on the stack
 ///
 /// # Cycles
 ///
-/// * If jump: 17
-/// * If not jump: 11
+/// * If subroutine called: 17
+/// * If subroutine not called: 11
 ///
 /// # Arguments
 ///
@@ -126,12 +131,13 @@ pub fn cnz(state: &mut State) -> u8 {
     }
 }
 
-/// Jump to the specified address if sign bit is set
+/// Call a subroutine at a specified address, if the sign bit is set, storing the address of the
+/// next instruction on the stack
 ///
 /// # Cycles
 ///
-/// * If jump: 17
-/// * If not jump: 11
+/// * If subroutine called: 17
+/// * If subroutine not called: 11
 ///
 /// # Arguments
 ///
@@ -147,12 +153,13 @@ pub fn cm(state: &mut State) -> u8 {
     }
 }
 
-/// Jump to the specified address if sign bit is not set
+/// Call a subroutine at a specified address, if the sign bit is not set, storing the address of
+/// the next instruction on the stack
 ///
 /// # Cycles
 ///
-/// * If jump: 17
-/// * If not jump: 11
+/// * If subroutine called: 17
+/// * If subroutine not called: 11
 ///
 /// # Arguments
 ///
@@ -168,12 +175,13 @@ pub fn cp(state: &mut State) -> u8 {
     }
 }
 
-/// Jump to the specified address if parity bit is set
+/// Call a subroutine at a specified address, if the parity bit is set, storing the address of the
+/// next instruction on the stack
 ///
 /// # Cycles
 ///
-/// * If jump: 17
-/// * If not jump: 11
+/// * If subroutine called: 17
+/// * If subroutine not called: 11
 ///
 /// # Arguments
 ///
@@ -189,12 +197,13 @@ pub fn cpe(state: &mut State) -> u8 {
     }
 }
 
-/// Jump to the specified address if parity bit is not set
+/// Call a subroutine at a specified address, if the parity bit is not set, storing the address of
+/// the next instruction on the stack
 ///
 /// # Cycles
 ///
-/// * If jump: 17
-/// * If not jump: 11
+/// * If subroutine called: 17
+/// * If subroutine not called: 11
 ///
 /// # Arguments
 ///
