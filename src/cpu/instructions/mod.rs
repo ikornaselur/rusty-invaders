@@ -13,3 +13,4 @@ pub mod io;
 pub mod jump;
 pub mod load;
 pub mod mov;
+pub mod or;

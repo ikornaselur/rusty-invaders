@@ -1,50 +1,73 @@
-use super::Register;
-use super::State;
+use state::{Register, State};
 
-impl State {
-    pub fn ora(&mut self, register: Register) -> u8 {
-        let result = self.a | match register {
-            Register::A => self.a,
-            Register::B => self.b,
-            Register::C => self.c,
-            Register::D => self.d,
-            Register::E => self.e,
-            Register::H => self.h,
-            Register::L => self.l,
-            Register::M => {
-                let offset = (u16::from(self.h) << 8) + u16::from(self.l);
-                self.memory[offset as usize]
-            }
-            unsupported => {
-                panic!("ora doesn't support {:?}", unsupported);
-            }
-        };
-
-        self.a = result;
-        self.set_flags(result, false);
-
-        match register {
-            Register::M => 7,
-            _ => 4,
+/// Perform and or between accumulator and register and put results into the accumulator
+///
+/// Sets condition flags
+///
+/// # Cycles
+///
+/// * Register M: 7
+/// * Other: 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the or in
+/// * `register` - The register to perform the or with
+///
+pub fn ora(state: &mut State, register: Register) -> u8 {
+    let result = state.a | match register {
+        Register::A => state.a,
+        Register::B => state.b,
+        Register::C => state.c,
+        Register::D => state.d,
+        Register::E => state.e,
+        Register::H => state.h,
+        Register::L => state.l,
+        Register::M => {
+            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
+            state.memory[offset as usize]
         }
+        unsupported => {
+            panic!("ora doesn't support {:?}", unsupported);
+        }
+    };
+
+    state.a = result;
+    state.set_flags(result, false);
+
+    match register {
+        Register::M => 7,
+        _ => 4,
     }
+}
 
-    pub fn ori(&mut self) -> u8 {
-        let byte = self.read_byte().unwrap();
+/// Perform and or between accumulator and the next immediate byte and put results into the accumulator
+///
+/// Sets condition flags
+///
+/// # Cycles
+///
+/// 7
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the or in
+///
+pub fn ori(state: &mut State) -> u8 {
+    let byte = state.read_byte().unwrap();
 
-        let result = self.a | byte;
+    let result = state.a | byte;
 
-        self.a = result;
-        self.set_flags(result, false);
+    state.a = result;
+    state.set_flags(result, false);
 
-        7
-    }
+    7
 }
 
 #[cfg(test)]
 mod test {
-    use super::super::ConditionCodes;
     use super::*;
+    use state::ConditionCodes;
 
     #[test]
     fn ora_resets_carry_bit() {
@@ -58,7 +81,7 @@ mod test {
             ..State::default()
         };
 
-        state.ora(Register::B);
+        ora(&mut state, Register::B);
 
         assert_eq!(state.cc.carry, false);
     }
@@ -71,7 +94,7 @@ mod test {
             ..State::default()
         };
 
-        state.ora(Register::B);
+        ora(&mut state, Register::B);
 
         assert_eq!(state.a, 0b0111_1100);
     }
@@ -84,7 +107,7 @@ mod test {
             ..State::default()
         };
 
-        state.ora(Register::C);
+        ora(&mut state, Register::C);
 
         assert_eq!(state.a, 0b0111_1100);
     }
@@ -97,7 +120,7 @@ mod test {
             ..State::default()
         };
 
-        state.ora(Register::D);
+        ora(&mut state, Register::D);
 
         assert_eq!(state.a, 0b0111_1100);
     }
@@ -110,7 +133,7 @@ mod test {
             ..State::default()
         };
 
-        state.ora(Register::E);
+        ora(&mut state, Register::E);
 
         assert_eq!(state.a, 0b0111_1100);
     }
@@ -123,7 +146,7 @@ mod test {
             ..State::default()
         };
 
-        state.ora(Register::H);
+        ora(&mut state, Register::H);
 
         assert_eq!(state.a, 0b0111_1100);
     }
@@ -136,7 +159,7 @@ mod test {
             ..State::default()
         };
 
-        state.ora(Register::L);
+        ora(&mut state, Register::L);
 
         assert_eq!(state.a, 0b0111_1100);
     }
@@ -148,7 +171,7 @@ mod test {
             ..State::default()
         };
 
-        state.ora(Register::A);
+        ora(&mut state, Register::A);
 
         assert_eq!(state.a, 0b1111_1100);
     }
@@ -163,7 +186,7 @@ mod test {
             ..State::default()
         };
 
-        state.ora(Register::M);
+        ora(&mut state, Register::M);
 
         assert_eq!(state.a, 0b0111_1100);
     }
@@ -180,11 +203,11 @@ mod test {
             ..State::default()
         };
 
-        state.ori();
+        ori(&mut state);
         assert_eq!(state.a, 0b0111_0101);
         assert_eq!(state.cc.carry, false);
 
-        state.ori();
+        ori(&mut state);
         assert_eq!(state.a, 0b0111_0111);
         assert_eq!(state.cc.carry, false);
     }

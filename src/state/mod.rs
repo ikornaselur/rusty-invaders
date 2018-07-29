@@ -1,4 +1,3 @@
-mod or;
 mod pop;
 mod push;
 mod restart;
@@ -23,6 +22,7 @@ use cpu::instructions::io::{input, output};
 use cpu::instructions::jump::{jc, jm, jmp, jnc, jnz, jp, jpe, jpo, jz};
 use cpu::instructions::load::{lda, ldax, lhld, lxi, pchl, sphl};
 use cpu::instructions::mov::{mov, mvi};
+use cpu::instructions::or::{ora, ori};
 
 use io::IO;
 
@@ -400,14 +400,14 @@ impl State {
             0xAF => self.xra(Register::A),
 
             // ORA ?
-            0xB0 => self.ora(Register::B),
-            0xB1 => self.ora(Register::C),
-            0xB2 => self.ora(Register::D),
-            0xB3 => self.ora(Register::E),
-            0xB4 => self.ora(Register::H),
-            0xB5 => self.ora(Register::L),
-            0xB6 => self.ora(Register::M),
-            0xB7 => self.ora(Register::A),
+            0xB0 => ora(self, Register::B),
+            0xB1 => ora(self, Register::C),
+            0xB2 => ora(self, Register::D),
+            0xB3 => ora(self, Register::E),
+            0xB4 => ora(self, Register::H),
+            0xB5 => ora(self, Register::L),
+            0xB6 => ora(self, Register::M),
+            0xB7 => ora(self, Register::A),
 
             // CMP ?
             0xB8 => cmp(self, Register::B),
@@ -465,7 +465,7 @@ impl State {
             // ANI d8
             0xE6 => ani(self),
             // ORI d8
-            0xF6 => self.ori(),
+            0xF6 => ori(self),
             // ACI d8
             0xCE => aci(self),
             // SBI d8
