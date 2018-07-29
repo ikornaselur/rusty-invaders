@@ -1,4 +1,3 @@
-mod store;
 mod sub;
 mod xor;
 
@@ -23,6 +22,7 @@ use cpu::instructions::push::push;
 use cpu::instructions::restart::rst;
 use cpu::instructions::returns::{rc, ret, rm, rnc, rnz, rp, rpe, rpo, rz};
 use cpu::instructions::rotate::{ral, rar, rlc, rrc};
+use cpu::instructions::store::{shld, sta, stax};
 
 use io::IO;
 
@@ -450,8 +450,8 @@ impl State {
             0x3B => dcx(self, Register::SP),
 
             // STAX ?
-            0x02 => self.stax(Register::B),
-            0x12 => self.stax(Register::D),
+            0x02 => stax(self, Register::B),
+            0x12 => stax(self, Register::D),
 
             // LDAX ?
             0x0A => ldax(self, Register::B),
@@ -503,13 +503,13 @@ impl State {
             0xF9 => sphl(self),
 
             // Store accumulator direct a16
-            0x32 => self.sta(),
+            0x32 => sta(self),
 
             // Load accumulator direct a16
             0x3A => lda(self),
 
             // Store H and L direct a16
-            0x22 => self.shld(),
+            0x22 => shld(self),
 
             // Load H and L direct a16
             0x2A => lhld(self),
