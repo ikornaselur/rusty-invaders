@@ -1,4 +1,3 @@
-mod rotate;
 mod store;
 mod sub;
 mod xor;
@@ -23,6 +22,7 @@ use cpu::instructions::pop::pop;
 use cpu::instructions::push::push;
 use cpu::instructions::restart::rst;
 use cpu::instructions::returns::{rc, ret, rm, rnc, rnz, rp, rpe, rpo, rz};
+use cpu::instructions::rotate::{ral, rar, rlc, rrc};
 
 use io::IO;
 
@@ -476,10 +476,10 @@ impl State {
             0xFE => cpi(self),
 
             // Rotate accumulator
-            0x07 => self.rlc(),
-            0x0F => self.rrc(),
-            0x17 => self.ral(),
-            0x1F => self.rar(),
+            0x07 => rlc(self),
+            0x0F => rrc(self),
+            0x17 => ral(self),
+            0x1F => rar(self),
 
             // Decimal Adjustment Accumulator
             0x27 => daa(self),

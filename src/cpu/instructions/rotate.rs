@@ -1,59 +1,101 @@
-use super::State;
+use state::State;
 
-impl State {
-    pub fn rlc(&mut self) -> u8 {
-        let carry = self.a >> 7 == 1;
-        let result = self.a.rotate_left(1);
+/// Rotate the accumulator left
+///
+/// Sets the carry flag if the left most bit is set before the rotation
+///
+/// # Cycles
+///
+/// 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the rotation in
+///
+pub fn rlc(state: &mut State) -> u8 {
+    let carry = state.a >> 7 == 1;
+    let result = state.a.rotate_left(1);
 
-        self.a = result;
-        self.set_flags(result, carry);
+    state.a = result;
+    state.set_flags(result, carry);
 
-        4
+    4
+}
+
+/// Rotate the accumulator left, through the carry bit
+///
+/// # Cycles
+///
+/// 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the rotation in
+///
+pub fn ral(state: &mut State) -> u8 {
+    let carry = state.a >> 7 == 1;
+    let mut result = state.a << 1;
+
+    if state.cc.carry {
+        result |= 0x01;
     }
 
-    pub fn ral(&mut self) -> u8 {
-        let carry = self.a >> 7 == 1;
-        let mut result = self.a << 1;
+    state.a = result;
+    state.set_flags(result, carry);
 
-        if self.cc.carry {
-            result |= 0x01;
-        }
+    4
+}
 
-        self.a = result;
-        self.set_flags(result, carry);
+/// Rotate the accumulator right
+///
+/// Sets the carry flag if the right most bit is set before the rotation
+///
+/// # Cycles
+///
+/// 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the rotation in
+///
+pub fn rrc(state: &mut State) -> u8 {
+    let carry = state.a & 0x01 == 1;
+    let result = state.a.rotate_right(1);
 
-        4
+    state.a = result;
+    state.set_flags(result, carry);
+
+    4
+}
+
+/// Rotate the accumulator right, through the carry bit
+///
+/// # Cycles
+///
+/// 4
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the rotation in
+///
+pub fn rar(state: &mut State) -> u8 {
+    let carry = state.a & 0x01 == 1;
+    let mut result = state.a >> 1;
+
+    if state.cc.carry {
+        result |= 0x01 << 7;
     }
 
-    pub fn rrc(&mut self) -> u8 {
-        let carry = self.a & 0x01 == 1;
-        let result = self.a.rotate_right(1);
+    state.a = result;
+    state.set_flags(result, carry);
 
-        self.a = result;
-        self.set_flags(result, carry);
-
-        4
-    }
-
-    pub fn rar(&mut self) -> u8 {
-        let carry = self.a & 0x01 == 1;
-        let mut result = self.a >> 1;
-
-        if self.cc.carry {
-            result |= 0x01 << 7;
-        }
-
-        self.a = result;
-        self.set_flags(result, carry);
-
-        4
-    }
+    4
 }
 
 #[cfg(test)]
 mod test {
-    use super::super::ConditionCodes;
     use super::*;
+    use state::ConditionCodes;
 
     #[test]
     fn rlc_rotates_accumulator_left() {
@@ -66,12 +108,12 @@ mod test {
             ..State::default()
         };
 
-        state.rlc();
+        rlc(&mut state);
 
         assert_eq!(state.a, 0b1110_0100);
         assert_eq!(state.cc.carry, false);
 
-        state.rlc();
+        rlc(&mut state);
 
         assert_eq!(state.a, 0b1100_1001);
         assert_eq!(state.cc.carry, true);
@@ -88,12 +130,12 @@ mod test {
             ..State::default()
         };
 
-        state.ral();
+        ral(&mut state);
 
         assert_eq!(state.a, 0b1110_0101);
         assert_eq!(state.cc.carry, false);
 
-        state.ral();
+        ral(&mut state);
 
         assert_eq!(state.a, 0b1100_1010);
         assert_eq!(state.cc.carry, true);
@@ -110,12 +152,12 @@ mod test {
             ..State::default()
         };
 
-        state.rrc();
+        rrc(&mut state);
 
         assert_eq!(state.a, 0b0111_1001);
         assert_eq!(state.cc.carry, false);
 
-        state.rrc();
+        rrc(&mut state);
 
         assert_eq!(state.a, 0b1011_1100);
         assert_eq!(state.cc.carry, true);
@@ -132,17 +174,17 @@ mod test {
             ..State::default()
         };
 
-        state.rar();
+        rar(&mut state);
 
         assert_eq!(state.a, 0b0111_1001);
         assert_eq!(state.cc.carry, true);
 
-        state.rar();
+        rar(&mut state);
 
         assert_eq!(state.a, 0b1011_1100);
         assert_eq!(state.cc.carry, true);
 
-        state.rar();
+        rar(&mut state);
 
         assert_eq!(state.a, 0b1101_1110);
         assert_eq!(state.cc.carry, false);

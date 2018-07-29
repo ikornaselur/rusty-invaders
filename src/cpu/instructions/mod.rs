@@ -18,3 +18,4 @@ pub mod pop;
 pub mod push;
 pub mod restart;
 pub mod returns;
+pub mod rotate;
