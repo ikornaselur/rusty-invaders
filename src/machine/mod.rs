@@ -6,10 +6,13 @@ use sfml::window::{Event, Key, Style};
 use std::thread::sleep;
 use std::time::Duration;
 
-use clock::Clock;
 use cpu::instructions::interrupt::di;
 use cpu::instructions::restart::rst;
 use cpu::CPU;
+use machine::clock::Clock;
+
+mod clock;
+pub mod io;
 
 // 1 Billion nanoseconds divided by 2 million cycles a second
 const CYCLE_TIME_NANOS: u64 = 1_000_000_000 / 2_000_000;

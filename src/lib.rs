@@ -6,9 +6,7 @@ use std::io::prelude::*;
 
 use machine::Machine;
 
-pub mod clock;
 pub mod cpu;
-pub mod io;
 pub mod machine;
 
 pub fn run(config: Config) -> Result<(), Box<Error>> {

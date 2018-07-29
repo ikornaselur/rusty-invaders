@@ -25,7 +25,7 @@ use cpu::instructions::subtraction::{sbb, sbi, sub, sui};
 use cpu::instructions::xor::{xra, xri};
 use cpu::register::Register;
 
-use io::IO;
+use machine::io::IO;
 
 pub mod flags;
 pub mod instructions;
