@@ -17,7 +17,7 @@ pub fn push(state: &mut State, register: Register) -> u8 {
         Register::B => (state.b, state.c),
         Register::D => (state.d, state.e),
         Register::H => (state.h, state.l),
-        Register::PSW => (state.a, state.get_flags_as_bits()),
+        Register::PSW => (state.a, state.cc.as_bits()),
         unsupported => {
             panic!("pop doesn't support {:?}", unsupported);
         }

@@ -148,23 +148,6 @@ impl State {
         self.cc.carry = bits & 0b0000_0001 != 0;
     }
 
-    pub fn get_flags_as_bits(&self) -> u8 {
-        let mut bits = 0;
-        if self.cc.sign {
-            bits |= 0b1000_0000
-        }
-        if self.cc.zero {
-            bits |= 0b0100_0000
-        }
-        if self.cc.parity {
-            bits |= 0b0000_0100
-        }
-        if self.cc.carry {
-            bits |= 0b0000_0001
-        }
-        bits
-    }
-
     pub fn nop(&mut self) -> u8 {
         4
     }
@@ -646,29 +629,6 @@ mod test {
         assert_eq!(state.cc.zero, true);
         assert_eq!(state.cc.parity, true);
         assert_eq!(state.cc.carry, true);
-    }
-
-    #[test]
-    fn get_flags_as_bits_returns_correct_bits() {
-        let mut state = State::default();
-
-        assert_eq!(state.get_flags_as_bits(), 0b0000_0000);
-
-        state.cc.carry = true;
-
-        assert_eq!(state.get_flags_as_bits(), 0b0000_0001);
-
-        state.cc.parity = true;
-
-        assert_eq!(state.get_flags_as_bits(), 0b0000_0101);
-
-        state.cc.zero = true;
-
-        assert_eq!(state.get_flags_as_bits(), 0b0100_0101);
-
-        state.cc.sign = true;
-
-        assert_eq!(state.get_flags_as_bits(), 0b1100_0101);
     }
 
     #[test]

@@ -20,3 +20,50 @@ impl Default for Flags {
         }
     }
 }
+
+impl Flags {
+    pub fn as_bits(&self) -> u8 {
+        let mut bits = 0;
+        if self.sign {
+            bits |= 0b1000_0000
+        }
+        if self.zero {
+            bits |= 0b0100_0000
+        }
+        if self.parity {
+            bits |= 0b0000_0100
+        }
+        if self.carry {
+            bits |= 0b0000_0001
+        }
+        bits
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn as_bits_returns_correct_bits() {
+        let mut flags = Flags::default();
+
+        assert_eq!(flags.as_bits(), 0b0000_0000);
+
+        flags.carry = true;
+
+        assert_eq!(flags.as_bits(), 0b0000_0001);
+
+        flags.parity = true;
+
+        assert_eq!(flags.as_bits(), 0b0000_0101);
+
+        flags.zero = true;
+
+        assert_eq!(flags.as_bits(), 0b0100_0101);
+
+        flags.sign = true;
+
+        assert_eq!(flags.as_bits(), 0b1100_0101);
+    }
+}
