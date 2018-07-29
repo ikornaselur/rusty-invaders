@@ -1,4 +1,3 @@
-mod load;
 mod mov;
 mod or;
 mod pop;
@@ -23,6 +22,7 @@ use cpu::instructions::increment::{inr, inx};
 use cpu::instructions::interrupt::{di, ei};
 use cpu::instructions::io::{input, output};
 use cpu::instructions::jump::{jc, jm, jmp, jnc, jnz, jp, jpe, jpo, jz};
+use cpu::instructions::load::{lda, ldax, lhld, lxi, pchl, sphl};
 
 use io::IO;
 
@@ -236,10 +236,10 @@ impl State {
             // Instructions with registers
 
             // LXI ?,d16
-            0x01 => self.lxi(Register::B),
-            0x11 => self.lxi(Register::D),
-            0x21 => self.lxi(Register::H),
-            0x31 => self.lxi(Register::SP),
+            0x01 => lxi(self, Register::B),
+            0x11 => lxi(self, Register::D),
+            0x21 => lxi(self, Register::H),
+            0x31 => lxi(self, Register::SP),
 
             // INR ?
             0x04 => inr(self, Register::B),
@@ -455,8 +455,8 @@ impl State {
             0x12 => self.stax(Register::D),
 
             // LDAX ?
-            0x0A => self.ldax(Register::B),
-            0x1A => self.ldax(Register::D),
+            0x0A => ldax(self, Register::B),
+            0x1A => ldax(self, Register::D),
 
             // Instructions without registers
             // ADI d8
@@ -501,22 +501,22 @@ impl State {
             0xE3 => xthl(self),
 
             // Load SP from H and L
-            0xF9 => self.sphl(),
+            0xF9 => sphl(self),
 
             // Store accumulator direct a16
             0x32 => self.sta(),
 
             // Load accumulator direct a16
-            0x3A => self.lda(),
+            0x3A => lda(self),
 
             // Store H and L direct a16
             0x22 => self.shld(),
 
             // Load H and L direct a16
-            0x2A => self.lhld(),
+            0x2A => lhld(self),
 
             // Load Program Counter
-            0xE9 => self.pchl(),
+            0xE9 => pchl(self),
 
             // Jumps
             0xC3 => jmp(self),

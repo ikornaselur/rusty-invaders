@@ -1,77 +1,136 @@
-use super::Register;
-use super::State;
+use state::{Register, State};
 
-impl State {
-    pub fn lxi(&mut self, register: Register) -> u8 {
-        let least = self.read_byte().unwrap();
-        let most = self.read_byte().unwrap();
+/// Load register pair from the next two immediate bytes
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the load in
+/// * `register` - The register pair to load into
+///
+pub fn lxi(state: &mut State, register: Register) -> u8 {
+    let least = state.read_byte().unwrap();
+    let most = state.read_byte().unwrap();
 
-        match register {
-            Register::B => {
-                self.c = least;
-                self.b = most;
-            }
-            Register::D => {
-                self.e = least;
-                self.d = most;
-            }
-            Register::H => {
-                self.l = least;
-                self.h = most;
-            }
-            Register::SP => {
-                self.sp = (u16::from(most) << 8) + u16::from(least);
-            }
-            unsupported => {
-                panic!("lxi doesn't support {:?}", unsupported);
-            }
-        };
+    match register {
+        Register::B => {
+            state.c = least;
+            state.b = most;
+        }
+        Register::D => {
+            state.e = least;
+            state.d = most;
+        }
+        Register::H => {
+            state.l = least;
+            state.h = most;
+        }
+        Register::SP => {
+            state.sp = (u16::from(most) << 8) + u16::from(least);
+        }
+        unsupported => {
+            panic!("lxi doesn't support {:?}", unsupported);
+        }
+    };
 
-        10
-    }
+    10
+}
 
-    pub fn sphl(&mut self) -> u8 {
-        self.sp = (u16::from(self.h) << 8) + u16::from(self.l);
+/// Load SP from H and L
+///
+/// # Cycles
+///
+/// 5
+///
+/// # Arguments
+///
+/// * `state` - The state to load SP in
+///
+pub fn sphl(state: &mut State) -> u8 {
+    state.sp = (u16::from(state.h) << 8) + u16::from(state.l);
 
-        5
-    }
+    5
+}
 
-    pub fn lda(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
+/// Load the accumulator directly from an address
+///
+/// # Cycles
+///
+/// 13
+///
+/// # Arguments
+///
+/// * `state` - The state to load the accumulator in
+///
+pub fn lda(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
 
-        self.a = self.memory[address as usize];
+    state.a = state.memory[address as usize];
 
-        13
-    }
+    13
+}
 
-    pub fn lhld(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
+/// Load H and L directrly from an address
+///
+/// # Cycles
+///
+/// 16
+///
+/// # Arguments
+///
+/// * `state` - The state to load H and L in
+///
+pub fn lhld(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
 
-        self.l = self.memory[address as usize];
-        self.h = self.memory[(address + 1) as usize];
+    state.l = state.memory[address as usize];
+    state.h = state.memory[(address + 1) as usize];
 
-        16
-    }
+    16
+}
 
-    pub fn ldax(&mut self, register: Register) -> u8 {
-        let address = match register {
-            Register::B => (u16::from(self.b) << 8) + u16::from(self.c),
-            Register::D => (u16::from(self.d) << 8) + u16::from(self.e),
-            unsupported => {
-                panic!("stax doesn't support {:?}", unsupported);
-            }
-        };
+/// Load the accumulator from a memory address
+///
+/// # Cycles
+///
+/// 7
+///
+/// # Arguments
+///
+/// * `state` - The state to load the accumulator in
+/// * `register` - The register pair containing the address to load the accumulator from
+///
+pub fn ldax(state: &mut State, register: Register) -> u8 {
+    let address = match register {
+        Register::B => (u16::from(state.b) << 8) + u16::from(state.c),
+        Register::D => (u16::from(state.d) << 8) + u16::from(state.e),
+        unsupported => {
+            panic!("stax doesn't support {:?}", unsupported);
+        }
+    };
 
-        self.a = self.memory[address as usize];
+    state.a = state.memory[address as usize];
 
-        7
-    }
+    7
+}
 
-    pub fn pchl(&mut self) -> u8 {
-        self.pc = (u16::from(self.h) << 8) + u16::from(self.l);
+/// Load program counter
+///
+/// # Cycles
+///
+/// 5
+///
+/// # Arguments
+///
+/// * `state` - The state to load the program counter in
+///
+pub fn pchl(state: &mut State) -> u8 {
+    state.pc = (u16::from(state.h) << 8) + u16::from(state.l);
 
-        5
-    }
+    5
 }
 
 #[cfg(test)]
@@ -86,7 +145,7 @@ mod test {
             ..State::default()
         };
 
-        state.lxi(Register::B);
+        lxi(&mut state, Register::B);
 
         assert_eq!(state.c, 0xDE);
         assert_eq!(state.b, 0xAD);
@@ -100,7 +159,7 @@ mod test {
             ..State::default()
         };
 
-        state.lxi(Register::D);
+        lxi(&mut state, Register::D);
 
         assert_eq!(state.e, 0xDE);
         assert_eq!(state.d, 0xAD);
@@ -114,7 +173,7 @@ mod test {
             ..State::default()
         };
 
-        state.lxi(Register::H);
+        lxi(&mut state, Register::H);
 
         assert_eq!(state.l, 0xDE);
         assert_eq!(state.h, 0xAD);
@@ -128,7 +187,7 @@ mod test {
             ..State::default()
         };
 
-        state.lxi(Register::SP);
+        lxi(&mut state, Register::SP);
 
         assert_eq!(state.sp, 0xDEAD);
     }
@@ -142,7 +201,7 @@ mod test {
             ..State::default()
         };
 
-        state.sphl();
+        sphl(&mut state);
 
         assert_eq!(state.h, 0x50);
         assert_eq!(state.l, 0x6C);
@@ -158,7 +217,7 @@ mod test {
             ..State::default()
         };
 
-        state.lda();
+        lda(&mut state);
 
         assert_eq!(state.pc, 4);
         assert_eq!(state.memory, vec![0x11, 0x12, 0x06, 0x00, 0x13, 0x14, 0xAA]);
@@ -173,7 +232,7 @@ mod test {
             ..State::default()
         };
 
-        state.lhld();
+        lhld(&mut state);
 
         assert_eq!(state.pc, 4);
         assert_eq!(
@@ -194,7 +253,7 @@ mod test {
             ..State::default()
         };
 
-        state.ldax(Register::B);
+        ldax(&mut state, Register::B);
 
         assert_eq!(state.a, 0xFF);
     }
@@ -209,7 +268,7 @@ mod test {
             ..State::default()
         };
 
-        state.ldax(Register::D);
+        ldax(&mut state, Register::D);
 
         assert_eq!(state.a, 0xFF);
     }
@@ -223,7 +282,7 @@ mod test {
             ..State::default()
         };
 
-        state.pchl();
+        pchl(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }
