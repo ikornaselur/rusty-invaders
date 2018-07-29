@@ -1,4 +1,3 @@
-mod push;
 mod restart;
 mod returns;
 mod rotate;
@@ -23,6 +22,7 @@ use cpu::instructions::load::{lda, ldax, lhld, lxi, pchl, sphl};
 use cpu::instructions::mov::{mov, mvi};
 use cpu::instructions::or::{ora, ori};
 use cpu::instructions::pop::pop;
+use cpu::instructions::push::push;
 
 use io::IO;
 
@@ -185,7 +185,7 @@ impl State {
         self.cc.carry = bits & 0b0000_0001 != 0;
     }
 
-    fn get_flags_as_bits(&self) -> u8 {
+    pub fn get_flags_as_bits(&self) -> u8 {
         let mut bits = 0;
         if self.cc.sign {
             bits |= 0b1000_0000
@@ -426,10 +426,10 @@ impl State {
             0xF1 => pop(self, Register::PSW),
 
             // PUSH ?
-            0xC5 => self.push(Register::B),
-            0xD5 => self.push(Register::D),
-            0xE5 => self.push(Register::H),
-            0xF5 => self.push(Register::PSW),
+            0xC5 => push(self, Register::B),
+            0xD5 => push(self, Register::D),
+            0xE5 => push(self, Register::H),
+            0xF5 => push(self, Register::PSW),
 
             // DAD ?
             0x09 => dad(self, Register::B),
