@@ -1,89 +1,185 @@
-use super::State;
+use state::State;
 
-impl State {
-    pub fn ret(&mut self) -> u8 {
-        self.pc = self.read_address_from_stack().unwrap();
+/// Perform an unconditional return to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the return in
+///
+pub fn ret(state: &mut State) -> u8 {
+    state.pc = state.read_address_from_stack().unwrap();
 
-        10
+    10
+}
+
+/// Perform a return, if the carry bit is set, to an address
+///
+/// # Cycles
+///
+/// * If return is performed: 11
+/// * If return is not performed: 5
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the return in
+///
+pub fn rc(state: &mut State) -> u8 {
+    if state.cc.carry {
+        ret(state);
+        11
+    } else {
+        5
     }
+}
 
-    pub fn rc(&mut self) -> u8 {
-        if self.cc.carry {
-            self.ret();
-            11
-        } else {
-            5
-        }
+/// Perform a return, if the carry bit is not set, to an address
+///
+/// # Cycles
+///
+/// * If return is performed: 11
+/// * If return is not performed: 5
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the return in
+///
+pub fn rnc(state: &mut State) -> u8 {
+    if state.cc.carry {
+        5
+    } else {
+        ret(state);
+        11
     }
+}
 
-    pub fn rnc(&mut self) -> u8 {
-        if self.cc.carry {
-            5
-        } else {
-            self.ret();
-            11
-        }
+/// Perform a return, if the zero bit is set, to an address
+///
+/// # Cycles
+///
+/// * If return is performed: 11
+/// * If return is not performed: 5
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the return in
+///
+pub fn rz(state: &mut State) -> u8 {
+    if state.cc.zero {
+        ret(state);
+        11
+    } else {
+        5
     }
+}
 
-    pub fn rz(&mut self) -> u8 {
-        if self.cc.zero {
-            self.ret();
-            11
-        } else {
-            5
-        }
+/// Perform a return, if the zero bit is not set, to an address
+///
+/// # Cycles
+///
+/// * If return is performed: 11
+/// * If return is not performed: 5
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the return in
+///
+pub fn rnz(state: &mut State) -> u8 {
+    if state.cc.zero {
+        5
+    } else {
+        ret(state);
+        11
     }
+}
 
-    pub fn rnz(&mut self) -> u8 {
-        if self.cc.zero {
-            5
-        } else {
-            self.ret();
-            11
-        }
+/// Perform a return, if the sign bit is set, to an address
+///
+/// # Cycles
+///
+/// * If return is performed: 11
+/// * If return is not performed: 5
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the return in
+///
+pub fn rm(state: &mut State) -> u8 {
+    if state.cc.sign {
+        ret(state);
+        11
+    } else {
+        5
     }
+}
 
-    pub fn rm(&mut self) -> u8 {
-        if self.cc.sign {
-            self.ret();
-            11
-        } else {
-            5
-        }
+/// Perform a return, if the sign bit is not set, to an address
+///
+/// # Cycles
+///
+/// * If return is performed: 11
+/// * If return is not performed: 5
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the return in
+///
+pub fn rp(state: &mut State) -> u8 {
+    if state.cc.sign {
+        5
+    } else {
+        ret(state);
+        11
     }
+}
 
-    pub fn rp(&mut self) -> u8 {
-        if self.cc.sign {
-            5
-        } else {
-            self.ret();
-            11
-        }
+/// Perform a return, if the parity bit is set, to an address
+///
+/// # Cycles
+///
+/// * If return is performed: 11
+/// * If return is not performed: 5
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the return in
+///
+pub fn rpe(state: &mut State) -> u8 {
+    if state.cc.parity {
+        ret(state);
+        11
+    } else {
+        5
     }
+}
 
-    pub fn rpe(&mut self) -> u8 {
-        if self.cc.parity {
-            self.ret();
-            11
-        } else {
-            5
-        }
-    }
-
-    pub fn rpo(&mut self) -> u8 {
-        if self.cc.parity {
-            5
-        } else {
-            self.ret();
-            11
-        }
+/// Perform a return, if the parity bit is not set, to an address
+///
+/// # Cycles
+///
+/// * If return is performed: 11
+/// * If return is not performed: 5
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the return in
+///
+pub fn rpo(state: &mut State) -> u8 {
+    if state.cc.parity {
+        5
+    } else {
+        ret(state);
+        11
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::super::ConditionCodes;
     use super::*;
+    use state::ConditionCodes;
 
     #[test]
     fn ret_pops_the_address_off_the_stack_and_jumps_back() {
@@ -94,7 +190,7 @@ mod test {
             ..State::default()
         };
 
-        state.ret();
+        ret(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 0x0008);
@@ -113,14 +209,14 @@ mod test {
             ..State::default()
         };
 
-        state.rc();
+        rc(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
         state.cc.carry = true;
-        state.rc();
+        rc(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 0x0008);
@@ -139,14 +235,14 @@ mod test {
             ..State::default()
         };
 
-        state.rnc();
+        rnc(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
         state.cc.carry = false;
-        state.rnc();
+        rnc(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 0x0008);
@@ -165,14 +261,14 @@ mod test {
             ..State::default()
         };
 
-        state.rz();
+        rz(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
         state.cc.zero = true;
-        state.rz();
+        rz(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 0x0008);
@@ -191,14 +287,14 @@ mod test {
             ..State::default()
         };
 
-        state.rnz();
+        rnz(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
         state.cc.zero = false;
-        state.rnz();
+        rnz(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 0x0008);
@@ -217,14 +313,14 @@ mod test {
             ..State::default()
         };
 
-        state.rm();
+        rm(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
         state.cc.sign = true;
-        state.rm();
+        rm(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 0x0008);
@@ -243,14 +339,14 @@ mod test {
             ..State::default()
         };
 
-        state.rp();
+        rp(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
         state.cc.sign = false;
-        state.rp();
+        rp(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 0x0008);
@@ -269,14 +365,14 @@ mod test {
             ..State::default()
         };
 
-        state.rpe();
+        rpe(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
         state.cc.parity = true;
-        state.rpe();
+        rpe(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 0x0008);
@@ -295,14 +391,14 @@ mod test {
             ..State::default()
         };
 
-        state.rpo();
+        rpo(&mut state);
 
         assert_eq!(state.sp, 1);
         assert_eq!(state.pc, 0xDEAD);
         assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
         state.cc.parity = false;
-        state.rpo();
+        rpo(&mut state);
 
         assert_eq!(state.sp, 3);
         assert_eq!(state.pc, 0x0008);

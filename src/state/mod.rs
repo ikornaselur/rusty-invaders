@@ -1,4 +1,3 @@
-mod returns;
 mod rotate;
 mod store;
 mod sub;
@@ -23,6 +22,7 @@ use cpu::instructions::or::{ora, ori};
 use cpu::instructions::pop::pop;
 use cpu::instructions::push::push;
 use cpu::instructions::restart::rst;
+use cpu::instructions::returns::{rc, ret, rm, rnc, rnz, rp, rpe, rpo, rz};
 
 use io::IO;
 
@@ -545,17 +545,17 @@ impl State {
             0xE4 => cpo(self), // Call if parity odd
 
             // Returns
-            0xC9 => self.ret(),
-            0xD9 => self.ret(),
+            0xC9 => ret(self),
+            0xD9 => ret(self),
 
-            0xD8 => self.rc(),  // Return if carry
-            0xD0 => self.rnc(), // Return if no carry
-            0xC8 => self.rz(),  // Return if zero
-            0xC0 => self.rnz(), // Return if not zero
-            0xF8 => self.rm(),  // Return if minus
-            0xF0 => self.rp(),  // Return if plus
-            0xE8 => self.rpe(), // Return if parity even
-            0xE0 => self.rpo(), // Return if parity odd
+            0xD8 => rc(self),  // Return if carry
+            0xD0 => rnc(self), // Return if no carry
+            0xC8 => rz(self),  // Return if zero
+            0xC0 => rnz(self), // Return if not zero
+            0xF8 => rm(self),  // Return if minus
+            0xF0 => rp(self),  // Return if plus
+            0xE8 => rpe(self), // Return if parity even
+            0xE0 => rpo(self), // Return if parity odd
 
             // Halt
             0x76 => self.hlt(),
