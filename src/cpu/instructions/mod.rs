@@ -10,3 +10,4 @@ pub mod exchange;
 pub mod increment;
 pub mod interrupt;
 pub mod io;
+pub mod jump;

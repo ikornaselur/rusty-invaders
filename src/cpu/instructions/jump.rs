@@ -1,89 +1,177 @@
-use super::State;
+use state::State;
 
-impl State {
-    pub fn jmp(&mut self) -> u8 {
-        self.pc = self.read_address().unwrap();
+/// Perform a unconditional jump to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the jump in
+///
+pub fn jmp(state: &mut State) -> u8 {
+    state.pc = state.read_address().unwrap();
 
-        10
+    10
+}
+
+/// Perform a jump, if the carry bit is set, to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the jump in
+///
+pub fn jc(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.carry {
+        state.pc = address;
     }
 
-    pub fn jc(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.carry {
-            self.pc = address;
-        }
+    10
+}
 
-        10
+/// Perform a jump, if the carry bit is not set, to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the jump in
+///
+pub fn jnc(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if !state.cc.carry {
+        state.pc = address;
     }
 
-    pub fn jnc(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if !self.cc.carry {
-            self.pc = address;
-        }
+    10
+}
 
-        10
+/// Perform a jump, if the zero bit is set, to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the jump in
+///
+pub fn jz(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.zero {
+        state.pc = address;
     }
 
-    pub fn jz(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.zero {
-            self.pc = address;
-        }
+    10
+}
 
-        10
+/// Perform a jump, if the zero bit is not set, to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the jump in
+///
+pub fn jnz(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if !state.cc.zero {
+        state.pc = address;
     }
 
-    pub fn jnz(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if !self.cc.zero {
-            self.pc = address;
-        }
+    10
+}
 
-        10
+/// Perform a jump, if the sign bit is set, to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the jump in
+///
+pub fn jm(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.sign {
+        state.pc = address;
     }
 
-    pub fn jm(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.sign {
-            self.pc = address;
-        }
+    10
+}
 
-        10
+/// Perform a jump, if the sign bit is not set, to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the jump in
+///
+pub fn jp(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if !state.cc.sign {
+        state.pc = address;
     }
 
-    pub fn jp(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if !self.cc.sign {
-            self.pc = address;
-        }
+    10
+}
 
-        10
+/// Perform a jump, if the parity bit is set, to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the jump in
+///
+pub fn jpe(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if state.cc.parity {
+        state.pc = address;
     }
 
-    pub fn jpe(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if self.cc.parity {
-            self.pc = address;
-        }
+    10
+}
 
-        10
+/// Perform a jump, if the parity bit is not set, to an address
+///
+/// # Cycles
+///
+/// 10
+///
+/// # Arguments
+///
+/// * `state` - The state to perform the jump in
+///
+pub fn jpo(state: &mut State) -> u8 {
+    let address = state.read_address().unwrap();
+    if !state.cc.parity {
+        state.pc = address;
     }
 
-    pub fn jpo(&mut self) -> u8 {
-        let address = self.read_address().unwrap();
-        if !self.cc.parity {
-            self.pc = address;
-        }
-
-        10
-    }
+    10
 }
 
 #[cfg(test)]
 mod test {
-    use super::super::ConditionCodes;
     use super::*;
+    use state::ConditionCodes;
 
     #[test]
     fn jmp_sets_pc_to_new_address() {
@@ -92,7 +180,7 @@ mod test {
             ..State::default()
         };
 
-        state.jmp();
+        jmp(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }
@@ -108,12 +196,12 @@ mod test {
             ..State::default()
         };
 
-        state.jc();
+        jc(&mut state);
 
         assert_eq!(state.pc, 2);
 
         state.cc.carry = true;
-        state.jc();
+        jc(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }
@@ -129,12 +217,12 @@ mod test {
             ..State::default()
         };
 
-        state.jnc();
+        jnc(&mut state);
 
         assert_eq!(state.pc, 2);
 
         state.cc.carry = false;
-        state.jnc();
+        jnc(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }
@@ -150,12 +238,12 @@ mod test {
             ..State::default()
         };
 
-        state.jz();
+        jz(&mut state);
 
         assert_eq!(state.pc, 2);
 
         state.cc.zero = true;
-        state.jz();
+        jz(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }
@@ -171,12 +259,12 @@ mod test {
             ..State::default()
         };
 
-        state.jnz();
+        jnz(&mut state);
 
         assert_eq!(state.pc, 2);
 
         state.cc.zero = false;
-        state.jnz();
+        jnz(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }
@@ -192,12 +280,12 @@ mod test {
             ..State::default()
         };
 
-        state.jm();
+        jm(&mut state);
 
         assert_eq!(state.pc, 2);
 
         state.cc.sign = true;
-        state.jm();
+        jm(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }
@@ -213,12 +301,12 @@ mod test {
             ..State::default()
         };
 
-        state.jp();
+        jp(&mut state);
 
         assert_eq!(state.pc, 2);
 
         state.cc.sign = false;
-        state.jp();
+        jp(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }
@@ -234,12 +322,12 @@ mod test {
             ..State::default()
         };
 
-        state.jpe();
+        jpe(&mut state);
 
         assert_eq!(state.pc, 2);
 
         state.cc.parity = true;
-        state.jpe();
+        jpe(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }
@@ -255,12 +343,12 @@ mod test {
             ..State::default()
         };
 
-        state.jpo();
+        jpo(&mut state);
 
         assert_eq!(state.pc, 2);
 
         state.cc.parity = false;
-        state.jpo();
+        jpo(&mut state);
 
         assert_eq!(state.pc, 0xDEAD);
     }

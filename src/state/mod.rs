@@ -1,4 +1,3 @@
-mod jump;
 mod load;
 mod mov;
 mod or;
@@ -23,6 +22,7 @@ use cpu::instructions::exchange::{xchg, xthl};
 use cpu::instructions::increment::{inr, inx};
 use cpu::instructions::interrupt::{di, ei};
 use cpu::instructions::io::{input, output};
+use cpu::instructions::jump::{jc, jm, jmp, jnc, jnz, jp, jpe, jpo, jz};
 
 use io::IO;
 
@@ -519,16 +519,16 @@ impl State {
             0xE9 => self.pchl(),
 
             // Jumps
-            0xC3 => self.jmp(),
-            0xCB => self.jmp(),
-            0xDA => self.jc(),  // Jump if carry
-            0xD2 => self.jnc(), // Jump if no carry
-            0xCA => self.jz(),  // Jump if zero
-            0xC2 => self.jnz(), // Jump if not zero
-            0xFA => self.jm(),  // Jump if minus
-            0xF2 => self.jp(),  // Jump if positive
-            0xEA => self.jpe(), // Jump if parity even
-            0xE2 => self.jpo(), // Jump if parity odd
+            0xC3 => jmp(self),
+            0xCB => jmp(self),
+            0xDA => jc(self),  // Jump if carry
+            0xD2 => jnc(self), // Jump if no carry
+            0xCA => jz(self),  // Jump if zero
+            0xC2 => jnz(self), // Jump if not zero
+            0xFA => jm(self),  // Jump if minus
+            0xF2 => jp(self),  // Jump if positive
+            0xEA => jpe(self), // Jump if parity even
+            0xE2 => jpo(self), // Jump if parity odd
 
             // Calls
             0xCD => call(self),

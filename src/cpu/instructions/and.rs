@@ -4,7 +4,10 @@ use state::{Register, State};
 ///
 /// Sets condition flags
 ///
-/// Cycles: 7 for register M, else 4
+/// # Cycles
+///
+/// Register M: 7
+/// Other: 4
 ///
 /// # Arguments
 ///
@@ -43,7 +46,9 @@ pub fn ana(state: &mut State, register: Register) -> u8 {
 ///
 /// Sets condition flags
 ///
-/// Cycles: 7
+/// # Cycles
+///
+/// 7
 ///
 /// # Arguments
 ///
