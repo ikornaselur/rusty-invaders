@@ -9,7 +9,7 @@ use std::time::Duration;
 use clock::Clock;
 use cpu::instructions::interrupt::di;
 use cpu::instructions::restart::rst;
-use cpu::state::State;
+use cpu::CPU;
 
 // 1 Billion nanoseconds divided by 2 million cycles a second
 const CYCLE_TIME_NANOS: u64 = 1_000_000_000 / 2_000_000;
@@ -17,7 +17,7 @@ const INTERRUPT_TIME: Duration = Duration::from_micros(1_000_000 / 120);
 const SCALE: u32 = 8;
 
 pub struct Machine {
-    state: State,
+    cpu: CPU,
     interrupt_timer: Clock,
     cpu_timer: Clock,
     next_interrupt: u8,
@@ -36,7 +36,7 @@ impl Machine {
         );
 
         Machine {
-            state: State::new(buffer, true),
+            cpu: CPU::new(buffer, true),
             interrupt_timer: Clock::new(),
             cpu_timer: Clock::new(),
             next_interrupt: 1,
@@ -64,7 +64,7 @@ impl Machine {
             }
             _ => (),
         }
-        self.state.set_input(1, self.keys);
+        self.cpu.set_input(1, self.keys);
     }
 
     fn key_release(&mut self, key: Key) -> () {
@@ -86,13 +86,13 @@ impl Machine {
             }
             _ => (),
         }
-        self.state.set_input(1, self.keys);
+        self.cpu.set_input(1, self.keys);
     }
 
     fn draw(&mut self) -> () {
         let mut texture = Texture::new(256, 224).expect("Unable to create texture");
         let mut buffer = Vec::new();
-        for pixel in self.state.get_frame() {
+        for pixel in self.cpu.get_frame() {
             for i in 0..8 {
                 let res = if (pixel & 1 << i) > 0 { 0xff } else { 0x00 };
                 buffer.push(res as u8);
@@ -128,7 +128,7 @@ impl Machine {
 
     pub fn emulate(&mut self) -> () {
         loop {
-            if self.state.int_enabled && self.interrupt_timer.elapsed() > INTERRUPT_TIME {
+            if self.cpu.int_enabled && self.interrupt_timer.elapsed() > INTERRUPT_TIME {
                 while let Some(event) = self.window.poll_event() {
                     match event {
                         Event::Closed
@@ -141,22 +141,22 @@ impl Machine {
                     }
                 }
                 self.interrupt_timer.reset_last_time();
-                di(&mut self.state);
+                di(&mut self.cpu);
                 match self.next_interrupt {
                     1 => {
-                        rst(&mut self.state, 1);
+                        rst(&mut self.cpu, 1);
                         self.next_interrupt = 2;
                     }
                     2 => {
                         self.draw();
-                        rst(&mut self.state, 2);
+                        rst(&mut self.cpu, 2);
                         self.next_interrupt = 1;
                     }
                     _ => panic!("Invalid interrupt"),
                 }
             }
 
-            let cycles = match self.state.step() {
+            let cycles = match self.cpu.step() {
                 None => break,
                 Some(cycles) => cycles,
             };

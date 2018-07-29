@@ -1,4 +1,4 @@
-use cpu::state::State;
+use cpu::CPU;
 
 /// Perform a unconditional jump to an address
 ///
@@ -8,10 +8,10 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the jump in
+/// * `cpu` - The cpu to perform the jump in
 ///
-pub fn jmp(state: &mut State) -> u8 {
-    state.pc = state.read_address().unwrap();
+pub fn jmp(cpu: &mut CPU) -> u8 {
+    cpu.pc = cpu.read_address().unwrap();
 
     10
 }
@@ -24,12 +24,12 @@ pub fn jmp(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the jump in
+/// * `cpu` - The cpu to perform the jump in
 ///
-pub fn jc(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.carry {
-        state.pc = address;
+pub fn jc(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.carry {
+        cpu.pc = address;
     }
 
     10
@@ -43,12 +43,12 @@ pub fn jc(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the jump in
+/// * `cpu` - The cpu to perform the jump in
 ///
-pub fn jnc(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if !state.flags.carry {
-        state.pc = address;
+pub fn jnc(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if !cpu.flags.carry {
+        cpu.pc = address;
     }
 
     10
@@ -62,12 +62,12 @@ pub fn jnc(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the jump in
+/// * `cpu` - The cpu to perform the jump in
 ///
-pub fn jz(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.zero {
-        state.pc = address;
+pub fn jz(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.zero {
+        cpu.pc = address;
     }
 
     10
@@ -81,12 +81,12 @@ pub fn jz(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the jump in
+/// * `cpu` - The cpu to perform the jump in
 ///
-pub fn jnz(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if !state.flags.zero {
-        state.pc = address;
+pub fn jnz(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if !cpu.flags.zero {
+        cpu.pc = address;
     }
 
     10
@@ -100,12 +100,12 @@ pub fn jnz(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the jump in
+/// * `cpu` - The cpu to perform the jump in
 ///
-pub fn jm(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.sign {
-        state.pc = address;
+pub fn jm(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.sign {
+        cpu.pc = address;
     }
 
     10
@@ -119,12 +119,12 @@ pub fn jm(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the jump in
+/// * `cpu` - The cpu to perform the jump in
 ///
-pub fn jp(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if !state.flags.sign {
-        state.pc = address;
+pub fn jp(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if !cpu.flags.sign {
+        cpu.pc = address;
     }
 
     10
@@ -138,12 +138,12 @@ pub fn jp(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the jump in
+/// * `cpu` - The cpu to perform the jump in
 ///
-pub fn jpe(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.parity {
-        state.pc = address;
+pub fn jpe(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.parity {
+        cpu.pc = address;
     }
 
     10
@@ -157,12 +157,12 @@ pub fn jpe(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the jump in
+/// * `cpu` - The cpu to perform the jump in
 ///
-pub fn jpo(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if !state.flags.parity {
-        state.pc = address;
+pub fn jpo(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if !cpu.flags.parity {
+        cpu.pc = address;
     }
 
     10
@@ -175,181 +175,181 @@ mod test {
 
     #[test]
     fn jmp_sets_pc_to_new_address() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xAD, 0xDE],
-            ..State::default()
+            ..CPU::default()
         };
 
-        jmp(&mut state);
+        jmp(&mut cpu);
 
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.pc, 0xDEAD);
     }
 
     #[test]
     fn jc_sets_pc_to_new_address_if_carry_flag_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        jc(&mut state);
+        jc(&mut cpu);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(cpu.pc, 2);
 
-        state.flags.carry = true;
-        jc(&mut state);
+        cpu.flags.carry = true;
+        jc(&mut cpu);
 
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.pc, 0xDEAD);
     }
 
     #[test]
     fn jnc_sets_pc_to_new_address_if_carry_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        jnc(&mut state);
+        jnc(&mut cpu);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(cpu.pc, 2);
 
-        state.flags.carry = false;
-        jnc(&mut state);
+        cpu.flags.carry = false;
+        jnc(&mut cpu);
 
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.pc, 0xDEAD);
     }
 
     #[test]
     fn jz_sets_pc_to_new_address_if_zero_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             flags: Flags {
                 zero: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        jz(&mut state);
+        jz(&mut cpu);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(cpu.pc, 2);
 
-        state.flags.zero = true;
-        jz(&mut state);
+        cpu.flags.zero = true;
+        jz(&mut cpu);
 
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.pc, 0xDEAD);
     }
 
     #[test]
     fn jnz_sets_pc_to_new_address_if_zero_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             flags: Flags {
                 zero: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        jnz(&mut state);
+        jnz(&mut cpu);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(cpu.pc, 2);
 
-        state.flags.zero = false;
-        jnz(&mut state);
+        cpu.flags.zero = false;
+        jnz(&mut cpu);
 
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.pc, 0xDEAD);
     }
 
     #[test]
     fn jm_sets_pc_to_new_address_if_sign_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             flags: Flags {
                 sign: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        jm(&mut state);
+        jm(&mut cpu);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(cpu.pc, 2);
 
-        state.flags.sign = true;
-        jm(&mut state);
+        cpu.flags.sign = true;
+        jm(&mut cpu);
 
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.pc, 0xDEAD);
     }
 
     #[test]
     fn jp_sets_pc_to_new_address_if_sign_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             flags: Flags {
                 sign: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        jp(&mut state);
+        jp(&mut cpu);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(cpu.pc, 2);
 
-        state.flags.sign = false;
-        jp(&mut state);
+        cpu.flags.sign = false;
+        jp(&mut cpu);
 
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.pc, 0xDEAD);
     }
 
     #[test]
     fn jpe_sets_pc_to_new_address_if_parity_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             flags: Flags {
                 parity: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        jpe(&mut state);
+        jpe(&mut cpu);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(cpu.pc, 2);
 
-        state.flags.parity = true;
-        jpe(&mut state);
+        cpu.flags.parity = true;
+        jpe(&mut cpu);
 
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.pc, 0xDEAD);
     }
 
     #[test]
     fn jpo_sets_pc_to_new_address_if_parity_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xEF, 0xBE, 0xAD, 0xDE],
             flags: Flags {
                 parity: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        jpo(&mut state);
+        jpo(&mut cpu);
 
-        assert_eq!(state.pc, 2);
+        assert_eq!(cpu.pc, 2);
 
-        state.flags.parity = false;
-        jpo(&mut state);
+        cpu.flags.parity = false;
+        jpo(&mut cpu);
 
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.pc, 0xDEAD);
     }
 }

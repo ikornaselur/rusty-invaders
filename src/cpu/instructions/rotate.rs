@@ -1,4 +1,4 @@
-use cpu::state::State;
+use cpu::CPU;
 
 /// Rotate the accumulator left
 ///
@@ -10,14 +10,14 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the rotation in
+/// * `cpu` - The cpu to perform the rotation in
 ///
-pub fn rlc(state: &mut State) -> u8 {
-    let carry = state.a >> 7 == 1;
-    let result = state.a.rotate_left(1);
+pub fn rlc(cpu: &mut CPU) -> u8 {
+    let carry = cpu.a >> 7 == 1;
+    let result = cpu.a.rotate_left(1);
 
-    state.a = result;
-    state.flags.set(result, carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry);
 
     4
 }
@@ -30,18 +30,18 @@ pub fn rlc(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the rotation in
+/// * `cpu` - The cpu to perform the rotation in
 ///
-pub fn ral(state: &mut State) -> u8 {
-    let carry = state.a >> 7 == 1;
-    let mut result = state.a << 1;
+pub fn ral(cpu: &mut CPU) -> u8 {
+    let carry = cpu.a >> 7 == 1;
+    let mut result = cpu.a << 1;
 
-    if state.flags.carry {
+    if cpu.flags.carry {
         result |= 0x01;
     }
 
-    state.a = result;
-    state.flags.set(result, carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry);
 
     4
 }
@@ -56,14 +56,14 @@ pub fn ral(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the rotation in
+/// * `cpu` - The cpu to perform the rotation in
 ///
-pub fn rrc(state: &mut State) -> u8 {
-    let carry = state.a & 0x01 == 1;
-    let result = state.a.rotate_right(1);
+pub fn rrc(cpu: &mut CPU) -> u8 {
+    let carry = cpu.a & 0x01 == 1;
+    let result = cpu.a.rotate_right(1);
 
-    state.a = result;
-    state.flags.set(result, carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry);
 
     4
 }
@@ -76,18 +76,18 @@ pub fn rrc(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the rotation in
+/// * `cpu` - The cpu to perform the rotation in
 ///
-pub fn rar(state: &mut State) -> u8 {
-    let carry = state.a & 0x01 == 1;
-    let mut result = state.a >> 1;
+pub fn rar(cpu: &mut CPU) -> u8 {
+    let carry = cpu.a & 0x01 == 1;
+    let mut result = cpu.a >> 1;
 
-    if state.flags.carry {
+    if cpu.flags.carry {
         result |= 0x01 << 7;
     }
 
-    state.a = result;
-    state.flags.set(result, carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry);
 
     4
 }
@@ -99,94 +99,94 @@ mod test {
 
     #[test]
     fn rlc_rotates_accumulator_left() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 0b0111_0010,
             flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rlc(&mut state);
+        rlc(&mut cpu);
 
-        assert_eq!(state.a, 0b1110_0100);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 0b1110_0100);
+        assert_eq!(cpu.flags.carry, false);
 
-        rlc(&mut state);
+        rlc(&mut cpu);
 
-        assert_eq!(state.a, 0b1100_1001);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 0b1100_1001);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn ral_rotates_accumulator_left_through_carry() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 0b0111_0010,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        ral(&mut state);
+        ral(&mut cpu);
 
-        assert_eq!(state.a, 0b1110_0101);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 0b1110_0101);
+        assert_eq!(cpu.flags.carry, false);
 
-        ral(&mut state);
+        ral(&mut cpu);
 
-        assert_eq!(state.a, 0b1100_1010);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 0b1100_1010);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn rrc_rotates_accumulator_right() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 0b1111_0010,
             flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rrc(&mut state);
+        rrc(&mut cpu);
 
-        assert_eq!(state.a, 0b0111_1001);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 0b0111_1001);
+        assert_eq!(cpu.flags.carry, false);
 
-        rrc(&mut state);
+        rrc(&mut cpu);
 
-        assert_eq!(state.a, 0b1011_1100);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 0b1011_1100);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn rar_rotates_accumulator_right_through_carry() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 0b1111_0011,
             flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rar(&mut state);
+        rar(&mut cpu);
 
-        assert_eq!(state.a, 0b0111_1001);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 0b0111_1001);
+        assert_eq!(cpu.flags.carry, true);
 
-        rar(&mut state);
+        rar(&mut cpu);
 
-        assert_eq!(state.a, 0b1011_1100);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 0b1011_1100);
+        assert_eq!(cpu.flags.carry, true);
 
-        rar(&mut state);
+        rar(&mut cpu);
 
-        assert_eq!(state.a, 0b1101_1110);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 0b1101_1110);
+        assert_eq!(cpu.flags.carry, false);
     }
 }

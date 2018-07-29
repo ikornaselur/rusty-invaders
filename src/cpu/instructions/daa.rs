@@ -1,4 +1,4 @@
-use cpu::state::State;
+use cpu::CPU;
 
 /// Perform decimal adjustment, ignoring the Auxiliary Carry
 ///
@@ -10,16 +10,16 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the DDA in
+/// * `cpu` - The cpu to perform the DDA in
 ///
-pub fn daa(state: &mut State) -> u8 {
-    if state.a & 0x0f > 9 {
-        state.a += 6;
+pub fn daa(cpu: &mut CPU) -> u8 {
+    if cpu.a & 0x0f > 9 {
+        cpu.a += 6;
     }
-    if state.a & 0xf0 > 0x90 {
-        let (result, carry) = state.a.overflowing_add(0x60);
-        state.a = result;
-        state.flags.set(result, carry);
+    if cpu.a & 0xf0 > 0x90 {
+        let (result, carry) = cpu.a.overflowing_add(0x60);
+        cpu.a = result;
+        cpu.flags.set(result, carry);
     }
 
     4

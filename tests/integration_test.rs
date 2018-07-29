@@ -3,7 +3,7 @@ extern crate rusty_invaders;
 use std::fs::File;
 use std::io::prelude::*;
 
-use rusty_invaders::cpu::state::State;
+use rusty_invaders::cpu::CPU;
 
 #[test]
 fn full_cpu_test() {
@@ -13,7 +13,7 @@ fn full_cpu_test() {
         .expect("Failed to read cpu.bin into buffer");
     buffer.resize(0x10000, 0);
 
-    let mut state = State::new(buffer, true);
+    let mut state = CPU::new(buffer, true);
 
     loop {
         match state.step() {

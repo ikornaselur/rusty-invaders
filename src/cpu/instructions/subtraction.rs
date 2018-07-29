@@ -1,5 +1,5 @@
 use cpu::register::Register;
-use cpu::state::State;
+use cpu::CPU;
 
 /// Perform accumulator subtraction from a register
 ///
@@ -12,29 +12,29 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the subtraction in
+/// * `cpu` - The cpu to perform the subtraction in
 /// * `register` - The register to subtract from the accumulator
 ///
-pub fn sub(state: &mut State, register: Register) -> u8 {
+pub fn sub(cpu: &mut CPU, register: Register) -> u8 {
     let (result, borrow) = match register {
-        Register::A => state.a.overflowing_sub(state.a),
-        Register::B => state.a.overflowing_sub(state.b),
-        Register::C => state.a.overflowing_sub(state.c),
-        Register::D => state.a.overflowing_sub(state.d),
-        Register::E => state.a.overflowing_sub(state.e),
-        Register::H => state.a.overflowing_sub(state.h),
-        Register::L => state.a.overflowing_sub(state.l),
+        Register::A => cpu.a.overflowing_sub(cpu.a),
+        Register::B => cpu.a.overflowing_sub(cpu.b),
+        Register::C => cpu.a.overflowing_sub(cpu.c),
+        Register::D => cpu.a.overflowing_sub(cpu.d),
+        Register::E => cpu.a.overflowing_sub(cpu.e),
+        Register::H => cpu.a.overflowing_sub(cpu.h),
+        Register::L => cpu.a.overflowing_sub(cpu.l),
         Register::M => {
-            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
-            state.a.overflowing_sub(state.memory[offset as usize])
+            let offset = (u16::from(cpu.h) << 8) + u16::from(cpu.l);
+            cpu.a.overflowing_sub(cpu.memory[offset as usize])
         }
         unsupported => {
             panic!("sub doesn't support {:?}", unsupported);
         }
     };
 
-    state.a = result;
-    state.flags.set(result, borrow);
+    cpu.a = result;
+    cpu.flags.set(result, borrow);
 
     match register {
         Register::M => 7,
@@ -52,14 +52,14 @@ pub fn sub(state: &mut State, register: Register) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the subtraction in
+/// * `cpu` - The cpu to perform the subtraction in
 ///
-pub fn sui(state: &mut State) -> u8 {
-    let byte = state.read_byte().unwrap();
-    let (result, carry) = state.a.overflowing_sub(byte);
+pub fn sui(cpu: &mut CPU) -> u8 {
+    let byte = cpu.read_byte().unwrap();
+    let (result, carry) = cpu.a.overflowing_sub(byte);
 
-    state.a = result;
-    state.flags.set(result, carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry);
 
     7
 }
@@ -75,37 +75,37 @@ pub fn sui(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the subtraction in
+/// * `cpu` - The cpu to perform the subtraction in
 /// * `register` - The register to subtract from the accumulator
 ///
-pub fn sbb(state: &mut State, register: Register) -> u8 {
+pub fn sbb(cpu: &mut CPU, register: Register) -> u8 {
     let byte = match register {
-        Register::A => state.a,
-        Register::B => state.b,
-        Register::C => state.c,
-        Register::D => state.d,
-        Register::E => state.e,
-        Register::H => state.h,
-        Register::L => state.l,
+        Register::A => cpu.a,
+        Register::B => cpu.b,
+        Register::C => cpu.c,
+        Register::D => cpu.d,
+        Register::E => cpu.e,
+        Register::H => cpu.h,
+        Register::L => cpu.l,
         Register::M => {
-            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
-            state.memory[offset as usize]
+            let offset = (u16::from(cpu.h) << 8) + u16::from(cpu.l);
+            cpu.memory[offset as usize]
         }
         unsupported => {
             panic!("sbb doesn't support {:?}", unsupported);
         }
     };
 
-    let (byte, byte_carry) = if state.flags.carry {
+    let (byte, byte_carry) = if cpu.flags.carry {
         byte.overflowing_add(1)
     } else {
         (byte, false)
     };
 
-    let (result, carry) = state.a.overflowing_sub(byte);
+    let (result, carry) = cpu.a.overflowing_sub(byte);
 
-    state.a = result;
-    state.flags.set(result, carry || byte_carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry || byte_carry);
 
     match register {
         Register::M => 7,
@@ -123,21 +123,21 @@ pub fn sbb(state: &mut State, register: Register) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the subtraction in
+/// * `cpu` - The cpu to perform the subtraction in
 ///
-pub fn sbi(state: &mut State) -> u8 {
-    let byte = state.read_byte().unwrap();
+pub fn sbi(cpu: &mut CPU) -> u8 {
+    let byte = cpu.read_byte().unwrap();
 
-    let (byte, byte_carry) = if state.flags.carry {
+    let (byte, byte_carry) = if cpu.flags.carry {
         byte.overflowing_add(1)
     } else {
         (byte, false)
     };
 
-    let (result, carry) = state.a.overflowing_sub(byte);
+    let (result, carry) = cpu.a.overflowing_sub(byte);
 
-    state.a = result;
-    state.flags.set(result, carry || byte_carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry || byte_carry);
 
     7
 }
@@ -149,312 +149,312 @@ mod test {
 
     #[test]
     fn sub_a_subs_a_from_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 10,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::A);
+        sub(&mut cpu, Register::A);
 
-        assert_eq!(state.a, 0);
+        assert_eq!(cpu.a, 0);
     }
 
     #[test]
     fn sub_b_subs_b_from_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 10,
             b: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::B);
+        sub(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 7);
+        assert_eq!(cpu.a, 7);
     }
 
     #[test]
     fn sub_c_subs_c_from_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 10,
             c: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::C);
+        sub(&mut cpu, Register::C);
 
-        assert_eq!(state.a, 7);
+        assert_eq!(cpu.a, 7);
     }
 
     #[test]
     fn sub_d_subs_d_from_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 10,
             d: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::D);
+        sub(&mut cpu, Register::D);
 
-        assert_eq!(state.a, 7);
+        assert_eq!(cpu.a, 7);
     }
 
     #[test]
     fn sub_e_subs_e_from_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 10,
             e: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::E);
+        sub(&mut cpu, Register::E);
 
-        assert_eq!(state.a, 7);
+        assert_eq!(cpu.a, 7);
     }
 
     #[test]
     fn sub_h_subs_h_from_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 10,
             h: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::H);
+        sub(&mut cpu, Register::H);
 
-        assert_eq!(state.a, 7);
+        assert_eq!(cpu.a, 7);
     }
 
     #[test]
     fn sub_l_subs_l_from_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 10,
             l: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::L);
+        sub(&mut cpu, Register::L);
 
-        assert_eq!(state.a, 7);
+        assert_eq!(cpu.a, 7);
     }
 
     #[test]
     fn sub_m_subs_byte_at_hl_address_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0x00, 0x00, 0x00, 0x00, 0x00, 3],
             a: 10,
             h: 0x00,
             l: 0x05,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::M);
+        sub(&mut cpu, Register::M);
 
-        assert_eq!(state.a, 7);
+        assert_eq!(cpu.a, 7);
     }
 
     #[test]
     fn sub_resets_the_carry_bit_if_no_borrow() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 10,
             b: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::B);
+        sub(&mut cpu, Register::B);
 
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn sub_sets_the_carry_bit_if_borrow() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             b: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::B);
+        sub(&mut cpu, Register::B);
 
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn sub_a_resets_the_carry_and_zeros_the_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 0x3e,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sub(&mut state, Register::A);
+        sub(&mut cpu, Register::A);
 
-        assert_eq!(state.flags.carry, false);
-        assert_eq!(state.a, 0);
+        assert_eq!(cpu.flags.carry, false);
+        assert_eq!(cpu.a, 0);
     }
 
     #[test]
     fn sui_removes_immediate_byte_from_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![1, 5],
             a: 0,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sui(&mut state);
-        assert_eq!(state.a, 255);
-        assert_eq!(state.flags.carry, true);
+        sui(&mut cpu);
+        assert_eq!(cpu.a, 255);
+        assert_eq!(cpu.flags.carry, true);
 
-        sui(&mut state);
-        assert_eq!(state.a, 250);
-        assert_eq!(state.flags.carry, false);
+        sui(&mut cpu);
+        assert_eq!(cpu.a, 250);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn sbb_b_subs_b_from_accumulator_with_carry_flag_and_borrowing() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 4,
             b: 10,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::B);
+        sbb(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 249);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 249);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn sbb_b_subs_b_from_accumulator_without_carry_flag_and_borrowing() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 4,
             b: 10,
             flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::B);
+        sbb(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 250);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 250);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn sbb_b_subs_b_from_accumulator_with_carry_flag_and_not_borrowing() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 4,
             b: 1,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::B);
+        sbb(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 2);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 2);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn sbb_b_subs_b_from_accumulator_without_carry_flag_and_not_borrowing() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 4,
             b: 1,
             flags: Flags {
                 carry: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::B);
+        sbb(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 3);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 3);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn sbb_c_subs_c_from_accumulator_with_carry_flag_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 5,
             c: 10,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::C);
+        sbb(&mut cpu, Register::C);
 
-        assert_eq!(state.a, 250);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 250);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn sbb_d_subs_d_from_accumulator_with_carry_flag_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 5,
             d: 10,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::D);
+        sbb(&mut cpu, Register::D);
 
-        assert_eq!(state.a, 250);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 250);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn sbb_e_subs_e_from_accumulator_with_carry_flag_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 5,
             e: 10,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::E);
+        sbb(&mut cpu, Register::E);
 
-        assert_eq!(state.a, 250);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 250);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn sbb_h_subs_h_from_accumulator_with_carry_flag_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 5,
             h: 10,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::H);
+        sbb(&mut cpu, Register::H);
 
-        assert_eq!(state.a, 250);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 250);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn sbb_m_subs_byte_at_hl_address_to_accumulator_with_carry_flag_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0x00, 0x00, 0x00, 0x00, 0x00, 10],
             a: 5,
             h: 0x00,
@@ -463,73 +463,73 @@ mod test {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::M);
+        sbb(&mut cpu, Register::M);
 
-        assert_eq!(state.a, 250);
+        assert_eq!(cpu.a, 250);
     }
 
     #[test]
     fn sbb_sub_with_carry_bit() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 4,
             l: 2,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::L);
+        sbb(&mut cpu, Register::L);
 
-        assert_eq!(state.a, 1);
-        assert_eq!(state.flags.carry, false);
-        assert_eq!(state.flags.zero, false);
+        assert_eq!(cpu.a, 1);
+        assert_eq!(cpu.flags.carry, false);
+        assert_eq!(cpu.flags.zero, false);
     }
 
     #[test]
     fn sbb_sub_with_max_values() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: u8::max_value(),
             b: u8::max_value(),
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbb(&mut state, Register::B);
+        sbb(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 255);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 255);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn sbi_removes_immediate_byte_from_accumulator_with_borrow() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xFF, 0xFF, 0x00, 0x01],
             a: 0x00,
-            ..State::default()
+            ..CPU::default()
         };
 
-        sbi(&mut state);
-        assert_eq!(state.a, 0x01);
-        assert_eq!(state.flags.carry, true);
+        sbi(&mut cpu);
+        assert_eq!(cpu.a, 0x01);
+        assert_eq!(cpu.flags.carry, true);
 
-        sbi(&mut state);
-        assert_eq!(state.a, 0x01);
-        assert_eq!(state.flags.carry, true);
+        sbi(&mut cpu);
+        assert_eq!(cpu.a, 0x01);
+        assert_eq!(cpu.flags.carry, true);
 
-        sbi(&mut state);
-        assert_eq!(state.a, 0x00);
-        assert_eq!(state.flags.carry, false);
+        sbi(&mut cpu);
+        assert_eq!(cpu.a, 0x00);
+        assert_eq!(cpu.flags.carry, false);
 
-        sbi(&mut state);
-        assert_eq!(state.a, 0xFF);
-        assert_eq!(state.flags.carry, true);
+        sbi(&mut cpu);
+        assert_eq!(cpu.a, 0xFF);
+        assert_eq!(cpu.flags.carry, true);
     }
 }

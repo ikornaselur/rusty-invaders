@@ -1,4 +1,4 @@
-use cpu::state::State;
+use cpu::CPU;
 
 /// Set the carry flag
 ///
@@ -8,10 +8,10 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to set the flag in
+/// * `cpu` - The cpu to set the flag in
 ///
-pub fn stc(state: &mut State) -> u8 {
-    state.flags.carry = true;
+pub fn stc(cpu: &mut CPU) -> u8 {
+    cpu.flags.carry = true;
     4
 }
 
@@ -23,10 +23,10 @@ pub fn stc(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to complement the flag in
+/// * `cpu` - The cpu to complement the flag in
 ///
-pub fn cmc(state: &mut State) -> u8 {
-    state.flags.carry = !state.flags.carry;
+pub fn cmc(cpu: &mut CPU) -> u8 {
+    cpu.flags.carry = !cpu.flags.carry;
     4
 }
 
@@ -36,24 +36,24 @@ mod test {
 
     #[test]
     fn stc_sets_carry_bit() {
-        let mut state = State { ..State::default() };
+        let mut cpu = CPU { ..CPU::default() };
 
-        stc(&mut state);
+        stc(&mut cpu);
 
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn cmc_reverses_carry_bit() {
-        let mut state = State { ..State::default() };
+        let mut cpu = CPU { ..CPU::default() };
 
-        cmc(&mut state);
-        assert_eq!(state.flags.carry, true);
+        cmc(&mut cpu);
+        assert_eq!(cpu.flags.carry, true);
 
-        cmc(&mut state);
-        assert_eq!(state.flags.carry, false);
+        cmc(&mut cpu);
+        assert_eq!(cpu.flags.carry, false);
 
-        cmc(&mut state);
-        assert_eq!(state.flags.carry, true);
+        cmc(&mut cpu);
+        assert_eq!(cpu.flags.carry, true);
     }
 }

@@ -1,4 +1,4 @@
-use cpu::state::State;
+use cpu::CPU;
 use std::mem::swap;
 
 /// Swap the contents of register pairs HL with DE
@@ -9,11 +9,11 @@ use std::mem::swap;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the swap in
+/// * `cpu` - The cpu to perform the swap in
 ///
-pub fn xchg(state: &mut State) -> u8 {
-    swap(&mut state.h, &mut state.d);
-    swap(&mut state.l, &mut state.e);
+pub fn xchg(cpu: &mut CPU) -> u8 {
+    swap(&mut cpu.h, &mut cpu.d);
+    swap(&mut cpu.l, &mut cpu.e);
 
     5
 }
@@ -26,11 +26,11 @@ pub fn xchg(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the swap in
+/// * `cpu` - The cpu to perform the swap in
 ///
-pub fn xthl(state: &mut State) -> u8 {
-    swap(&mut state.h, &mut state.memory[(state.sp + 1) as usize]);
-    swap(&mut state.l, &mut state.memory[state.sp as usize]);
+pub fn xthl(cpu: &mut CPU) -> u8 {
+    swap(&mut cpu.h, &mut cpu.memory[(cpu.sp + 1) as usize]);
+    swap(&mut cpu.l, &mut cpu.memory[cpu.sp as usize]);
 
     18
 }
@@ -41,36 +41,36 @@ mod test {
 
     #[test]
     fn xchg_exchanges_h_l_pair_with_d_e_pair() {
-        let mut state = State {
+        let mut cpu = CPU {
             d: 0xDE,
             e: 0xAD,
             h: 0xBE,
             l: 0xEF,
-            ..State::default()
+            ..CPU::default()
         };
 
-        xchg(&mut state);
+        xchg(&mut cpu);
 
-        assert_eq!(state.d, 0xBE);
-        assert_eq!(state.e, 0xEF);
-        assert_eq!(state.h, 0xDE);
-        assert_eq!(state.l, 0xAD);
+        assert_eq!(cpu.d, 0xBE);
+        assert_eq!(cpu.e, 0xEF);
+        assert_eq!(cpu.h, 0xDE);
+        assert_eq!(cpu.l, 0xAD);
     }
 
     #[test]
     fn xthl_exchanges_h_l_pair_with_bytes_on_stack() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0xDE, 0xAD],
             h: 0xBE,
             l: 0xEF,
             sp: 1,
-            ..State::default()
+            ..CPU::default()
         };
 
-        xthl(&mut state);
+        xthl(&mut cpu);
 
-        assert_eq!(state.h, 0xAD);
-        assert_eq!(state.l, 0xDE);
-        assert_eq!(state.memory, vec![0, 0xEF, 0xBE]);
+        assert_eq!(cpu.h, 0xAD);
+        assert_eq!(cpu.l, 0xDE);
+        assert_eq!(cpu.memory, vec![0, 0xEF, 0xBE]);
     }
 }

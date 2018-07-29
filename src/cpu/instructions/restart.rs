@@ -1,4 +1,4 @@
-use cpu::state::State;
+use cpu::CPU;
 
 /// Write the next byte address to the stack and jump to a predefined RST address at the start
 ///
@@ -8,21 +8,21 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the restart in
+/// * `cpu` - The cpu to perform the restart in
 /// * `rst` - Which restart to perform, from 0 to 7 (inclusive)
 ///
-pub fn rst(state: &mut State, rst: usize) -> u8 {
+pub fn rst(cpu: &mut CPU, rst: usize) -> u8 {
     if rst > 7 {
         panic!("rst doesn't support {}", rst);
     }
 
-    let most = (state.pc >> 8) as u8;
-    let least = state.pc as u8;
+    let most = (cpu.pc >> 8) as u8;
+    let least = cpu.pc as u8;
 
-    state.write_byte_to_stack(most);
-    state.write_byte_to_stack(least);
+    cpu.write_byte_to_stack(most);
+    cpu.write_byte_to_stack(least);
 
-    state.pc = (8 * rst) as u16;
+    cpu.pc = (8 * rst) as u16;
 
     11
 }
@@ -33,16 +33,16 @@ mod test {
 
     #[test]
     fn rst_0_writes_pc_to_stack_and_sets_pc_to_0() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0; 4],
             pc: 0xDEAD,
             sp: 4,
-            ..State::default()
+            ..CPU::default()
         };
 
-        rst(&mut state, 0);
+        rst(&mut cpu, 0);
 
-        assert_eq!(state.pc, 0x00);
-        assert_eq!(state.memory, vec![0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.pc, 0x00);
+        assert_eq!(cpu.memory, vec![0, 0, 0xAD, 0xDE]);
     }
 }

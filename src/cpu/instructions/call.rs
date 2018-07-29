@@ -1,27 +1,27 @@
-use cpu::state::State;
+use cpu::CPU;
 
-fn process_call(state: &mut State, address: u16) -> () {
+fn process_call(cpu: &mut CPU, address: u16) -> () {
     // A specific hack for full cpu test
-    if state.debug && address == 5 && state.c == 9 {
-        let offset = (u16::from(state.d) << 8) + u16::from(state.e);
+    if cpu.debug && address == 5 && cpu.c == 9 {
+        let offset = (u16::from(cpu.d) << 8) + u16::from(cpu.e);
         if offset == 0x018B {
             panic!("CPU HAS FAILED");
         } else if offset == 0x0174 {
             println!("*** CPU IS OPERATIONAL ***");
-            state.exit = true;
+            cpu.exit = true;
         } else {
             panic!("UNKNOWN PRINT");
         }
     }
     // End of said hack
 
-    let least = state.pc as u8;
-    let most = (state.pc >> 8) as u8;
+    let least = cpu.pc as u8;
+    let most = (cpu.pc >> 8) as u8;
 
-    state.write_byte_to_stack(most);
-    state.write_byte_to_stack(least);
+    cpu.write_byte_to_stack(most);
+    cpu.write_byte_to_stack(least);
 
-    state.pc = address;
+    cpu.pc = address;
 }
 
 /// Call a subroutine at a specified address, storing the address of the next instruction on the
@@ -33,12 +33,12 @@ fn process_call(state: &mut State, address: u16) -> () {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn call(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
+pub fn call(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
 
-    process_call(state, address);
+    process_call(cpu, address);
 
     17
 }
@@ -53,12 +53,12 @@ pub fn call(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn cc(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.carry {
-        process_call(state, address);
+pub fn cc(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.carry {
+        process_call(cpu, address);
         17
     } else {
         11
@@ -75,14 +75,14 @@ pub fn cc(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn cnc(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.carry {
+pub fn cnc(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.carry {
         11
     } else {
-        process_call(state, address);
+        process_call(cpu, address);
         17
     }
 }
@@ -97,12 +97,12 @@ pub fn cnc(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn cz(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.zero {
-        process_call(state, address);
+pub fn cz(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.zero {
+        process_call(cpu, address);
         17
     } else {
         11
@@ -119,14 +119,14 @@ pub fn cz(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn cnz(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.zero {
+pub fn cnz(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.zero {
         11
     } else {
-        process_call(state, address);
+        process_call(cpu, address);
         17
     }
 }
@@ -141,12 +141,12 @@ pub fn cnz(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn cm(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.sign {
-        process_call(state, address);
+pub fn cm(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.sign {
+        process_call(cpu, address);
         17
     } else {
         11
@@ -163,14 +163,14 @@ pub fn cm(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn cp(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.sign {
+pub fn cp(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.sign {
         11
     } else {
-        process_call(state, address);
+        process_call(cpu, address);
         17
     }
 }
@@ -185,12 +185,12 @@ pub fn cp(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn cpe(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.parity {
-        process_call(state, address);
+pub fn cpe(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.parity {
+        process_call(cpu, address);
         17
     } else {
         11
@@ -207,14 +207,14 @@ pub fn cpe(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn cpo(state: &mut State) -> u8 {
-    let address = state.read_address().unwrap();
-    if state.flags.parity {
+pub fn cpo(cpu: &mut CPU) -> u8 {
+    let address = cpu.read_address().unwrap();
+    if cpu.flags.parity {
         11
     } else {
-        process_call(state, address);
+        process_call(cpu, address);
         17
     }
 }
@@ -226,26 +226,26 @@ mod test {
 
     #[test]
     fn call_pushes_the_address_after_to_the_stack_and_jumps() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0 /* SP */, 0, 0, 0xAD /* PC */, 0xDE],
             sp: 3,
             pc: 6,
-            ..State::default()
+            ..CPU::default()
         };
 
-        call(&mut state);
+        call(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
         assert_eq!(
-            state.memory,
+            cpu.memory,
             vec![0, 0x08 /* SP */, 0x00, 0, 0, 0, 0xAD, 0xDE]
         )
     }
 
     #[test]
     fn cc_pushes_the_address_after_to_the_stack_and_jumps_if_carry_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
@@ -253,27 +253,27 @@ mod test {
                 carry: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        cc(&mut state);
+        cc(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 8);
-        assert_eq!(state.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 8);
+        assert_eq!(cpu.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.pc = 6;
-        state.flags.carry = true;
-        cc(&mut state);
+        cpu.pc = 6;
+        cpu.flags.carry = true;
+        cc(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
     }
 
     #[test]
     fn cnc_pushes_the_address_after_to_the_stack_and_jumps_if_carry_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
@@ -281,27 +281,27 @@ mod test {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        cnc(&mut state);
+        cnc(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 8);
-        assert_eq!(state.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 8);
+        assert_eq!(cpu.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.pc = 6;
-        state.flags.carry = false;
-        cnc(&mut state);
+        cpu.pc = 6;
+        cpu.flags.carry = false;
+        cnc(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
     }
 
     #[test]
     fn cz_pushes_the_address_after_to_the_stack_and_jumps_if_zero_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
@@ -309,27 +309,27 @@ mod test {
                 zero: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        cz(&mut state);
+        cz(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 8);
-        assert_eq!(state.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 8);
+        assert_eq!(cpu.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.pc = 6;
-        state.flags.zero = true;
-        cz(&mut state);
+        cpu.pc = 6;
+        cpu.flags.zero = true;
+        cz(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
     }
 
     #[test]
     fn cnz_pushes_the_address_after_to_the_stack_and_jumps_if_zero_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
@@ -337,27 +337,27 @@ mod test {
                 zero: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        cnz(&mut state);
+        cnz(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 8);
-        assert_eq!(state.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 8);
+        assert_eq!(cpu.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.pc = 6;
-        state.flags.zero = false;
-        cnz(&mut state);
+        cpu.pc = 6;
+        cpu.flags.zero = false;
+        cnz(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
     }
 
     #[test]
     fn cm_pushes_the_address_after_to_the_stack_and_jumps_if_sign_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
@@ -365,27 +365,27 @@ mod test {
                 sign: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        cm(&mut state);
+        cm(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 8);
-        assert_eq!(state.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 8);
+        assert_eq!(cpu.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.pc = 6;
-        state.flags.sign = true;
-        cm(&mut state);
+        cpu.pc = 6;
+        cpu.flags.sign = true;
+        cm(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
     }
 
     #[test]
     fn cp_pushes_the_address_after_to_the_stack_and_jumps_if_sign_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
@@ -393,27 +393,27 @@ mod test {
                 sign: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        cp(&mut state);
+        cp(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 8);
-        assert_eq!(state.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 8);
+        assert_eq!(cpu.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.pc = 6;
-        state.flags.sign = false;
-        cp(&mut state);
+        cpu.pc = 6;
+        cpu.flags.sign = false;
+        cp(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
     }
 
     #[test]
     fn cpe_pushes_the_address_after_to_the_stack_and_jumps_if_parity_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
@@ -421,27 +421,27 @@ mod test {
                 parity: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        cpe(&mut state);
+        cpe(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 8);
-        assert_eq!(state.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 8);
+        assert_eq!(cpu.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.pc = 6;
-        state.flags.parity = true;
-        cpe(&mut state);
+        cpu.pc = 6;
+        cpu.flags.parity = true;
+        cpe(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
     }
 
     #[test]
     fn cpo_pushes_the_address_after_to_the_stack_and_jumps_if_parity_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE],
             sp: 3,
             pc: 6,
@@ -449,21 +449,21 @@ mod test {
                 parity: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        cpo(&mut state);
+        cpo(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 8);
-        assert_eq!(state.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 8);
+        assert_eq!(cpu.memory, vec![0, 0, 0, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.pc = 6;
-        state.flags.parity = false;
-        cpo(&mut state);
+        cpu.pc = 6;
+        cpu.flags.parity = false;
+        cpo(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE])
     }
 }

@@ -1,5 +1,5 @@
 use cpu::register::Register;
-use cpu::state::State;
+use cpu::CPU;
 
 /// Perform accumulator addition from a register
 ///
@@ -12,29 +12,29 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 /// * `register` - The register to add to the accumulator
 ///
-pub fn add(state: &mut State, register: Register) -> u8 {
+pub fn add(cpu: &mut CPU, register: Register) -> u8 {
     let (result, carry) = match register {
-        Register::A => state.a.overflowing_add(state.a),
-        Register::B => state.a.overflowing_add(state.b),
-        Register::C => state.a.overflowing_add(state.c),
-        Register::D => state.a.overflowing_add(state.d),
-        Register::E => state.a.overflowing_add(state.e),
-        Register::H => state.a.overflowing_add(state.h),
-        Register::L => state.a.overflowing_add(state.l),
+        Register::A => cpu.a.overflowing_add(cpu.a),
+        Register::B => cpu.a.overflowing_add(cpu.b),
+        Register::C => cpu.a.overflowing_add(cpu.c),
+        Register::D => cpu.a.overflowing_add(cpu.d),
+        Register::E => cpu.a.overflowing_add(cpu.e),
+        Register::H => cpu.a.overflowing_add(cpu.h),
+        Register::L => cpu.a.overflowing_add(cpu.l),
         Register::M => {
-            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
-            state.a.overflowing_add(state.memory[offset as usize])
+            let offset = (u16::from(cpu.h) << 8) + u16::from(cpu.l);
+            cpu.a.overflowing_add(cpu.memory[offset as usize])
         }
         unsupported => {
             panic!("add doesn't support {:?}", unsupported);
         }
     };
 
-    state.a = result;
-    state.flags.set(result, carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry);
 
     match register {
         Register::M => 7,
@@ -52,14 +52,14 @@ pub fn add(state: &mut State, register: Register) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn adi(state: &mut State) -> u8 {
-    let byte = state.read_byte().unwrap();
-    let (result, carry) = state.a.overflowing_add(byte);
+pub fn adi(cpu: &mut CPU) -> u8 {
+    let byte = cpu.read_byte().unwrap();
+    let (result, carry) = cpu.a.overflowing_add(byte);
 
-    state.a = result;
-    state.flags.set(result, carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry);
 
     7
 }
@@ -74,24 +74,24 @@ pub fn adi(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 /// * `register` - The double register pair to add to M
 ///
-pub fn dad(state: &mut State, register: Register) -> u8 {
-    let current: u16 = (u16::from(state.h) << 8) + u16::from(state.l);
+pub fn dad(cpu: &mut CPU, register: Register) -> u8 {
+    let current: u16 = (u16::from(cpu.h) << 8) + u16::from(cpu.l);
     let (result, carry) = match register {
-        Register::B => current.overflowing_add((u16::from(state.b) << 8) + u16::from(state.c)),
-        Register::D => current.overflowing_add((u16::from(state.d) << 8) + u16::from(state.e)),
-        Register::H => current.overflowing_add((u16::from(state.h) << 8) + u16::from(state.l)),
-        Register::SP => current.overflowing_add(state.sp),
+        Register::B => current.overflowing_add((u16::from(cpu.b) << 8) + u16::from(cpu.c)),
+        Register::D => current.overflowing_add((u16::from(cpu.d) << 8) + u16::from(cpu.e)),
+        Register::H => current.overflowing_add((u16::from(cpu.h) << 8) + u16::from(cpu.l)),
+        Register::SP => current.overflowing_add(cpu.sp),
         unsupported => {
             panic!("dad doesn't support {:?}", unsupported);
         }
     };
 
-    state.l = result as u8;
-    state.h = (result >> 8) as u8;
-    state.flags.carry = carry;
+    cpu.l = result as u8;
+    cpu.h = (result >> 8) as u8;
+    cpu.flags.carry = carry;
 
     10
 }
@@ -107,37 +107,37 @@ pub fn dad(state: &mut State, register: Register) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 /// * `register` - The register to add to the accumulator
 ///
-pub fn adc(state: &mut State, register: Register) -> u8 {
+pub fn adc(cpu: &mut CPU, register: Register) -> u8 {
     let byte = match register {
-        Register::A => state.a,
-        Register::B => state.b,
-        Register::C => state.c,
-        Register::D => state.d,
-        Register::E => state.e,
-        Register::H => state.h,
-        Register::L => state.l,
+        Register::A => cpu.a,
+        Register::B => cpu.b,
+        Register::C => cpu.c,
+        Register::D => cpu.d,
+        Register::E => cpu.e,
+        Register::H => cpu.h,
+        Register::L => cpu.l,
         Register::M => {
-            let offset = (u16::from(state.h) << 8) + u16::from(state.l);
-            state.memory[offset as usize]
+            let offset = (u16::from(cpu.h) << 8) + u16::from(cpu.l);
+            cpu.memory[offset as usize]
         }
         unsupported => {
             panic!("adc doesn't support {:?}", unsupported);
         }
     };
 
-    let (byte, byte_carry) = if state.flags.carry {
+    let (byte, byte_carry) = if cpu.flags.carry {
         byte.overflowing_add(1)
     } else {
         (byte, false)
     };
 
-    let (result, carry) = state.a.overflowing_add(byte);
+    let (result, carry) = cpu.a.overflowing_add(byte);
 
-    state.a = result;
-    state.flags.set(result, carry || byte_carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry || byte_carry);
 
     match register {
         Register::M => 7,
@@ -155,21 +155,21 @@ pub fn adc(state: &mut State, register: Register) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the addition in
+/// * `cpu` - The cpu to perform the addition in
 ///
-pub fn aci(state: &mut State) -> u8 {
-    let byte = state.read_byte().unwrap();
+pub fn aci(cpu: &mut CPU) -> u8 {
+    let byte = cpu.read_byte().unwrap();
 
-    let (byte, byte_carry) = if state.flags.carry {
+    let (byte, byte_carry) = if cpu.flags.carry {
         byte.overflowing_add(1)
     } else {
         (byte, false)
     };
 
-    let (result, carry) = state.a.overflowing_add(byte);
+    let (result, carry) = cpu.a.overflowing_add(byte);
 
-    state.a = result;
-    state.flags.set(result, carry || byte_carry);
+    cpu.a = result;
+    cpu.flags.set(result, carry || byte_carry);
 
     7
 }
@@ -181,338 +181,338 @@ mod test {
 
     #[test]
     fn add_b_adds_b_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             b: 2,
-            ..State::default()
+            ..CPU::default()
         };
 
-        add(&mut state, Register::B);
+        add(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 3);
+        assert_eq!(cpu.a, 3);
     }
 
     #[test]
     fn add_c_adds_c_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             c: 2,
-            ..State::default()
+            ..CPU::default()
         };
 
-        add(&mut state, Register::C);
+        add(&mut cpu, Register::C);
 
-        assert_eq!(state.a, 3);
+        assert_eq!(cpu.a, 3);
     }
 
     #[test]
     fn add_d_adds_d_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             d: 2,
-            ..State::default()
+            ..CPU::default()
         };
 
-        add(&mut state, Register::D);
+        add(&mut cpu, Register::D);
 
-        assert_eq!(state.a, 3);
+        assert_eq!(cpu.a, 3);
     }
 
     #[test]
     fn add_e_adds_e_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             e: 2,
-            ..State::default()
+            ..CPU::default()
         };
 
-        add(&mut state, Register::E);
+        add(&mut cpu, Register::E);
 
-        assert_eq!(state.a, 3);
+        assert_eq!(cpu.a, 3);
     }
 
     #[test]
     fn add_h_adds_h_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             h: 2,
-            ..State::default()
+            ..CPU::default()
         };
 
-        add(&mut state, Register::H);
+        add(&mut cpu, Register::H);
 
-        assert_eq!(state.a, 3);
+        assert_eq!(cpu.a, 3);
     }
 
     #[test]
     fn add_l_adds_l_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             l: 2,
-            ..State::default()
+            ..CPU::default()
         };
 
-        add(&mut state, Register::L);
+        add(&mut cpu, Register::L);
 
-        assert_eq!(state.a, 3);
+        assert_eq!(cpu.a, 3);
     }
 
     #[test]
     fn add_a_adds_a_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
-            ..State::default()
+            ..CPU::default()
         };
 
-        add(&mut state, Register::A);
+        add(&mut cpu, Register::A);
 
-        assert_eq!(state.a, 2);
+        assert_eq!(cpu.a, 2);
     }
 
     #[test]
     fn add_m_adds_byte_at_hl_address_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0x00, 0x00, 0x00, 0x00, 0x00, 5],
             a: 1,
             h: 0x00,
             l: 0x05,
-            ..State::default()
+            ..CPU::default()
         };
 
-        add(&mut state, Register::M);
+        add(&mut cpu, Register::M);
 
-        assert_eq!(state.a, 6);
+        assert_eq!(cpu.a, 6);
     }
 
     #[test]
     fn adi_adds_immediate_byte_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![1, 5],
             a: 0xFF,
-            ..State::default()
+            ..CPU::default()
         };
 
-        adi(&mut state);
-        assert_eq!(state.a, 0);
-        assert_eq!(state.flags.carry, true);
+        adi(&mut cpu);
+        assert_eq!(cpu.a, 0);
+        assert_eq!(cpu.flags.carry, true);
 
-        adi(&mut state);
-        assert_eq!(state.a, 5);
-        assert_eq!(state.flags.carry, false);
+        adi(&mut cpu);
+        assert_eq!(cpu.a, 5);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn dad_b_double_adds_b_c_to_h_l() {
-        let mut state = State {
+        let mut cpu = CPU {
             b: 0x33,
             c: 0x9F,
             h: 0xA1,
             l: 0x7B,
-            ..State::default()
+            ..CPU::default()
         };
 
-        dad(&mut state, Register::B);
+        dad(&mut cpu, Register::B);
 
-        assert_eq!(state.h, 0xD5);
-        assert_eq!(state.l, 0x1A);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.h, 0xD5);
+        assert_eq!(cpu.l, 0x1A);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn dad_d_double_adds_d_e_to_h_l() {
-        let mut state = State {
+        let mut cpu = CPU {
             d: 0x33,
             e: 0x9F,
             h: 0xA1,
             l: 0x7B,
-            ..State::default()
+            ..CPU::default()
         };
 
-        dad(&mut state, Register::D);
+        dad(&mut cpu, Register::D);
 
-        assert_eq!(state.h, 0xD5);
-        assert_eq!(state.l, 0x1A);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.h, 0xD5);
+        assert_eq!(cpu.l, 0x1A);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn dad_h_double_adds_h_l_to_h_l() {
-        let mut state = State {
+        let mut cpu = CPU {
             h: 0x11,
             l: 0x22,
-            ..State::default()
+            ..CPU::default()
         };
 
-        dad(&mut state, Register::H);
+        dad(&mut cpu, Register::H);
 
-        assert_eq!(state.h, 0x22);
-        assert_eq!(state.l, 0x44);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.h, 0x22);
+        assert_eq!(cpu.l, 0x44);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn dad_sp_double_adds_sp_to_h_l() {
-        let mut state = State {
+        let mut cpu = CPU {
             h: 0x11,
             l: 0x22,
             sp: 0x1111,
-            ..State::default()
+            ..CPU::default()
         };
 
-        dad(&mut state, Register::SP);
+        dad(&mut cpu, Register::SP);
 
-        assert_eq!(state.h, 0x22);
-        assert_eq!(state.l, 0x33);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.h, 0x22);
+        assert_eq!(cpu.l, 0x33);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn adc_b_adds_b_with_carry_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             b: 2,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::B);
+        adc(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 4);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 4);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn adc_with_max_values() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: u8::max_value(),
             b: u8::max_value(),
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::B);
+        adc(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 255u8);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 255u8);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn adc_where_carry_causes_carry() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: u8::max_value(),
             b: 0,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::B);
+        adc(&mut cpu, Register::B);
 
-        assert_eq!(state.a, 0);
-        assert_eq!(state.flags.carry, true);
+        assert_eq!(cpu.a, 0);
+        assert_eq!(cpu.flags.carry, true);
     }
 
     #[test]
     fn adc_c_adds_c_with_carry_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             c: 2,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::C);
+        adc(&mut cpu, Register::C);
 
-        assert_eq!(state.a, 4);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 4);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn adc_d_adds_d_with_carry_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             d: 2,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::D);
+        adc(&mut cpu, Register::D);
 
-        assert_eq!(state.a, 4);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 4);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn adc_e_adds_e_with_carry_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             e: 2,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::E);
+        adc(&mut cpu, Register::E);
 
-        assert_eq!(state.a, 4);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 4);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn adc_h_adds_h_with_carry_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             h: 2,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::H);
+        adc(&mut cpu, Register::H);
 
-        assert_eq!(state.a, 4);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 4);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn adc_l_adds_l_with_carry_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             l: 2,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::L);
+        adc(&mut cpu, Register::L);
 
-        assert_eq!(state.a, 4);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 4);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn adc_m_adds_m_with_carry_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0x00, 0x00, 0x00, 0x00, 0x00, 5],
             a: 1,
             h: 0x00,
@@ -521,54 +521,54 @@ mod test {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::M);
+        adc(&mut cpu, Register::M);
 
-        assert_eq!(state.a, 7);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 7);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn adc_a_adds_a_with_carry_to_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 1,
             flags: Flags {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        adc(&mut state, Register::A);
+        adc(&mut cpu, Register::A);
 
-        assert_eq!(state.a, 3);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 3);
+        assert_eq!(cpu.flags.carry, false);
     }
 
     #[test]
     fn aci_adds_immediate_byte_to_accumulator_with_carry() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0xFF, 0xFF, 0x00, 0x01],
             a: 0xFF,
-            ..State::default()
+            ..CPU::default()
         };
 
-        aci(&mut state);
-        assert_eq!(state.a, 0xFE);
-        assert_eq!(state.flags.carry, true);
+        aci(&mut cpu);
+        assert_eq!(cpu.a, 0xFE);
+        assert_eq!(cpu.flags.carry, true);
 
-        aci(&mut state);
-        assert_eq!(state.a, 0xFE);
-        assert_eq!(state.flags.carry, true);
+        aci(&mut cpu);
+        assert_eq!(cpu.a, 0xFE);
+        assert_eq!(cpu.flags.carry, true);
 
-        aci(&mut state);
-        assert_eq!(state.a, 0xFF);
-        assert_eq!(state.flags.carry, false);
+        aci(&mut cpu);
+        assert_eq!(cpu.a, 0xFF);
+        assert_eq!(cpu.flags.carry, false);
 
-        aci(&mut state);
-        assert_eq!(state.a, 0x00);
-        assert_eq!(state.flags.carry, true);
+        aci(&mut cpu);
+        assert_eq!(cpu.a, 0x00);
+        assert_eq!(cpu.flags.carry, true);
     }
 }

@@ -1,4 +1,4 @@
-use cpu::state::State;
+use cpu::CPU;
 
 /// Perform an unconditional return to an address
 ///
@@ -8,10 +8,10 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the return in
+/// * `cpu` - The cpu to perform the return in
 ///
-pub fn ret(state: &mut State) -> u8 {
-    state.pc = state.read_address_from_stack().unwrap();
+pub fn ret(cpu: &mut CPU) -> u8 {
+    cpu.pc = cpu.read_address_from_stack().unwrap();
 
     10
 }
@@ -25,11 +25,11 @@ pub fn ret(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the return in
+/// * `cpu` - The cpu to perform the return in
 ///
-pub fn rc(state: &mut State) -> u8 {
-    if state.flags.carry {
-        ret(state);
+pub fn rc(cpu: &mut CPU) -> u8 {
+    if cpu.flags.carry {
+        ret(cpu);
         11
     } else {
         5
@@ -45,13 +45,13 @@ pub fn rc(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the return in
+/// * `cpu` - The cpu to perform the return in
 ///
-pub fn rnc(state: &mut State) -> u8 {
-    if state.flags.carry {
+pub fn rnc(cpu: &mut CPU) -> u8 {
+    if cpu.flags.carry {
         5
     } else {
-        ret(state);
+        ret(cpu);
         11
     }
 }
@@ -65,11 +65,11 @@ pub fn rnc(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the return in
+/// * `cpu` - The cpu to perform the return in
 ///
-pub fn rz(state: &mut State) -> u8 {
-    if state.flags.zero {
-        ret(state);
+pub fn rz(cpu: &mut CPU) -> u8 {
+    if cpu.flags.zero {
+        ret(cpu);
         11
     } else {
         5
@@ -85,13 +85,13 @@ pub fn rz(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the return in
+/// * `cpu` - The cpu to perform the return in
 ///
-pub fn rnz(state: &mut State) -> u8 {
-    if state.flags.zero {
+pub fn rnz(cpu: &mut CPU) -> u8 {
+    if cpu.flags.zero {
         5
     } else {
-        ret(state);
+        ret(cpu);
         11
     }
 }
@@ -105,11 +105,11 @@ pub fn rnz(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the return in
+/// * `cpu` - The cpu to perform the return in
 ///
-pub fn rm(state: &mut State) -> u8 {
-    if state.flags.sign {
-        ret(state);
+pub fn rm(cpu: &mut CPU) -> u8 {
+    if cpu.flags.sign {
+        ret(cpu);
         11
     } else {
         5
@@ -125,13 +125,13 @@ pub fn rm(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the return in
+/// * `cpu` - The cpu to perform the return in
 ///
-pub fn rp(state: &mut State) -> u8 {
-    if state.flags.sign {
+pub fn rp(cpu: &mut CPU) -> u8 {
+    if cpu.flags.sign {
         5
     } else {
-        ret(state);
+        ret(cpu);
         11
     }
 }
@@ -145,11 +145,11 @@ pub fn rp(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the return in
+/// * `cpu` - The cpu to perform the return in
 ///
-pub fn rpe(state: &mut State) -> u8 {
-    if state.flags.parity {
-        ret(state);
+pub fn rpe(cpu: &mut CPU) -> u8 {
+    if cpu.flags.parity {
+        ret(cpu);
         11
     } else {
         5
@@ -165,13 +165,13 @@ pub fn rpe(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the return in
+/// * `cpu` - The cpu to perform the return in
 ///
-pub fn rpo(state: &mut State) -> u8 {
-    if state.flags.parity {
+pub fn rpo(cpu: &mut CPU) -> u8 {
+    if cpu.flags.parity {
         5
     } else {
-        ret(state);
+        ret(cpu);
         11
     }
 }
@@ -183,22 +183,22 @@ mod test {
 
     #[test]
     fn ret_pops_the_address_off_the_stack_and_jumps_back() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0x08 /* SP */, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
-            ..State::default()
+            ..CPU::default()
         };
 
-        ret(&mut state);
+        ret(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 0x0008);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 0x0008);
     }
 
     #[test]
     fn rc_pops_the_address_off_the_stack_and_jumps_back_if_carry_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
@@ -206,25 +206,25 @@ mod test {
                 carry: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rc(&mut state);
+        rc(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.flags.carry = true;
-        rc(&mut state);
+        cpu.flags.carry = true;
+        rc(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 0x0008);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 0x0008);
     }
 
     #[test]
     fn rnc_pops_the_address_off_the_stack_and_jumps_back_if_carry_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
@@ -232,25 +232,25 @@ mod test {
                 carry: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rnc(&mut state);
+        rnc(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.flags.carry = false;
-        rnc(&mut state);
+        cpu.flags.carry = false;
+        rnc(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 0x0008);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 0x0008);
     }
 
     #[test]
     fn rz_pops_the_address_off_the_stack_and_jumps_back_if_zero_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
@@ -258,25 +258,25 @@ mod test {
                 zero: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rz(&mut state);
+        rz(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.flags.zero = true;
-        rz(&mut state);
+        cpu.flags.zero = true;
+        rz(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 0x0008);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 0x0008);
     }
 
     #[test]
     fn rnz_pops_the_address_off_the_stack_and_jumps_back_if_zero_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
@@ -284,25 +284,25 @@ mod test {
                 zero: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rnz(&mut state);
+        rnz(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.flags.zero = false;
-        rnz(&mut state);
+        cpu.flags.zero = false;
+        rnz(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 0x0008);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 0x0008);
     }
 
     #[test]
     fn rm_pops_the_address_off_the_stack_and_jumps_back_if_sign_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
@@ -310,25 +310,25 @@ mod test {
                 sign: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rm(&mut state);
+        rm(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.flags.sign = true;
-        rm(&mut state);
+        cpu.flags.sign = true;
+        rm(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 0x0008);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 0x0008);
     }
 
     #[test]
     fn rp_pops_the_address_off_the_stack_and_jumps_back_if_sign_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
@@ -336,25 +336,25 @@ mod test {
                 sign: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rp(&mut state);
+        rp(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.flags.sign = false;
-        rp(&mut state);
+        cpu.flags.sign = false;
+        rp(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 0x0008);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 0x0008);
     }
 
     #[test]
     fn rpe_pops_the_address_off_the_stack_and_jumps_back_if_parity_flag_is_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
@@ -362,25 +362,25 @@ mod test {
                 parity: false,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rpe(&mut state);
+        rpe(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.flags.parity = true;
-        rpe(&mut state);
+        cpu.flags.parity = true;
+        rpe(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 0x0008);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 0x0008);
     }
 
     #[test]
     fn rpo_pops_the_address_off_the_stack_and_jumps_back_if_parity_flag_is_not_set() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE],
             sp: 1,
             pc: 0xDEAD,
@@ -388,19 +388,19 @@ mod test {
                 parity: true,
                 ..Flags::default()
             },
-            ..State::default()
+            ..CPU::default()
         };
 
-        rpo(&mut state);
+        rpo(&mut cpu);
 
-        assert_eq!(state.sp, 1);
-        assert_eq!(state.pc, 0xDEAD);
-        assert_eq!(state.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
+        assert_eq!(cpu.sp, 1);
+        assert_eq!(cpu.pc, 0xDEAD);
+        assert_eq!(cpu.memory, vec![0, 0x08, 0x00, 0, 0, 0, 0xAD, 0xDE]);
 
-        state.flags.parity = false;
-        rpo(&mut state);
+        cpu.flags.parity = false;
+        rpo(&mut cpu);
 
-        assert_eq!(state.sp, 3);
-        assert_eq!(state.pc, 0x0008);
+        assert_eq!(cpu.sp, 3);
+        assert_eq!(cpu.pc, 0x0008);
     }
 }

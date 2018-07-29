@@ -1,5 +1,5 @@
 use cpu::register::Register;
-use cpu::state::State;
+use cpu::CPU;
 
 /// Pop data off the stack into the specified register pair
 ///
@@ -9,29 +9,29 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the pop in
+/// * `cpu` - The cpu to perform the pop in
 /// * `register` - The register pair to pop the data into
 ///
-pub fn pop(state: &mut State, register: Register) -> u8 {
-    let least = state.read_byte_from_stack().unwrap();
-    let most = state.read_byte_from_stack().unwrap();
+pub fn pop(cpu: &mut CPU, register: Register) -> u8 {
+    let least = cpu.read_byte_from_stack().unwrap();
+    let most = cpu.read_byte_from_stack().unwrap();
 
     match register {
         Register::B => {
-            state.c = least;
-            state.b = most;
+            cpu.c = least;
+            cpu.b = most;
         }
         Register::D => {
-            state.e = least;
-            state.d = most;
+            cpu.e = least;
+            cpu.d = most;
         }
         Register::H => {
-            state.l = least;
-            state.h = most;
+            cpu.l = least;
+            cpu.h = most;
         }
         Register::PSW => {
-            state.flags.set_from_bits(least);
-            state.a = most;
+            cpu.flags.set_from_bits(least);
+            cpu.a = most;
         }
         unsupported => {
             panic!("pop doesn't support {:?}", unsupported);
@@ -47,72 +47,72 @@ mod test {
 
     #[test]
     fn pop_into_register_b_pops_two_bytes_off_the_stack_into_b_and_c() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0x15, 0x26, 0x37],
             sp: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        pop(&mut state, Register::B);
+        pop(&mut cpu, Register::B);
 
-        assert_eq!(state.c, 0x15);
-        assert_eq!(state.b, 0x26);
-        assert_eq!(state.sp, 5);
+        assert_eq!(cpu.c, 0x15);
+        assert_eq!(cpu.b, 0x26);
+        assert_eq!(cpu.sp, 5);
     }
 
     #[test]
     fn pop_into_register_d_pops_two_bytes_off_the_stack_into_d_and_e() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0x15, 0x26, 0x37],
             sp: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        pop(&mut state, Register::D);
+        pop(&mut cpu, Register::D);
 
-        assert_eq!(state.e, 0x15);
-        assert_eq!(state.d, 0x26);
-        assert_eq!(state.sp, 5);
+        assert_eq!(cpu.e, 0x15);
+        assert_eq!(cpu.d, 0x26);
+        assert_eq!(cpu.sp, 5);
     }
 
     #[test]
     fn pop_into_register_h_pops_two_bytes_off_the_stack_into_h_and_l() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0x15, 0x26, 0x37],
             sp: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        pop(&mut state, Register::H);
+        pop(&mut cpu, Register::H);
 
-        assert_eq!(state.l, 0x15);
-        assert_eq!(state.h, 0x26);
-        assert_eq!(state.sp, 5);
+        assert_eq!(cpu.l, 0x15);
+        assert_eq!(cpu.h, 0x26);
+        assert_eq!(cpu.sp, 5);
     }
 
     #[test]
     fn pop_into_psq_pops_two_bytes_off_the_stack_into_accumulator_and_flags() {
-        let mut state = State {
+        let mut cpu = CPU {
             memory: vec![0, 0, 0, 0b0100_0100, 0x26, 0b1000_0001, 0x37],
             sp: 3,
-            ..State::default()
+            ..CPU::default()
         };
 
-        pop(&mut state, Register::PSW);
+        pop(&mut cpu, Register::PSW);
 
-        assert_eq!(state.a, 0x26);
-        assert_eq!(state.sp, 5);
-        assert_eq!(state.flags.sign, false);
-        assert_eq!(state.flags.zero, true);
-        assert_eq!(state.flags.parity, true);
-        assert_eq!(state.flags.carry, false);
+        assert_eq!(cpu.a, 0x26);
+        assert_eq!(cpu.sp, 5);
+        assert_eq!(cpu.flags.sign, false);
+        assert_eq!(cpu.flags.zero, true);
+        assert_eq!(cpu.flags.parity, true);
+        assert_eq!(cpu.flags.carry, false);
 
-        pop(&mut state, Register::PSW);
-        assert_eq!(state.a, 0x37);
-        assert_eq!(state.sp, 7);
-        assert_eq!(state.flags.sign, true);
-        assert_eq!(state.flags.zero, false);
-        assert_eq!(state.flags.parity, false);
-        assert_eq!(state.flags.carry, true);
+        pop(&mut cpu, Register::PSW);
+        assert_eq!(cpu.a, 0x37);
+        assert_eq!(cpu.sp, 7);
+        assert_eq!(cpu.flags.sign, true);
+        assert_eq!(cpu.flags.zero, false);
+        assert_eq!(cpu.flags.parity, false);
+        assert_eq!(cpu.flags.carry, true);
     }
 }

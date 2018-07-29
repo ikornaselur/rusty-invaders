@@ -1,4 +1,4 @@
-use cpu::state::State;
+use cpu::CPU;
 
 /// Enable interrupts
 ///
@@ -8,10 +8,10 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to enable interrupts in
+/// * `cpu` - The cpu to enable interrupts in
 ///
-pub fn ei(state: &mut State) -> u8 {
-    state.int_enabled = true;
+pub fn ei(cpu: &mut CPU) -> u8 {
+    cpu.int_enabled = true;
 
     4
 }
@@ -24,10 +24,10 @@ pub fn ei(state: &mut State) -> u8 {
 ///
 /// # Arguments
 ///
-/// * `state` - The state to disable interrupts in
+/// * `cpu` - The cpu to disable interrupts in
 ///
-pub fn di(state: &mut State) -> u8 {
-    state.int_enabled = false;
+pub fn di(cpu: &mut CPU) -> u8 {
+    cpu.int_enabled = false;
 
     4
 }
@@ -38,25 +38,25 @@ mod test {
 
     #[test]
     fn ei_enables_interrupts() {
-        let mut state = State {
+        let mut cpu = CPU {
             int_enabled: false,
-            ..State::default()
+            ..CPU::default()
         };
 
-        ei(&mut state);
+        ei(&mut cpu);
 
-        assert_eq!(state.int_enabled, true);
+        assert_eq!(cpu.int_enabled, true);
     }
 
     #[test]
     fn di_enables_interrupts() {
-        let mut state = State {
+        let mut cpu = CPU {
             int_enabled: true,
-            ..State::default()
+            ..CPU::default()
         };
 
-        di(&mut state);
+        di(&mut cpu);
 
-        assert_eq!(state.int_enabled, false);
+        assert_eq!(cpu.int_enabled, false);
     }
 }

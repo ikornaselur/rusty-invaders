@@ -1,4 +1,4 @@
-use cpu::state::State;
+use cpu::CPU;
 
 /// Complement the accumulator
 ///
@@ -8,10 +8,10 @@ use cpu::state::State;
 ///
 /// # Arguments
 ///
-/// * `state` - The state to perform the complement in
+/// * `cpu` - The cpu to perform the complement in
 ///
-pub fn cma(state: &mut State) -> u8 {
-    state.a = !state.a;
+pub fn cma(cpu: &mut CPU) -> u8 {
+    cpu.a = !cpu.a;
 
     4
 }
@@ -22,17 +22,17 @@ mod test {
 
     #[test]
     fn cma_complements_accumulator() {
-        let mut state = State {
+        let mut cpu = CPU {
             a: 0b1100_0101,
-            ..State::default()
+            ..CPU::default()
         };
 
-        cma(&mut state);
+        cma(&mut cpu);
 
-        assert_eq!(state.a, 0b0011_1010);
+        assert_eq!(cpu.a, 0b0011_1010);
 
-        cma(&mut state);
+        cma(&mut cpu);
 
-        assert_eq!(state.a, 0b1100_0101);
+        assert_eq!(cpu.a, 0b1100_0101);
     }
 }
