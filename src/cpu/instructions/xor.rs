@@ -34,7 +34,7 @@ pub fn xra(state: &mut State, register: Register) -> u8 {
     };
 
     state.a = result;
-    state.set_flags(result, false);
+    state.flags.set(result, false);
 
     match register {
         Register::M => 7,
@@ -60,7 +60,7 @@ pub fn xri(state: &mut State) -> u8 {
     let result = state.a ^ byte;
 
     state.a = result;
-    state.set_flags(result, false);
+    state.flags.set(result, false);
 
     7
 }

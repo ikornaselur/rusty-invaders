@@ -20,37 +20,37 @@ pub fn dcr(state: &mut State, register: Register) -> u8 {
         Register::A => {
             let (result, carry) = state.a.overflowing_sub(1);
             state.a = result;
-            state.set_flags(result, carry);
+            state.flags.set(result, carry);
         }
         Register::B => {
             let (result, carry) = state.b.overflowing_sub(1);
             state.b = result;
-            state.set_flags(result, carry);
+            state.flags.set(result, carry);
         }
         Register::C => {
             let (result, carry) = state.c.overflowing_sub(1);
             state.c = result;
-            state.set_flags(result, carry);
+            state.flags.set(result, carry);
         }
         Register::D => {
             let (result, carry) = state.d.overflowing_sub(1);
             state.d = result;
-            state.set_flags(result, carry);
+            state.flags.set(result, carry);
         }
         Register::E => {
             let (result, carry) = state.e.overflowing_sub(1);
             state.e = result;
-            state.set_flags(result, carry);
+            state.flags.set(result, carry);
         }
         Register::H => {
             let (result, carry) = state.h.overflowing_sub(1);
             state.h = result;
-            state.set_flags(result, carry);
+            state.flags.set(result, carry);
         }
         Register::L => {
             let (result, carry) = state.l.overflowing_sub(1);
             state.l = result;
-            state.set_flags(result, carry);
+            state.flags.set(result, carry);
         }
         Register::M => {
             let offset = (u16::from(state.h) << 8) + u16::from(state.l);
@@ -58,7 +58,7 @@ pub fn dcr(state: &mut State, register: Register) -> u8 {
 
             let (result, carry) = byte.overflowing_sub(1);
             state.memory[offset as usize] = result;
-            state.set_flags(result, carry);
+            state.flags.set(result, carry);
         }
         unsupported => {
             panic!("add doesn't support {:?}", unsupported);

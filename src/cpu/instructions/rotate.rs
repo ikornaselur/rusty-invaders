@@ -17,7 +17,7 @@ pub fn rlc(state: &mut State) -> u8 {
     let result = state.a.rotate_left(1);
 
     state.a = result;
-    state.set_flags(result, carry);
+    state.flags.set(result, carry);
 
     4
 }
@@ -41,7 +41,7 @@ pub fn ral(state: &mut State) -> u8 {
     }
 
     state.a = result;
-    state.set_flags(result, carry);
+    state.flags.set(result, carry);
 
     4
 }
@@ -63,7 +63,7 @@ pub fn rrc(state: &mut State) -> u8 {
     let result = state.a.rotate_right(1);
 
     state.a = result;
-    state.set_flags(result, carry);
+    state.flags.set(result, carry);
 
     4
 }
@@ -87,7 +87,7 @@ pub fn rar(state: &mut State) -> u8 {
     }
 
     state.a = result;
-    state.set_flags(result, carry);
+    state.flags.set(result, carry);
 
     4
 }

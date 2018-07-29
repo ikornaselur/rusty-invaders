@@ -19,7 +19,7 @@ pub fn daa(state: &mut State) -> u8 {
     if state.a & 0xf0 > 0x90 {
         let (result, carry) = state.a.overflowing_add(0x60);
         state.a = result;
-        state.set_flags(result, carry);
+        state.flags.set(result, carry);
     }
 
     4

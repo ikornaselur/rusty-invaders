@@ -34,7 +34,7 @@ pub fn add(state: &mut State, register: Register) -> u8 {
     };
 
     state.a = result;
-    state.set_flags(result, carry);
+    state.flags.set(result, carry);
 
     match register {
         Register::M => 7,
@@ -59,7 +59,7 @@ pub fn adi(state: &mut State) -> u8 {
     let (result, carry) = state.a.overflowing_add(byte);
 
     state.a = result;
-    state.set_flags(result, carry);
+    state.flags.set(result, carry);
 
     7
 }
@@ -137,7 +137,7 @@ pub fn adc(state: &mut State, register: Register) -> u8 {
     let (result, carry) = state.a.overflowing_add(byte);
 
     state.a = result;
-    state.set_flags(result, carry || byte_carry);
+    state.flags.set(result, carry || byte_carry);
 
     match register {
         Register::M => 7,
@@ -169,7 +169,7 @@ pub fn aci(state: &mut State) -> u8 {
     let (result, carry) = state.a.overflowing_add(byte);
 
     state.a = result;
-    state.set_flags(result, carry || byte_carry);
+    state.flags.set(result, carry || byte_carry);
 
     7
 }

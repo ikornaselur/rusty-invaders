@@ -30,7 +30,7 @@ pub fn pop(state: &mut State, register: Register) -> u8 {
             state.h = most;
         }
         Register::PSW => {
-            state.set_flags_from_bits(least);
+            state.flags.set_from_bits(least);
             state.a = most;
         }
         unsupported => {

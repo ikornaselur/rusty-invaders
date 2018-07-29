@@ -33,7 +33,7 @@ pub fn cmp(state: &mut State, register: Register) -> u8 {
         }
     };
 
-    state.set_flags(result, borrow);
+    state.flags.set(result, borrow);
 
     match register {
         Register::M => 7,
@@ -58,7 +58,7 @@ pub fn cpi(state: &mut State) -> u8 {
 
     let (result, borrow) = state.a.overflowing_sub(byte);
 
-    state.set_flags(result, borrow);
+    state.flags.set(result, borrow);
 
     7
 }

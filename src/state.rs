@@ -134,20 +134,6 @@ impl State {
         self.io.set(port, byte);
     }
 
-    pub fn set_flags(&mut self, byte: u8, carry: bool) -> () {
-        self.flags.sign = (byte & 0x80) != 0;
-        self.flags.zero = byte == 0u8;
-        self.flags.parity = byte.count_ones() % 2 == 0;
-        self.flags.carry = carry;
-    }
-
-    pub fn set_flags_from_bits(&mut self, bits: u8) -> () {
-        self.flags.sign = bits & 0b1000_0000 != 0;
-        self.flags.zero = bits & 0b0100_0000 != 0;
-        self.flags.parity = bits & 0b0000_0100 != 0;
-        self.flags.carry = bits & 0b0000_0001 != 0;
-    }
-
     pub fn nop(&mut self) -> u8 {
         4
     }
@@ -535,101 +521,6 @@ impl State {
 #[cfg(test)]
 mod test {
     use super::*;
-
-    #[test]
-    fn set_flags_sets_sign_flag() {
-        let mut state = State::default();
-
-        let signed: u8 = 0b1000_0000;
-        state.set_flags(signed, false);
-        assert_eq!(state.flags.sign, true);
-
-        let unsigned: u8 = 0b0111_1111;
-        state.set_flags(unsigned, false);
-        assert_eq!(state.flags.sign, false);
-    }
-
-    #[test]
-    fn set_flags_sets_carry_flag() {
-        let mut state = State::default();
-
-        state.set_flags(0, true);
-        assert_eq!(state.flags.carry, true);
-
-        state.set_flags(0, false);
-        assert_eq!(state.flags.carry, false);
-    }
-
-    #[test]
-    fn set_flags_sets_parity_flag() {
-        let mut state = State::default();
-
-        let even1: u8 = 0b0000_0000;
-        let even2: u8 = 0b0110_0000;
-        let even3: u8 = 0b0001_1011;
-
-        state.set_flags(even1, false);
-        assert_eq!(state.flags.parity, true);
-
-        state.set_flags(even2, false);
-        assert_eq!(state.flags.parity, true);
-
-        state.set_flags(even3, false);
-        assert_eq!(state.flags.parity, true);
-
-        let odd1: u8 = 0b0000_0001;
-        let odd2: u8 = 0b0101_0001;
-        let odd3: u8 = 0b1011_0101;
-
-        state.set_flags(odd1, false);
-        assert_eq!(state.flags.parity, false);
-
-        state.set_flags(odd2, false);
-        assert_eq!(state.flags.parity, false);
-
-        state.set_flags(odd3, false);
-        assert_eq!(state.flags.parity, false);
-    }
-
-    #[test]
-    fn set_flags_from_bits_sets_flags() {
-        let mut state = State::default();
-
-        let sign = 0b1000_0000;
-        let zero = 0b0100_0000;
-        let parity = 0b0000_0100;
-        let carry = 0b0000_0001;
-
-        state.set_flags_from_bits(sign);
-        assert_eq!(state.flags.sign, true);
-        assert_eq!(state.flags.zero, false);
-        assert_eq!(state.flags.parity, false);
-        assert_eq!(state.flags.carry, false);
-
-        state.set_flags_from_bits(zero);
-        assert_eq!(state.flags.sign, false);
-        assert_eq!(state.flags.zero, true);
-        assert_eq!(state.flags.parity, false);
-        assert_eq!(state.flags.carry, false);
-
-        state.set_flags_from_bits(parity);
-        assert_eq!(state.flags.sign, false);
-        assert_eq!(state.flags.zero, false);
-        assert_eq!(state.flags.parity, true);
-        assert_eq!(state.flags.carry, false);
-
-        state.set_flags_from_bits(carry);
-        assert_eq!(state.flags.sign, false);
-        assert_eq!(state.flags.zero, false);
-        assert_eq!(state.flags.parity, false);
-        assert_eq!(state.flags.carry, true);
-
-        state.set_flags_from_bits(0b1111_1111);
-        assert_eq!(state.flags.sign, true);
-        assert_eq!(state.flags.zero, true);
-        assert_eq!(state.flags.parity, true);
-        assert_eq!(state.flags.carry, true);
-    }
 
     #[test]
     fn read_byte_returns_byte_and_increases_pc() {
