@@ -26,7 +26,9 @@ fn process_call(state: &mut State, address: u16) -> () {
 
 /// Jump to the specified address
 ///
-/// Cycles: 17
+/// # Cycles
+///
+/// 17
 ///
 /// # Arguments
 ///
@@ -42,7 +44,10 @@ pub fn call(state: &mut State) -> u8 {
 
 /// Jump to the specified address if carry bit is set
 ///
-/// Cycles: 17 if jump taken, else 11
+/// # Cycles
+///
+/// * If jump: 17
+/// * If not jump: 11
 ///
 /// # Arguments
 ///
@@ -60,7 +65,10 @@ pub fn cc(state: &mut State) -> u8 {
 
 /// Jump to the specified address if carry bit is not set
 ///
-/// Cycles: 17 if jump taken, else 11
+/// # Cycles
+///
+/// * If jump: 17
+/// * If not jump: 11
 ///
 /// # Arguments
 ///
@@ -78,7 +86,10 @@ pub fn cnc(state: &mut State) -> u8 {
 
 /// Jump to the specified address if zero bit is set
 ///
-/// Cycles: 17 if jump taken, else 11
+/// # Cycles
+///
+/// * If jump: 17
+/// * If not jump: 11
 ///
 /// # Arguments
 ///
@@ -96,7 +107,10 @@ pub fn cz(state: &mut State) -> u8 {
 
 /// Jump to the specified address if zero bit is not set
 ///
-/// Cycles: 17 if jump taken, else 11
+/// # Cycles
+///
+/// * If jump: 17
+/// * If not jump: 11
 ///
 /// # Arguments
 ///
@@ -114,7 +128,10 @@ pub fn cnz(state: &mut State) -> u8 {
 
 /// Jump to the specified address if sign bit is set
 ///
-/// Cycles: 17 if jump taken, else 11
+/// # Cycles
+///
+/// * If jump: 17
+/// * If not jump: 11
 ///
 /// # Arguments
 ///
@@ -132,7 +149,10 @@ pub fn cm(state: &mut State) -> u8 {
 
 /// Jump to the specified address if sign bit is not set
 ///
-/// Cycles: 17 if jump taken, else 11
+/// # Cycles
+///
+/// * If jump: 17
+/// * If not jump: 11
 ///
 /// # Arguments
 ///
@@ -150,7 +170,10 @@ pub fn cp(state: &mut State) -> u8 {
 
 /// Jump to the specified address if parity bit is set
 ///
-/// Cycles: 17 if jump taken, else 11
+/// # Cycles
+///
+/// * If jump: 17
+/// * If not jump: 11
 ///
 /// # Arguments
 ///
@@ -168,7 +191,10 @@ pub fn cpe(state: &mut State) -> u8 {
 
 /// Jump to the specified address if parity bit is not set
 ///
-/// Cycles: 17 if jump taken, else 11
+/// # Cycles
+///
+/// * If jump: 17
+/// * If not jump: 11
 ///
 /// # Arguments
 ///

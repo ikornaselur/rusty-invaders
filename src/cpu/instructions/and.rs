@@ -6,8 +6,8 @@ use state::{Register, State};
 ///
 /// # Cycles
 ///
-/// Register M: 7
-/// Other: 4
+/// * Register M: 7
+/// * Other: 4
 ///
 /// # Arguments
 ///

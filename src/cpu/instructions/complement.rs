@@ -2,7 +2,9 @@ use state::State;
 
 /// Complement the accumulator
 ///
-/// Cycles: 4
+/// # Cycles
+///
+/// 4
 ///
 /// # Arguments
 ///

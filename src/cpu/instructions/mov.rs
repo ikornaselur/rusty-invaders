@@ -4,8 +4,8 @@ use state::{Register, State};
 ///
 /// # Cycles
 ///
-/// To or from register M: 7
-/// Other: 5
+/// * To/from register M: 7
+/// * Other: 5
 ///
 /// # Arguments
 /// * `state` - The state to perform the move in
@@ -57,8 +57,8 @@ pub fn mov(state: &mut State, to: Register, from: Register) -> u8 {
 ///
 /// # Cycles
 ///
-/// Register M: 10
-/// Other: 7
+/// * Register M: 10
+/// * Other: 7
 ///
 /// # Arguments
 /// * `state` - The state to perform the move in

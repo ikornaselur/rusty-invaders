@@ -2,7 +2,9 @@ use state::State;
 
 /// Enable interrupts
 ///
-/// Cycles: 4
+/// # Cycles
+///
+/// 4
 ///
 /// # Arguments
 ///
@@ -16,7 +18,9 @@ pub fn ei(state: &mut State) -> u8 {
 
 /// Disable interrupts
 ///
-/// Cycles: 4
+/// # Cycles
+///
+/// 4
 ///
 /// # Arguments
 ///

@@ -4,7 +4,10 @@ use state::{Register, State};
 ///
 /// Sets conditions flags
 ///
-/// Cycles: 7 for register M, else 4
+/// # Cycles
+///
+/// * Register M: 7
+/// * Other: 4
 ///
 /// # Arguments
 ///
@@ -41,7 +44,9 @@ pub fn cmp(state: &mut State, register: Register) -> u8 {
 ///
 /// Sets conditions flags
 ///
-/// Cycles: 4
+/// # Cycles
+///
+/// 4
 ///
 /// # Arguments
 ///

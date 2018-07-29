@@ -4,7 +4,9 @@ use state::State;
 ///
 /// Sets conditions flags
 ///
-/// Cycles: 4
+/// # Cycles
+///
+/// 4
 ///
 /// # Arguments
 ///

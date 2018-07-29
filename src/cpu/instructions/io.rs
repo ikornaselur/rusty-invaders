@@ -4,7 +4,9 @@ use state::State;
 ///
 /// Goes through the io interface on the state
 ///
-/// Cycles: 10
+/// # Cycles
+///
+/// 10
 ///
 /// # Arguments
 ///
@@ -21,7 +23,9 @@ pub fn input(state: &mut State) -> u8 {
 ///
 /// Goes through the io interface on the state
 ///
-/// Cycles: 10
+/// # Cycles
+///
+/// 10
 ///
 /// # Arguments
 ///

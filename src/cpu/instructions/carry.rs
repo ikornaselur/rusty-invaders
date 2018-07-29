@@ -2,7 +2,9 @@ use state::State;
 
 /// Set the carry flag
 ///
-/// Cycles: 4
+/// # Cycles
+///
+/// 4
 ///
 /// # Arguments
 ///
@@ -15,7 +17,9 @@ pub fn stc(state: &mut State) -> u8 {
 
 /// Complement the carry flag
 ///
-/// Cycles: 4
+/// # Cycles
+///
+/// 4
 ///
 /// # Arguments
 ///

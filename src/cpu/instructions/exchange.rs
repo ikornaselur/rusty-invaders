@@ -3,7 +3,9 @@ use std::mem::swap;
 
 /// Swap the contents of register pairs HL with DE
 ///
-/// Cycles: 5
+/// # Cycles
+///
+/// 5
 ///
 /// # Arguments
 ///
@@ -18,7 +20,9 @@ pub fn xchg(state: &mut State) -> u8 {
 
 /// Swap the contents of register pairs HL with the top of the stack
 ///
-/// Cycles: 18
+/// # Cycles
+///
+/// 18
 ///
 /// # Arguments
 ///

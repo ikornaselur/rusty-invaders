@@ -4,7 +4,10 @@ use state::{Register, State};
 ///
 /// Sets condition flags
 ///
-/// Cycles: 7 for register M, else 4
+/// # Cycles
+///
+/// * Register M: 7
+/// * Other: 4
 ///
 /// # Arguments
 ///
@@ -42,7 +45,9 @@ pub fn add(state: &mut State, register: Register) -> u8 {
 ///
 /// Sets condition flags
 ///
-/// Cycles: 7
+/// # Cycles
+///
+/// 7
 ///
 /// # Arguments
 ///
@@ -62,7 +67,9 @@ pub fn adi(state: &mut State) -> u8 {
 ///
 /// Sets carry flag
 ///
-/// Cycles: 10
+/// # Cycles
+///
+/// 10
 ///
 /// # Arguments
 ///
@@ -92,7 +99,10 @@ pub fn dad(state: &mut State, register: Register) -> u8 {
 ///
 /// Sets condition codes
 ///
-/// Cycles: 7 if register M, else 4
+/// # Cycles
+///
+/// * Register M: 7
+/// * Other: 4
 ///
 /// # Arguments
 ///
@@ -138,7 +148,9 @@ pub fn adc(state: &mut State, register: Register) -> u8 {
 ///
 /// Sets condition codes
 ///
-/// Cycles: 7
+/// # Cycles
+///
+/// 7
 ///
 /// # Arguments
 ///

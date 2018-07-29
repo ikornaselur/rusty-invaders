@@ -4,7 +4,10 @@ use state::{Register, State};
 ///
 /// Sets condition flags
 ///
-/// Cycles: 10 for register M, else 5
+/// # Cycles
+///
+/// * Register M: 10
+/// * Other: 5
 ///
 /// # Arguments
 ///
@@ -71,7 +74,9 @@ pub fn dcr(state: &mut State, register: Register) -> u8 {
 ///
 /// Sets condition flags
 ///
-/// Cycles: 5
+/// # Cycles
+///
+/// 5
 ///
 /// # Arguments
 ///
