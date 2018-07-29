@@ -11,6 +11,7 @@ use std::time::Duration;
 
 use clock::Clock;
 use cpu::instructions::interrupt::di;
+use cpu::instructions::restart::rst;
 use state::State;
 
 pub mod clock;
@@ -162,12 +163,12 @@ impl Machine {
                 di(&mut self.state);
                 match self.next_interrupt {
                     1 => {
-                        self.state.rst(1);
+                        rst(&mut self.state, 1);
                         self.next_interrupt = 2;
                     }
                     2 => {
                         self.draw();
-                        self.state.rst(2);
+                        rst(&mut self.state, 2);
                         self.next_interrupt = 1;
                     }
                     _ => panic!("Invalid interrupt"),

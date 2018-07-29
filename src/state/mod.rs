@@ -1,4 +1,3 @@
-mod restart;
 mod returns;
 mod rotate;
 mod store;
@@ -23,6 +22,7 @@ use cpu::instructions::mov::{mov, mvi};
 use cpu::instructions::or::{ora, ori};
 use cpu::instructions::pop::pop;
 use cpu::instructions::push::push;
+use cpu::instructions::restart::rst;
 
 use io::IO;
 
@@ -569,14 +569,14 @@ impl State {
             0xFB => ei(self),
 
             // Restarts
-            0xC7 => self.rst(0),
-            0xCF => self.rst(1),
-            0xD7 => self.rst(2),
-            0xDF => self.rst(3),
-            0xE7 => self.rst(4),
-            0xEF => self.rst(5),
-            0xF7 => self.rst(6),
-            0xFF => self.rst(7),
+            0xC7 => rst(self, 0),
+            0xCF => rst(self, 1),
+            0xD7 => rst(self, 2),
+            0xDF => rst(self, 3),
+            0xE7 => rst(self, 4),
+            0xEF => rst(self, 5),
+            0xF7 => rst(self, 6),
+            0xFF => rst(self, 7),
 
             byte => {
                 panic!("Unknown OP: 0x{:02X?}", byte);
