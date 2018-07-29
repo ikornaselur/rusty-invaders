@@ -1,4 +1,5 @@
-use state::{Register, State};
+use cpu::register::Register;
+use state::State;
 
 /// Logical xor accumulator to register
 ///

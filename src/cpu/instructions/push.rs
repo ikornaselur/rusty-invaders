@@ -1,4 +1,5 @@
-use state::{Register, State};
+use cpu::register::Register;
+use state::State;
 
 /// Push data onto the stack from the specified register pair
 ///

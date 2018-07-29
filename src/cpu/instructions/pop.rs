@@ -1,4 +1,5 @@
-use state::{Register, State};
+use cpu::register::Register;
+use state::State;
 
 /// Pop data off the stack into the specified register pair
 ///

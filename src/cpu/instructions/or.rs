@@ -1,4 +1,5 @@
-use state::{Register, State};
+use cpu::register::Register;
+use state::State;
 
 /// Perform and or between accumulator and register and put results into the accumulator
 ///

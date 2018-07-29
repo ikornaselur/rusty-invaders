@@ -22,23 +22,9 @@ use cpu::instructions::rotate::{ral, rar, rlc, rrc};
 use cpu::instructions::store::{shld, sta, stax};
 use cpu::instructions::subtraction::{sbb, sbi, sub, sui};
 use cpu::instructions::xor::{xra, xri};
+use cpu::register::Register;
 
 use io::IO;
-
-#[derive(Debug)]
-pub enum Register {
-    A,
-    B,
-    C,
-    D,
-    E,
-    H,
-    L,
-    M,
-    SP,
-    PC,
-    PSW,
-}
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct ConditionCodes {
