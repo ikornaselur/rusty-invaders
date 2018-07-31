@@ -1,3 +1,3 @@
 lint:
-	cargo clean
-	cargo +nightly clippy
+	@touch src/**/*.rs
+	@cargo +nightly clippy
