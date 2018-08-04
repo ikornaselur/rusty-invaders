@@ -13,6 +13,7 @@ use cpu::instructions::interrupt::{di, ei};
 use cpu::instructions::io::{input, output};
 use cpu::instructions::jump::{jc, jm, jmp, jnc, jnz, jp, jpe, jpo, jz};
 use cpu::instructions::load::{lda, ldax, lhld, lxi, pchl, sphl};
+use cpu::instructions::misc::{hlt, nop};
 use cpu::instructions::mov::{mov, mvi};
 use cpu::instructions::or::{ora, ori};
 use cpu::instructions::pop::pop;
@@ -145,15 +146,6 @@ impl CPU {
         di(self);
     }
 
-    pub fn nop(&mut self) -> u8 {
-        4
-    }
-
-    pub fn hlt(&mut self) -> u8 {
-        self.exit = true;
-        7
-    }
-
     pub fn step(&mut self) -> Option<u8> {
         if self.exit {
             return None;
@@ -167,14 +159,14 @@ impl CPU {
 
         let cycles = match byte {
             // NOPs
-            0x00 => self.nop(),
-            0x08 => self.nop(),
-            0x10 => self.nop(),
-            0x18 => self.nop(),
-            0x20 => self.nop(),
-            0x28 => self.nop(),
-            0x30 => self.nop(),
-            0x38 => self.nop(),
+            0x00 => nop(),
+            0x08 => nop(),
+            0x10 => nop(),
+            0x18 => nop(),
+            0x20 => nop(),
+            0x28 => nop(),
+            0x30 => nop(),
+            0x38 => nop(),
 
             // Instructions with registers
 
@@ -501,7 +493,7 @@ impl CPU {
             0xE0 => rpo(self), // Return if parity odd
 
             // Halt
-            0x76 => self.hlt(),
+            0x76 => hlt(self),
 
             // IO
             0xD3 => output(self),

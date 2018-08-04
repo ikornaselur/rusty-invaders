@@ -12,6 +12,7 @@ pub mod interrupt;
 pub mod io;
 pub mod jump;
 pub mod load;
+pub mod misc;
 pub mod mov;
 pub mod or;
 pub mod pop;
